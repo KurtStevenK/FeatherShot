@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Swift Package Manager
+/.build
+/Packages
+.swiftpm/configuration/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# Xcode
+xcuserdata/
+DerivedData/
+
+# Build artifacts
+FeatherShot.app/
+AppIcon.iconset/
+*.dmg
+
+# External build tools (cloned at build time)
+create-dmg/
+
+# Credentials
+.netrc
+
+# Root files
+
+dmg_background.png
+FeatherShot 1.0.1.dmg
+build_release.sh
+
