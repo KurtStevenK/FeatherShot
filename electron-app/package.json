@@ -2,6 +2,10 @@
   "name": "feathershot",
   "version": "1.1.0",
   "description": "Lightweight screenshot annotations — fast and distraction-free.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KurtStevenK/FeatherShot.git"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",

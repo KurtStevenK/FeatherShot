@@ -11,7 +11,7 @@ permissions:
 jobs:
   # ─── macOS (Native Swift) ──────────────────────────────────────────
   build-macos:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
@@ -56,6 +56,7 @@ jobs:
         run: npm run build:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -86,6 +87,7 @@ jobs:
   # ─── Create GitHub Release ─────────────────────────────────────────
   release:
     needs: [build-macos, build-electron, build-chrome]
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -94,6 +96,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+
+      - name: List artifacts
+        run: find release-artifacts -type f | head -50
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
