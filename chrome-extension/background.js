@@ -1,15 +1,13 @@
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === 'capture') {
-    chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
-      if (chrome.runtime.lastError) {
-        console.error('Capture failed:', chrome.runtime.lastError.message);
-        return;
-      }
-      // Open the editor in a new tab, passing screenshot data via URL
-      const editorUrl = chrome.runtime.getURL('editor.html');
-      chrome.storage.local.set({ screenshotData: dataUrl }, () => {
-        chrome.tabs.create({ url: editorUrl });
-      });
+// Capture immediately when the extension icon is clicked — no popup
+chrome.action.onClicked.addListener((tab) => {
+  chrome.tabs.captureVisibleTab(null, { format: 'png' }, (dataUrl) => {
+    if (chrome.runtime.lastError) {
+      console.error('Capture failed:', chrome.runtime.lastError.message);
+      return;
+    }
+    // Store screenshot and open editor in a new tab
+    chrome.storage.local.set({ screenshotData: dataUrl }, () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('editor.html') });
     });
-  }
+  });
 });
