@@ -1,0 +1,107 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ─── macOS (Native Swift) ──────────────────────────────────────────
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Release Binary
+        run: swift build -c release
+
+      - name: Build App Bundle & DMG
+        run: |
+          chmod +x build_release.sh
+          ./build_release.sh
+
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dmg
+          path: "FeatherShot *.dmg"
+
+  # ─── Windows & Linux (Electron) ────────────────────────────────────
+  build-electron:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        working-directory: electron-app
+        run: npm ci
+
+      - name: Build Electron App
+        working-directory: electron-app
+        run: npm run build:${{ matrix.platform }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-${{ matrix.platform }}
+          path: |
+            electron-app/dist/*.exe
+            electron-app/dist/*.deb
+            electron-app/dist/*.AppImage
+
+  # ─── Chrome Extension ──────────────────────────────────────────────
+  build-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package Chrome Extension
+        run: |
+          cd chrome-extension
+          zip -r ../FeatherShot-Chrome-Extension.zip . -x ".*"
+
+      - name: Upload Chrome Extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: FeatherShot-Chrome-Extension.zip
+
+  # ─── Create GitHub Release ─────────────────────────────────────────
+  release:
+    needs: [build-macos, build-electron, build-chrome]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.deb
+            release-artifacts/**/*.AppImage
+            release-artifacts/**/*.zip

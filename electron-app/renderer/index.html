@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FeatherShot Editor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="editor">
+    <div id="canvas-container">
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div id="toolbar">
+      <div class="tool-group">
+        <button id="tool-arrow" class="tool-btn active" title="Arrow (A)">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+        <button id="tool-step-arrow" class="tool-btn" title="Step Arrow (S)">
+          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="8" fill="currentColor">1</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+        <button id="tool-rect" class="tool-btn" title="Rectangle (R)">
+          <svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+        </button>
+      </div>
+
+      <div class="separator"></div>
+
+      <div class="tool-group">
+        <input type="color" id="color-picker" value="#FF3B30" title="Color">
+        <div class="width-control">
+          <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width">
+          <span id="width-label">4px</span>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="tool-group actions">
+        <button id="btn-undo" class="action-btn" title="Undo (Ctrl+Z)">Undo</button>
+        <button id="btn-clear" class="action-btn danger" title="Clear All">Clear</button>
+        <button id="btn-save" class="action-btn primary" title="Save & Copy (Ctrl+S)">
+          💾 Save & Copy
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

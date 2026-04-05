@@ -11,7 +11,7 @@
 xcuserdata/
 DerivedData/
 
-# Build artifacts
+# Build artifacts (macOS)
 FeatherShot.app/
 AppIcon.iconset/
 *.dmg
@@ -22,9 +22,15 @@ create-dmg/
 # Credentials
 .netrc
 
-# Root files
+# Node.js / Electron
+node_modules/
+electron-app/node_modules/
+electron-app/dist/
+electron-app/out/
 
+# Chrome Extension build
+*.crx
+FeatherShot-Chrome-Extension.zip
+
+# Generated files
 dmg_background.png
-FeatherShot 1.0.1.dmg
-build_release.sh
-

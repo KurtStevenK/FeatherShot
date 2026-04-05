@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FeatherShot — Lightweight Screenshot Annotations</title>
+  <meta name="description" content="Capture, annotate, and share screenshots instantly. Available for macOS, Windows, Linux, and Chrome.">
+  <link rel="icon" type="image/png" href="../icon_1024.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════ NAV ═══════════════════ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <img src="../icon_1024.png" alt="FeatherShot" width="32" height="32">
+        <span>FeatherShot</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/KurtStevenK/FeatherShot" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════ HERO ═══════════════════ -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="badge">✨ v1.1.0 — Now on Windows, Linux & Chrome</div>
+      <h1>Screenshot.<br><span class="gradient-text">Annotate.</span><br>Share.</h1>
+      <p class="subtitle">
+        Lightweight screenshot annotations — fast, native, and distraction-free.
+        No bloat. No subscription. Open source.
+      </p>
+      <div class="hero-actions">
+        <a href="#download" class="btn btn-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          Download Free
+        </a>
+        <a href="https://github.com/KurtStevenK/FeatherShot" class="btn btn-ghost" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          View Source
+        </a>
+      </div>
+
+      <div class="platform-pills">
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/><path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11"/></svg> macOS</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg> Windows</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.504 0c-.155 0-.311.001-.465.003-.788.01-1.576.06-2.348.175-1.424.213-2.792.667-4.032 1.333-.932.5-1.786 1.123-2.537 1.843-.752.721-1.403 1.545-1.927 2.444C.62 6.838.157 7.982 0 9.168l.001.237c.009 1.206.191 2.43.564 3.597.371 1.16.922 2.271 1.623 3.278.7 1.003 1.549 1.9 2.507 2.66.952.757 2.009 1.377 3.14 1.831.89.357 1.822.617 2.771.743.68.09 1.37.13 2.06.116.69-.013 1.38-.08 2.057-.2.902-.157 1.786-.422 2.626-.788 1.107-.483 2.123-1.13 3.009-1.915.886-.786 1.642-1.711 2.233-2.73.593-1.02 1.02-2.136 1.25-3.294.133-.668.21-1.348.232-2.031.01-.313.011-.626.001-.939C23.998 8.544 23.76 7.206 23.267 5.97c-.5-1.249-1.24-2.394-2.174-3.363C20.159 1.637 19.04.882 17.799.381 16.78-.027 15.693-.14 14.606.089c-.307.064-.604.16-.889.281-.474.2-.916.46-1.32.774-.203-.012-.403-.032-.608-.038-.096-.003-.193-.003-.29-.003z"/></svg> Linux</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 7.09l.002.001h-.002l-3.953 6.848c.497.048 1.002.075 1.512.08 6.47.048 11.718-5.14 11.718-11.594 0-.215-.006-.43-.018-.644z"/></svg> Chrome</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FEATURES ═══════════════════ -->
+  <section id="features" class="features">
+    <div class="container">
+      <h2 class="section-title">Powerful Annotation Tools</h2>
+      <p class="section-sub">Everything you need. Nothing you don't.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">↗</div>
+          <h3>Arrow Tool</h3>
+          <p>Draw clean, directional arrows with elegant filled arrowheads to point out details.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">1→</div>
+          <h3>Step Arrow</h3>
+          <p>Arrows with auto-incrementing numbered circles — perfect for step-by-step guides.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">▢</div>
+          <h3>Rectangle</h3>
+          <p>Highlight regions with outlined rectangles to draw attention to specific areas.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Color Picker</h3>
+          <p>Choose any annotation color with a full-spectrum color wheel.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📏</div>
+          <h3>Line Width</h3>
+          <p>Adjust stroke thickness from 2px to 15px for just the right emphasis.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3>Save & Copy</h3>
+          <p>One click saves to Downloads and copies to clipboard simultaneously.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ DOWNLOAD ═══════════════════ -->
+  <section id="download" class="download">
+    <div class="container">
+      <h2 class="section-title">Download FeatherShot</h2>
+      <p class="section-sub">Free and open source. Pick your platform.</p>
+
+      <div class="download-grid">
+        <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
+          <div class="download-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/><path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11"/></svg>
+          </div>
+          <h3>macOS</h3>
+          <span class="download-format">.dmg — Native Swift App</span>
+          <span class="download-req">macOS 14 (Sonoma) or later</span>
+        </a>
+
+        <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
+          <div class="download-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+          </div>
+          <h3>Windows</h3>
+          <span class="download-format">.exe — Installer or Portable</span>
+          <span class="download-req">Windows 10 or later</span>
+        </a>
+
+        <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
+          <div class="download-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12.504 0c-.155 0-.311.001-.465.003-.788.01-1.576.06-2.348.175-1.424.213-2.792.667-4.032 1.333-.932.5-1.786 1.123-2.537 1.843-.752.721-1.403 1.545-1.927 2.444C.62 6.838.157 7.982 0 9.168l.001.237c.009 1.206.191 2.43.564 3.597.371 1.16.922 2.271 1.623 3.278.7 1.003 1.549 1.9 2.507 2.66.952.757 2.009 1.377 3.14 1.831.89.357 1.822.617 2.771.743.68.09 1.37.13 2.06.116.69-.013 1.38-.08 2.057-.2.902-.157 1.786-.422 2.626-.788 1.107-.483 2.123-1.13 3.009-1.915.886-.786 1.642-1.711 2.233-2.73.593-1.02 1.02-2.136 1.25-3.294.133-.668.21-1.348.232-2.031.01-.313.011-.626.001-.939C23.998 8.544 23.76 7.206 23.267 5.97c-.5-1.249-1.24-2.394-2.174-3.363C20.159 1.637 19.04.882 17.799.381 16.78-.027 15.693-.14 14.606.089c-.307.064-.604.16-.889.281-.474.2-.916.46-1.32.774-.203-.012-.403-.032-.608-.038-.096-.003-.193-.003-.29-.003z"/></svg>
+          </div>
+          <h3>Linux</h3>
+          <span class="download-format">.deb / .AppImage</span>
+          <span class="download-req">Ubuntu 22.04+, Debian, Fedora</span>
+        </a>
+
+        <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card chrome">
+          <div class="download-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 7.09l.002.001h-.002l-3.953 6.848c.497.048 1.002.075 1.512.08 6.47.048 11.718-5.14 11.718-11.594 0-.215-.006-.43-.018-.644z"/></svg>
+          </div>
+          <h3>Chrome Extension</h3>
+          <span class="download-format">Browser Extension</span>
+          <span class="download-req">Chrome, Edge, Brave, Arc</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <img src="../icon_1024.png" alt="FeatherShot" width="28" height="28">
+          <span>FeatherShot</span>
+        </div>
+        <p>Built with ❤️ and Swift · Open Source under MIT License</p>
+        <p>Copyright © 2026 <a href="https://github.com/KurtStevenK">Kurt Steven Kainzmayer</a></p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
