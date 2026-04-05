@@ -87,7 +87,6 @@ jobs:
         working-directory: electron-app
         run: npm run build:${{ matrix.platform }}
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
       - name: Upload Artifacts
