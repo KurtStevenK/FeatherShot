@@ -61,6 +61,28 @@ jobs:
         working-directory: electron-app
         run: npm ci
 
+      - name: Generate Platform Icons
+        working-directory: electron-app
+        shell: bash
+        run: |
+          if [[ "${{ matrix.platform }}" == "win" ]]; then
+            # Windows needs .ico — use electron-icon-builder or convert with magick
+            npm install --no-save png2icons 2>/dev/null || true
+            npx -y electron-icon-maker --input=../icon_1024.png --output=assets 2>/dev/null || true
+            # Fallback: if ico wasn't created, install imagemagick
+            if [ ! -f assets/icon.ico ] && [ ! -f assets/icons/win/icon.ico ]; then
+              if command -v magick >/dev/null 2>&1; then
+                magick ../icon_1024.png -define icon:auto-resize=256,128,64,48,32,16 assets/icon.ico
+              elif command -v convert >/dev/null 2>&1; then
+                convert ../icon_1024.png -define icon:auto-resize=256,128,64,48,32,16 assets/icon.ico
+              fi
+            fi
+            # Copy from nested output if needed
+            if [ -f assets/icons/win/icon.ico ] && [ ! -f assets/icon.ico ]; then
+              cp assets/icons/win/icon.ico assets/icon.ico
+            fi
+          fi
+
       - name: Build Electron App
         working-directory: electron-app
         run: npm run build:${{ matrix.platform }}
