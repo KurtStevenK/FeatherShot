@@ -68,6 +68,9 @@
   "dependencies": {
     "screenshot-desktop": "^1.15.0"
   },
-  "author": "Kurt Steven Kainzmayer",
+  "author": {
+    "name": "Kurt Steven Kainzmayer",
+    "email": "info@gfelektro.com"
+  },
   "license": "MIT"
 }

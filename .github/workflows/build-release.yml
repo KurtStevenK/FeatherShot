@@ -18,6 +18,16 @@ jobs:
       - name: Build Release Binary
         run: swift build -c release
 
+      - name: Generate DMG Background
+        run: |
+          if [ -f generate_assets.swift ]; then
+            swift generate_assets.swift || true
+          fi
+          # Create a simple background if generate_assets didn't produce one
+          if [ ! -f dmg_background.png ]; then
+            sips -z 400 600 icon_1024.png --out dmg_background.png 2>/dev/null || true
+          fi
+
       - name: Build App Bundle & DMG
         run: |
           chmod +x build_release.sh
