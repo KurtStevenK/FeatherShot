@@ -5,6 +5,27 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-04-06
+
+### Added
+
+- **Step Rectangle Tool** — New annotation tool that draws rectangles with auto-incrementing numbered circles at the top-left corner. Perfect for highlighting multiple regions with ordered callouts. Available on all platforms (macOS, Windows, Linux, Chrome Extension).
+- **Area Selection (Windows & Linux)** — Clicking the tray icon now shows a fullscreen overlay where you can drag to select exactly the area you want to capture, matching the macOS behavior. No more mandatory fullscreen captures.
+- **Area Selection (Chrome Extension)** — Clicking the extension icon now injects a selection overlay into the active tab. Drag to select an area, then only the selected region opens in the annotation editor.
+- **Multi-Monitor Support (Electron)** — Area selection overlay spans all connected displays for seamless multi-monitor screenshot capture.
+- **Landing Page SEO** — Added Open Graph meta tags, Twitter Card, keywords, author, canonical URL, and theme color for better social sharing and search engine visibility.
+
+### Changed
+
+- **Tool order redesigned** — Counting tools (Step Arrow, Step Rectangle) are now first in the toolbar, followed by plain tools (Arrow, Rectangle). Step Arrow is the new default tool.
+- **macOS editor window** — Now resizable and miniaturizable. Window size is clamped to the visible screen area so full-screen captures no longer push toolbar buttons behind the system title bar.
+- **Version bumped** to 1.1.1 across all configuration files (`Info.plist`, `build_release.sh`, `generate_assets.swift`, `electron-app/package.json`, `chrome-extension/manifest.json`).
+
+### Fixed
+
+- **macOS fullscreen capture overflow** — Annotation editor window was larger than the screen when capturing the full display, causing buttons and tools to be hidden behind the toolbar and making the window non-resizable. Window now auto-fits within screen bounds with a minimum size of 600×360.
+- **Electron editor not resizable** — Editor window now has a minimum size and can be freely resized by the user.
+
 ## [1.1.0] - 2026-04-05
 
 ### Added
@@ -55,6 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/KurtStevenK/FeatherShot/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/KurtStevenK/FeatherShot/releases/tag/v1.0.0

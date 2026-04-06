@@ -4,7 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FeatherShot — Lightweight Screenshot Annotations</title>
-  <meta name="description" content="Capture, annotate, and share screenshots instantly. Available for macOS, Windows, Linux, and Chrome.">
+  <meta name="description" content="Capture, annotate, and share screenshots instantly. Arrows, numbered steps, rectangles — all in a fast, native app. Available for macOS, Windows, Linux, and Chrome.">
+  <meta name="keywords" content="screenshot, annotation, screenshot tool, screen capture, annotate screenshots, arrow tool, step arrow, rectangle, macOS, Windows, Linux, Chrome extension, open source, free">
+  <meta name="author" content="Kurt Steven Kainzmayer">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0066FF">
+  <link rel="canonical" href="https://kurtstevenk.github.io/FeatherShot/">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kurtstevenk.github.io/FeatherShot/">
+  <meta property="og:title" content="FeatherShot — Lightweight Screenshot Annotations">
+  <meta property="og:description" content="Capture, annotate, and share screenshots instantly. Fast, native, open source. Available for macOS, Windows, Linux, and Chrome.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/KurtStevenK/FeatherShot/main/icon_1024.png">
+  <meta property="og:image:width" content="1024">
+  <meta property="og:image:height" content="1024">
+  <meta property="og:site_name" content="FeatherShot">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FeatherShot — Lightweight Screenshot Annotations">
+  <meta name="twitter:description" content="Capture, annotate, and share screenshots instantly. Fast, native, open source.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/KurtStevenK/FeatherShot/main/icon_1024.png">
+
   <link rel="icon" type="image/png" href="icon_1024.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +54,7 @@
   <section class="hero">
     <div class="hero-glow"></div>
     <div class="hero-content">
-      <div class="badge">✨ v1.1.0 — Now on Windows, Linux & Chrome</div>
+      <div class="badge">✨ v1.1.1 — Area Selection & Step Rectangles</div>
       <h1>Screenshot.<br><span class="gradient-text">Annotate.</span><br>Share.</h1>
       <p class="subtitle">
         Lightweight screenshot annotations — fast, native, and distraction-free.
@@ -66,14 +88,19 @@
 
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">↗</div>
-          <h3>Arrow Tool</h3>
-          <p>Draw clean, directional arrows with elegant filled arrowheads to point out details.</p>
-        </div>
-        <div class="feature-card">
           <div class="feature-icon">1→</div>
           <h3>Step Arrow</h3>
           <p>Arrows with auto-incrementing numbered circles — perfect for step-by-step guides.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">1▢</div>
+          <h3>Step Rectangle</h3>
+          <p>Numbered rectangles that auto-increment — highlight regions with ordered callouts.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">↗</div>
+          <h3>Arrow Tool</h3>
+          <p>Draw clean, directional arrows with elegant filled arrowheads to point out details.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">▢</div>
@@ -89,6 +116,11 @@
           <div class="feature-icon">📏</div>
           <h3>Line Width</h3>
           <p>Adjust stroke thickness from 2px to 15px for just the right emphasis.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✂️</div>
+          <h3>Area Selection</h3>
+          <p>Select exactly the area you want to capture — no more cropping afterwards.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">💾</div>

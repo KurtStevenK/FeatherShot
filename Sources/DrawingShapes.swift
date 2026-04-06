@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum Tool {
-    case arrow, rectangle, stepArrow
+    case stepArrow, stepRectangle, arrow, rectangle
 }
 
 struct DrawingElement: Identifiable {
@@ -110,6 +110,46 @@ struct StepArrowView: View {
                 .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .position(x: start.x, y: start.y)
+        }
+    }
+}
+
+// View for drawing counting step rectangles
+struct StepRectangleView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    var stepNumber: Int
+    
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        let drawingRect = CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: abs(end.x - start.x),
+            height: abs(end.y - start.y)
+        )
+        // Place the number circle at the top-left corner of the rectangle
+        let circleX = drawingRect.minX
+        let circleY = drawingRect.minY
+        
+        ZStack(alignment: .topLeading) {
+            // Rectangle
+            RectangleShape(start: start, end: end)
+                .stroke(color, lineWidth: lineWidth)
+            
+            // Number Circle at top-left corner
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: circleX, y: circleY)
+                
+            // The number text
+            Text("\(stepNumber)")
+                .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: circleX, y: circleY)
         }
     }
 }

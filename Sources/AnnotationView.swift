@@ -8,7 +8,7 @@ struct AnnotationView: View {
     @State private var currentStart: CGPoint?
     @State private var currentEnd: CGPoint?
     
-    @State private var selectedTool: Tool = .arrow
+    @State private var selectedTool: Tool = .stepArrow
     @State private var selectedColor: Color = .red
     @State private var lineWidth: CGFloat = 4.0
 
@@ -77,6 +77,9 @@ struct AnnotationView: View {
                 } else if drawing.tool == .stepArrow {
                     let stepNum = drawings[0...index].filter { $0.tool == .stepArrow }.count
                     StepArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
+                } else if drawing.tool == .stepRectangle {
+                    let stepNum = drawings[0...index].filter { $0.tool == .stepRectangle }.count
+                    StepRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
                 } else {
                     RectangleShape(start: drawing.start, end: drawing.end)
                         .stroke(drawing.color, lineWidth: drawing.lineWidth)
@@ -90,6 +93,9 @@ struct AnnotationView: View {
                 } else if selectedTool == .stepArrow {
                     let stepNum = drawings.filter { $0.tool == .stepArrow }.count + 1
                     StepArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
+                } else if selectedTool == .stepRectangle {
+                    let stepNum = drawings.filter { $0.tool == .stepRectangle }.count + 1
+                    StepRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
                 } else {
                     RectangleShape(start: start, end: end)
                         .stroke(selectedColor, lineWidth: lineWidth)
@@ -102,18 +108,8 @@ struct AnnotationView: View {
     
     var toolbar: some View {
         HStack(spacing: 12) {
-            // Tool Selection
+            // Tool Selection — counting tools first, then plain tools
             HStack(spacing: 0) {
-                Button(action: { selectedTool = .arrow }) {
-                    Image(systemName: "arrow.up.right")
-                        .padding(8)
-                        .background(selectedTool == .arrow ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTool == .arrow ? .white : .primary)
-                }
-                .buttonStyle(.plain)
-                
-                Divider().frame(height: 20)
-                
                 Button(action: { selectedTool = .stepArrow }) {
                     Image(systemName: "list.number")
                         .padding(8)
@@ -121,6 +117,29 @@ struct AnnotationView: View {
                         .foregroundColor(selectedTool == .stepArrow ? .white : .primary)
                 }
                 .buttonStyle(.plain)
+                .help("Step Arrow")
+                
+                Divider().frame(height: 20)
+                
+                Button(action: { selectedTool = .stepRectangle }) {
+                    Image(systemName: "number.square")
+                        .padding(8)
+                        .background(selectedTool == .stepRectangle ? Color.blue : Color.clear)
+                        .foregroundColor(selectedTool == .stepRectangle ? .white : .primary)
+                }
+                .buttonStyle(.plain)
+                .help("Step Rectangle")
+                
+                Divider().frame(height: 20)
+                
+                Button(action: { selectedTool = .arrow }) {
+                    Image(systemName: "arrow.up.right")
+                        .padding(8)
+                        .background(selectedTool == .arrow ? Color.blue : Color.clear)
+                        .foregroundColor(selectedTool == .arrow ? .white : .primary)
+                }
+                .buttonStyle(.plain)
+                .help("Arrow")
                 
                 Divider().frame(height: 20)
                 
@@ -131,6 +150,7 @@ struct AnnotationView: View {
                         .foregroundColor(selectedTool == .rectangle ? .white : .primary)
                 }
                 .buttonStyle(.plain)
+                .help("Rectangle")
             }
             .background(Color.gray.opacity(0.1))
             .cornerRadius(8)

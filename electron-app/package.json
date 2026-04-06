@@ -1,6 +1,6 @@
 {
   "name": "feathershot",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Lightweight screenshot annotations — fast and distraction-free.",
   "repository": {
     "type": "git",
@@ -29,11 +29,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico"
@@ -48,11 +52,15 @@
       "target": [
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.png",
@@ -70,7 +78,7 @@
   },
   "author": {
     "name": "Kurt Steven Kainzmayer",
-    "email": "info@gfelektro.com"
+    "email": "kurt.steven.kainzmyer@gmail.com"
   },
   "license": "MIT"
 }

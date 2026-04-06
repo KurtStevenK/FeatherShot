@@ -33,4 +33,11 @@ electron-app/out/
 FeatherShot-Chrome-Extension.zip
 
 # Generated files
-dmg_background.png
+FeatherShot 1.0.1.dmg
+
+# personal
+.agents/workflows/git-setup.md
+
+# Chat history
+.privatehistory/
+.privatefiles/

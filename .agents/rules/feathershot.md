@@ -37,11 +37,26 @@ See `.agents/workflows/add-tool.md` for the full walkthrough.
 
 ## Version Bumping
 
-The version string (`CFBundleShortVersionString` / `CFBundleVersion`) exists in **3 places** — all must be updated together:
+The version string exists in **7 places** across all platforms — all must be updated together:
 
-1. `Info.plist` — lines 12 and 14
-2. `build_release.sh` — lines 46, 48, 75, and 86 (version in bundle plist + DMG filename)
-3. `generate_assets.swift` — line 101 (DMG background "Version X.X.X" text)
+### macOS (Swift)
+
+- `Info.plist` — `CFBundleShortVersionString` and `CFBundleVersion`
+- `build_release.sh` — bundle plist versions + DMG filename (4 occurrences)
+- `generate_assets.swift` — DMG background "Version X.X.X" text
+
+### Electron (Windows & Linux)
+
+- `electron-app/package.json` — `version` field
+
+### Chrome Extension
+
+- `chrome-extension/manifest.json` — `version` field
+- `chrome-extension/popup.html` — displayed version text
+
+### Documentation
+
+- `docs/index.html` — version badge in hero section
 
 Always update `CHANGELOG.md` when bumping the version.
 

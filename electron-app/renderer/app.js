@@ -5,21 +5,23 @@ const os = require('os');
 
 // --- State ---
 let screenshotImage = null;
-let tool = 'arrow';
+let tool = 'step-arrow'; // Default to counting arrows
 let color = '#FF3B30';
 let lineWidth = 4;
 let drawings = [];
 let currentDraw = null;
-let stepCount = 0;
+let stepArrowCount = 0;
+let stepRectCount = 0;
 let isDragging = false;
 
 // --- DOM ---
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// Tool buttons
-document.getElementById('tool-arrow').addEventListener('click', () => setTool('arrow'));
+// Tool buttons (order: step-arrow, step-rect, arrow, rect)
 document.getElementById('tool-step-arrow').addEventListener('click', () => setTool('step-arrow'));
+document.getElementById('tool-step-rect').addEventListener('click', () => setTool('step-rect'));
+document.getElementById('tool-arrow').addEventListener('click', () => setTool('arrow'));
 document.getElementById('tool-rect').addEventListener('click', () => setTool('rect'));
 
 // Controls
@@ -36,9 +38,10 @@ document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'a') setTool('arrow');
-  if (e.key === 's' && !e.ctrlKey && !e.metaKey) setTool('step-arrow');
-  if (e.key === 'r') setTool('rect');
+  if (e.key === '1') setTool('step-arrow');
+  if (e.key === '2') setTool('step-rect');
+  if (e.key === '3' || e.key === 'a') setTool('arrow');
+  if (e.key === '4' || e.key === 'r') setTool('rect');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
@@ -79,8 +82,11 @@ canvas.addEventListener('mousemove', (e) => {
 canvas.addEventListener('mouseup', () => {
   if (currentDraw) {
     if (currentDraw.tool === 'step-arrow') {
-      stepCount++;
-      currentDraw.stepNumber = stepCount;
+      stepArrowCount++;
+      currentDraw.stepNumber = stepArrowCount;
+    } else if (currentDraw.tool === 'step-rect') {
+      stepRectCount++;
+      currentDraw.stepNumber = stepRectCount;
     }
     drawings.push(currentDraw);
     currentDraw = null;
@@ -97,11 +103,14 @@ function render() {
   ctx.drawImage(screenshotImage, 0, 0);
 
   // Draw completed
-  let step = 0;
+  let stepA = 0, stepR = 0;
   drawings.forEach(d => {
     if (d.tool === 'step-arrow') {
-      step++;
-      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, step);
+      stepA++;
+      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepA);
+    } else if (d.tool === 'step-rect') {
+      stepR++;
+      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepR);
     } else if (d.tool === 'arrow') {
       drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else {
@@ -112,7 +121,9 @@ function render() {
   // Draw active
   if (currentDraw) {
     if (currentDraw.tool === 'step-arrow') {
-      drawStepArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepCount + 1);
+      drawStepArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepArrowCount + 1);
+    } else if (currentDraw.tool === 'step-rect') {
+      drawStepRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepRectCount + 1);
     } else if (currentDraw.tool === 'arrow') {
       drawArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     } else {
@@ -182,17 +193,39 @@ function drawRect(ctx, x1, y1, x2, y2, color, lw) {
   ctx.stroke();
 }
 
+function drawStepRect(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+
+  const radius = Math.max(12, lw * 3);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+
+  // Circle at top-left corner
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Number
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${radius * 1.2}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(num.toString(), cx, cy);
+}
+
 // --- Actions ---
 function setTool(t) {
   tool = t;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + t.replace('-', '-')).classList.add('active');
+  document.getElementById('tool-' + t).classList.add('active');
 }
 
 function undo() {
   if (drawings.length > 0) {
     const removed = drawings.pop();
-    if (removed.tool === 'step-arrow') stepCount = Math.max(0, stepCount - 1);
+    if (removed.tool === 'step-arrow') stepArrowCount = Math.max(0, stepArrowCount - 1);
+    if (removed.tool === 'step-rect') stepRectCount = Math.max(0, stepRectCount - 1);
     render();
     updateUndoState();
   }
@@ -200,7 +233,8 @@ function undo() {
 
 function clearAll() {
   drawings = [];
-  stepCount = 0;
+  stepArrowCount = 0;
+  stepRectCount = 0;
   render();
   updateUndoState();
 }

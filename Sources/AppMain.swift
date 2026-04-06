@@ -140,13 +140,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.annotationWindow?.close()
         }
 
-        // Use a generous minimum size to ensure the toolbar looks great even for small captures
-        let windowWidth = max(nsImage.size.width, 600)
-        let windowHeight = max(nsImage.size.height, 300) + 60
+        // Clamp window to visible screen to prevent buttons hiding behind toolbar
+        let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
+        let toolbarHeight: CGFloat = 60
+        let padding: CGFloat = 40
+        let maxWidth = screenFrame.width - padding
+        let maxHeight = screenFrame.height - padding
+
+        let windowWidth = min(max(nsImage.size.width, 600), maxWidth)
+        let windowHeight = min(max(nsImage.size.height, 300) + toolbarHeight, maxHeight)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: windowHeight),
-            styleMask: [.titled, .closable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
@@ -158,6 +164,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.level = .floating
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden // Cleaner look
+        window.minSize = NSSize(width: 600, height: 360)
 
         self.annotationWindow = window
         NSApp.activate(ignoringOtherApps: true)
