@@ -254,5 +254,5 @@ Copyright © 2026 Kurt Steven Kainzmayer
 ---
 
 <p align="center">
-  <sub>Built with ❤️ and Swift · Crafted by <a href="https://github.com/KurtStevenK">Kurt Steven Kainzmayer</a></sub>
+  <sub>Built with ❤️ · Crafted by <a href="https://github.com/KurtStevenK">Kurt Steven Kainzmayer</a></sub>
 </p>
