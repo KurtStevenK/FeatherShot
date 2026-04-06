@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.0-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.1-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.1.0:** FeatherShot is now available on **Windows**, **Linux**, and as a **Chrome Extension** — in addition to the native macOS app!
+> **New in v1.1.1:** **Step Rectangle** tool, **area selection** on all platforms (Windows, Linux, Chrome), macOS editor window fixes, and reordered toolbar with counting tools first.
 
 ---
 
@@ -58,8 +58,9 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 | Tool | Icon | Description |
 | --- | --- | --- |
+| **Step Arrow** ⭐ | `1→ 2→ 3→` | Arrows with **auto-incrementing numbered circles** at the start — perfect for step-by-step guides and tutorials. Default tool. |
+| **Step Rectangle** | `1▢ 2▢ 3▢` | Rectangles with **auto-incrementing numbered circles** at the top-left corner — highlight multiple regions with ordered callouts. |
 | **Arrow** | `↗` | Draw clean, directional arrows with elegant filled arrowheads. |
-| **Step Arrow** | `1→ 2→ 3→` | Arrows with **auto-incrementing numbered circles** at the start — perfect for step-by-step guides and tutorials. |
 | **Rectangle** | `▢` | Highlight regions with outlined rectangles to draw attention to specific areas. |
 
 ### Additional Controls
@@ -84,14 +85,17 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 1. FeatherShot appears as a **tray icon** in your system tray.
 2. Left-click the icon (or right-click → Take Screenshot).
-3. The full screen is captured and the **annotation editor** opens.
-4. Annotate and click **Save & Copy**.
+3. A **selection overlay** appears — **drag to select the area** you want to capture.
+4. The **annotation editor** opens with your selected region.
+5. Annotate and click **Save & Copy**.
+
+> **Tip:** The selection overlay spans all connected monitors for multi-monitor support. Press **Esc** to cancel.
 
 ### Chrome Extension
 
 1. Click the **FeatherShot** icon in your browser toolbar.
-2. Click **"Capture This Tab"** — the current page is captured.
-3. A new tab opens with the annotation editor.
+2. A **selection overlay** appears on the current tab — **drag to select an area**.
+3. A new tab opens with the annotation editor showing only the selected region.
 4. Annotate and click **Save & Download**.
 
 ---
@@ -188,18 +192,21 @@ A lean, 3-file Swift application:
 Sources/
 ├── AppMain.swift          # Menu bar app lifecycle, screen capture, window management
 ├── AnnotationView.swift   # SwiftUI editor with canvas, toolbar, save/export
-└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, StepArrow, Rectangle)
+└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, StepArrow, Rectangle, StepRectangle)
 ```
 
 ### Windows & Linux (Electron)
 
 ```text
 electron-app/
-├── main.js                # System tray, screen capture, window management
+├── main.js                # System tray, area selection, screen capture, window management
 └── renderer/
     ├── index.html         # Editor UI
     ├── style.css          # Dark theme stylesheet
-    └── app.js             # Canvas-based annotation tools
+    ├── app.js             # Canvas-based annotation tools
+    ├── selection.html     # Area selection overlay UI
+    ├── selection.css      # Selection overlay styles
+    └── selection.js       # Selection overlay logic
 ```
 
 ### Chrome Extension
@@ -207,9 +214,11 @@ electron-app/
 ```text
 chrome-extension/
 ├── manifest.json          # Extension manifest v3
-├── background.js          # Tab capture service worker
+├── background.js          # Content script injection + tab capture
+├── selector.js            # Area selection content script (injected into tab)
+├── selector.css           # Selection overlay styles (injected into tab)
 ├── popup.html/js          # Toolbar popup UI
-├── editor.html/css/js     # Full annotation editor
+├── editor.html/css/js     # Full annotation editor with crop support
 └── icons/                 # Extension icons
 ```
 
