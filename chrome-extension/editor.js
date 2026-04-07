@@ -70,6 +70,7 @@ document.getElementById('tool-question-arrow').onclick = () => setTool('question
 document.getElementById('tool-question-rect').onclick = () => setTool('question-rect');
 document.getElementById('tool-abc-arrow').onclick = () => setTool('abc-arrow');
 document.getElementById('tool-abc-rect').onclick = () => setTool('abc-rect');
+document.getElementById('tool-circle').onclick = () => setTool('circle');
 
 document.getElementById('color').oninput = (e) => { color = e.target.value; };
 document.getElementById('width').oninput = (e) => {
@@ -96,7 +97,8 @@ function setTool(t) {
     'step': 'tool-step', 'step-rect': 'tool-step-rect',
     'arrow': 'tool-arrow', 'rect': 'tool-rect', 'line': 'tool-line',
     'question-arrow': 'tool-question-arrow', 'question-rect': 'tool-question-rect',
-    'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect'
+    'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect',
+    'circle': 'tool-circle'
   };
   document.getElementById(idMap[t]).classList.add('active');
 }
@@ -141,6 +143,7 @@ function render() {
     else if (d.tool === 'question-rect') drawQRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
     else if (d.tool === 'abc-arrow') { aA++; drawAbcArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aA); }
     else if (d.tool === 'abc-rect') { aR++; drawAbcRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aR); }
+    else if (d.tool === 'circle') drawEllipse(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
     else drawR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
   });
   if (current) {
@@ -152,6 +155,7 @@ function render() {
     else if (current.tool === 'question-rect') drawQRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
     else if (current.tool === 'abc-arrow') drawAbcArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcAN+1);
     else if (current.tool === 'abc-rect') drawAbcRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcRN+1);
+    else if (current.tool === 'circle') drawEllipse(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
     else drawR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
   }
 }
@@ -213,6 +217,14 @@ function drawAbcArrow(x1,y1,x2,y2,c,w,n) {
 function drawAbcRect(x1,y1,x2,y2,c,w,n) {
   drawR(x1,y1,x2,y2,c,w);
   circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,letterLabel(n));
+}
+
+function drawEllipse(x1,y1,x2,y2,c,w) {
+  const cx=(x1+x2)/2, cy=(y1+y2)/2;
+  const rx=Math.abs(x2-x1)/2, ry=Math.abs(y2-y1)/2;
+  if (rx<1||ry<1) return;
+  ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
 }
 
 function saveAndDownload() {

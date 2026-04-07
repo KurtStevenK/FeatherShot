@@ -92,6 +92,8 @@ struct AnnotationView: View {
                 } else if drawing.tool == .abcRectangle {
                     let stepNum = drawings[0...index].filter { $0.tool == .abcRectangle }.count
                     ABCRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
+                } else if drawing.tool == .circle {
+                    EllipseView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else {
                     RectangleShape(start: drawing.start, end: drawing.end)
                         .stroke(drawing.color, lineWidth: drawing.lineWidth)
@@ -120,6 +122,8 @@ struct AnnotationView: View {
                 } else if selectedTool == .abcRectangle {
                     let stepNum = drawings.filter { $0.tool == .abcRectangle }.count + 1
                     ABCRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
+                } else if selectedTool == .circle {
+                    EllipseView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else {
                     RectangleShape(start: start, end: end)
                         .stroke(selectedColor, lineWidth: lineWidth)
@@ -240,6 +244,18 @@ struct AnnotationView: View {
                     }
                     .buttonStyle(.plain)
                     .help("ABC Rectangle (9)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 10: Circle/Ellipse
+                    Button(action: { selectedTool = .circle }) {
+                        Image(systemName: "circle")
+                            .padding(8)
+                            .background(selectedTool == .circle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .circle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Circle (0)")
                 }
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)

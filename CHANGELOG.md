@@ -5,6 +5,16 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-04-07
+
+### Added
+
+- **Circle / Ellipse Tool** — New annotation tool that draws stroked ellipses inscribed in a bounding box. No fill, stroke only.
+
+### Fixed
+
+- **Multi-Monitor Selection (Electron)** — Completely reworked the multi-monitor overlay system. Now creates one overlay window per display with global coordinate synchronization, allowing selections to span across 2 or more monitors seamlessly. Works for any number of displays in any resolution/layout constellation.
+
 ## [1.1.2] - 2026-04-07
 
 ### Added
@@ -89,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.3]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/KurtStevenK/FeatherShot/compare/v1.0.1...v1.1.0

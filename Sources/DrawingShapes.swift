@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum Tool {
-    case stepArrow, stepRectangle, arrow, rectangle, line, questionArrow, questionRectangle, abcArrow, abcRectangle
+    case stepArrow, stepRectangle, arrow, rectangle, line, questionArrow, questionRectangle, abcArrow, abcRectangle, circle
 }
 
 struct DrawingElement: Identifiable {
@@ -304,5 +304,34 @@ struct ABCRectangleView: View {
                 .foregroundColor(.white)
                 .position(x: circleX, y: circleY)
         }
+    }
+}
+
+// Ellipse shape inscribed in the bounding rect from start to end
+struct EllipseShape: Shape {
+    var start: CGPoint
+    var end: CGPoint
+
+    func path(in rect: CGRect) -> Path {
+        let drawingRect = CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: abs(end.x - start.x),
+            height: abs(end.y - start.y)
+        )
+        return Path(ellipseIn: drawingRect)
+    }
+}
+
+// Circle/Ellipse annotation tool — stroke only, no fill
+struct EllipseView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+
+    var body: some View {
+        EllipseShape(start: start, end: end)
+            .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
     }
 }

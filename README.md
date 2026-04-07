@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.2-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.3-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.1.2:** **Line** tool, **Question / ABC** tools (arrows & rectangles), and multi-monitor capture fixes for Windows/Linux.
+> **New in v1.1.3:** **Circle/Ellipse** tool, and reliable **multi-monitor selection** across all displays on Windows/Linux.
 
 ---
 
@@ -67,6 +67,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 | **Question Rectangle** | `?▢` | Rectangle with a **Question Mark** circle at the top-left corner. |
 | **ABC Arrow** | `a→ b→ c→` | Arrows with **auto-incrementing lettered circles** (a, b, ..., z, aa, ab...) at the start. |
 | **ABC Rectangle** | `a▢ b▢ c▢` | Rectangles with **auto-incrementing lettered circles** at the top-left corner. |
+| **Circle / Ellipse** | `◯` | Draw circles and ellipses by dragging a bounding box — stroke only, no fill. |
 
 ### Additional Controls
 
@@ -197,7 +198,7 @@ A lean, 3-file Swift application:
 Sources/
 ├── AppMain.swift          # Menu bar app lifecycle, screen capture, window management
 ├── AnnotationView.swift   # SwiftUI editor with canvas, toolbar, save/export
-└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, Line, Step variants, Question variants, ABC variants)
+└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, Line, Ellipse, Step variants, Question variants, ABC variants)
 ```
 
 ### Windows & Linux (Electron)

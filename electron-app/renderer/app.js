@@ -41,6 +41,7 @@ document.getElementById('tool-question-arrow').addEventListener('click', () => s
 document.getElementById('tool-question-rect').addEventListener('click', () => setTool('question-rect'));
 document.getElementById('tool-abc-arrow').addEventListener('click', () => setTool('abc-arrow'));
 document.getElementById('tool-abc-rect').addEventListener('click', () => setTool('abc-rect'));
+document.getElementById('tool-circle').addEventListener('click', () => setTool('circle'));
 
 // Controls
 document.getElementById('color-picker').addEventListener('input', (e) => { color = e.target.value; });
@@ -65,6 +66,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '7') setTool('question-rect');
   if (e.key === '8') setTool('abc-arrow');
   if (e.key === '9') setTool('abc-rect');
+  if (e.key === '0') setTool('circle');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
@@ -154,6 +156,8 @@ function render() {
     } else if (d.tool === 'abc-rect') {
       abcR++;
       drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
+    } else if (d.tool === 'circle') {
+      drawEllipse(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else {
       drawRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     }
@@ -177,6 +181,8 @@ function render() {
       drawAbcArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcArrowCount + 1);
     } else if (currentDraw.tool === 'abc-rect') {
       drawAbcRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcRectCount + 1);
+    } else if (currentDraw.tool === 'circle') {
+      drawEllipse(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     } else {
       drawRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     }
@@ -271,6 +277,20 @@ function drawAbcRect(ctx, x1, y1, x2, y2, color, lw, num) {
   const cx = Math.min(x1, x2);
   const cy = Math.min(y1, y2);
   drawCircleLabel(ctx, cx, cy, color, lw, letterLabel(num));
+}
+
+function drawEllipse(ctx, x1, y1, x2, y2, color, lw) {
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const rx = Math.abs(x2 - x1) / 2;
+  const ry = Math.abs(y2 - y1) / 2;
+  if (rx < 1 || ry < 1) return;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.stroke();
 }
 
 // Shared helper: draw a filled circle with a text label at (x, y)
