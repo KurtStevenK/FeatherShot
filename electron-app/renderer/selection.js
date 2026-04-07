@@ -5,31 +5,23 @@ const ctx = canvas.getContext('2d');
 const dimLabel = document.getElementById('dimensions');
 const instructions = document.getElementById('instructions');
 
-let screenshot = null;
 let displayBounds = null;  // This display's CSS pixel bounds { x, y, width, height }
 let globalBounds = null;   // All displays combined { minX, minY, maxX, maxY }
-let scaleFactor = 1;
 
 // Selection state in GLOBAL CSS pixel coordinates
 let selecting = false;
 let globalStartX = 0, globalStartY = 0;
 let globalEndX = 0, globalEndY = 0;
 
-// Initialize — receive this display's portion of the screenshot
-ipcRenderer.on('selection-init', (event, { dataUrl, displayBounds: db, globalBounds: gb, scale }) => {
+// Initialize — receive display bounds (no screenshot needed)
+ipcRenderer.on('selection-init', (event, { displayBounds: db, globalBounds: gb }) => {
   displayBounds = db;
   globalBounds = gb;
-  scaleFactor = scale;
 
-  const img = new Image();
-  img.onload = () => {
-    screenshot = img;
-    // Canvas matches this display's pixel resolution
-    canvas.width = img.width;
-    canvas.height = img.height;
-    render();
-  };
-  img.src = dataUrl;
+  // Set canvas to match display CSS pixel dimensions
+  canvas.width = db.width;
+  canvas.height = db.height;
+  render();
 });
 
 // Receive selection updates from main process (broadcast from any overlay)
@@ -79,13 +71,8 @@ ipcRenderer.on('selection-update', (event, data) => {
 
 // --- Mouse events — convert local to global and send to main ---
 canvas.addEventListener('mousedown', (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const localCSSX = e.clientX;
-  const localCSSY = e.clientY;
-  // Convert local CSS position to global CSS position
-  const gx = displayBounds.x + localCSSX;
-  const gy = displayBounds.y + localCSSY;
-
+  const gx = displayBounds.x + e.clientX;
+  const gy = displayBounds.y + e.clientY;
   ipcRenderer.send('selection-mouse-event', { type: 'down', globalX: gx, globalY: gy });
 });
 
@@ -112,13 +99,10 @@ document.addEventListener('keydown', (e) => {
 
 // --- Render ---
 function render() {
-  if (!screenshot || !displayBounds) return;
+  if (!displayBounds) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw this display's portion of the screenshot
-  ctx.drawImage(screenshot, 0, 0);
-
-  // Dark overlay
+  // Dark semi-transparent overlay over the live desktop
   ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -129,12 +113,12 @@ function render() {
     const selW = Math.abs(globalEndX - globalStartX);
     const selH = Math.abs(globalEndY - globalStartY);
 
-    // Convert global selection to this display's local pixel coordinates
-    const sf = canvas.width / displayBounds.width; // pixel-to-CSS ratio for this display
-    const localX = (selX - displayBounds.x) * sf;
-    const localY = (selY - displayBounds.y) * sf;
-    const localW = selW * sf;
-    const localH = selH * sf;
+    // Convert global selection to this display's local coordinates
+    // Canvas pixels = display CSS pixels (1:1 mapping)
+    const localX = selX - displayBounds.x;
+    const localY = selY - displayBounds.y;
+    const localW = selW;
+    const localH = selH;
 
     // Clip to this display's canvas bounds
     const clipX = Math.max(0, localX);
@@ -145,19 +129,13 @@ function render() {
     const clipH = clipB - clipY;
 
     if (clipW > 0 && clipH > 0) {
-      // Clear the selected area to reveal the screenshot underneath
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(clipX, clipY, clipW, clipH);
-      ctx.clip();
+      // Clear the selected area to make it transparent — shows live desktop through
       ctx.clearRect(clipX, clipY, clipW, clipH);
-      ctx.drawImage(screenshot, 0, 0);
-      ctx.restore();
 
-      // Selection border — draw the full selection rect (will be clipped naturally by canvas)
+      // Selection border
       ctx.strokeStyle = '#0a84ff';
-      ctx.lineWidth = 2 * sf;
-      ctx.setLineDash([6 * sf, 3 * sf]);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
       ctx.strokeRect(localX, localY, localW, localH);
       ctx.setLineDash([]);
     }

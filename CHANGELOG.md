@@ -5,6 +5,16 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2026-04-07
+
+### Fixed
+
+- **Multi-Monitor Selection completely reworked** — Removed kiosk mode which caused stretched overlays, double taskbars, and wrong aspect ratios on Windows. Selection now uses a transparent dim overlay over the live desktop (no pre-capture). Screen is captured only after selection is complete, targeting just the relevant display. Much faster on multi-monitor setups since there's no 3-screen composite step.
+
+### Changed
+
+- **Capture flow redesigned** — Selection overlay is now instant (no delay for screen capture). The screenshot is taken after closing the overlay, then cropped to the selected region. This matches how professional tools like ShareX and Snagit work.
+
 ## [1.1.4] - 2026-04-07
 
 ### Added
@@ -115,6 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.5]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.1...v1.1.2
