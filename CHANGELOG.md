@@ -5,6 +5,13 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-04-07
+
+### Fixed
+
+- **Editor now opens after selection** — Three fixes: (1) `removeHandler` before `handleOnce` clears stale handlers from failed previous attempts, (2) `closeAndWait` exits fullscreen before closing and has a 2-second timeout fallback, (3) `did-finish-load` backup trigger ensures the editor shows even if `ready-to-show` doesn't fire.
+- **macOS .dmg missing from release** — Fixed CI glob pattern to match new `FeatherShot-*-(macOS).dmg` filename.
+
 ## [1.2.0] - 2026-04-07
 
 ### Fixed

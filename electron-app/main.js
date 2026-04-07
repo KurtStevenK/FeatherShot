@@ -81,8 +81,8 @@ function setupIPC() {
   ipcMain.on('sel-cancel',()=>closeAll());
 }
 
-function closeAll(){windowData.clear();const w=selectionWindows;selectionWindows=[];for(const x of w){try{if(x&&!x.isDestroyed())x.close();}catch(e){}}}
-function closeAndWait(){return new Promise(r=>{const w=selectionWindows.filter(x=>x&&!x.isDestroyed());selectionWindows=[];windowData.clear();if(!w.length)return setTimeout(r,150);let c=0;for(const x of w){x.on('closed',()=>{if(++c>=w.length)setTimeout(r,250);});try{x.close();}catch(e){if(++c>=w.length)setTimeout(r,250);}}});}
+function closeAll(){windowData.clear();const w=selectionWindows;selectionWindows=[];for(const x of w){try{if(x&&!x.isDestroyed()){if(x.isFullScreen())x.setFullScreen(false);x.close();}}catch(e){}}}
+function closeAndWait(){return new Promise(r=>{const w=selectionWindows.filter(x=>x&&!x.isDestroyed());selectionWindows=[];windowData.clear();if(!w.length)return setTimeout(r,150);let done=false;const finish=()=>{if(done)return;done=true;setTimeout(r,300);};let c=0;for(const x of w){x.on('closed',()=>{if(++c>=w.length)finish();});try{if(x.isFullScreen())x.setFullScreen(false);x.close();}catch(e){if(++c>=w.length)finish();}}setTimeout(finish,2000);});}
 
 function startSelection() {
   closeAll();
@@ -123,9 +123,13 @@ function openEditor(screenshotData) {
   } else { w=Math.min(Math.max(screenshotData.width,700),wa.width-80); h=Math.min(Math.max(screenshotData.height+80,400),wa.height-80); }
   editorWindow=new BrowserWindow({width:w,height:h,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
     webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
-  editorWindow.loadFile(path.join(__dirname,'renderer','index.html'));
+  // Clear any stale handler, then register fresh one
+  try{ipcMain.removeHandler('editor-screenshot-request');}catch(e){}
   ipcMain.handleOnce('editor-screenshot-request',()=>screenshotData);
+  editorWindow.loadFile(path.join(__dirname,'renderer','index.html'));
+  // Show via ready-to-show AND did-finish-load (belt and suspenders)
   editorWindow.once('ready-to-show',()=>{if(editorWindow&&!editorWindow.isDestroyed()){editorWindow.show();editorWindow.focus();}});
+  editorWindow.webContents.once('did-finish-load',()=>{if(editorWindow&&!editorWindow.isDestroyed()&&!editorWindow.isVisible()){editorWindow.show();editorWindow.focus();}});
   editorWindow.on('closed',()=>{editorWindow=null;});
 }
 
