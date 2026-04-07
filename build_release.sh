@@ -43,9 +43,9 @@ cat <<EOF > FeatherShot.app/Contents/Info.plist
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.1.8</string>
+    <string>1.1.9</string>
     <key>CFBundleVersion</key>
-    <string>1.1.8</string>
+    <string>1.1.9</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2026 Kurt Steven Kainzmayer</string>
     <key>LSMinimumSystemVersion</key>
@@ -72,7 +72,7 @@ if [ ! -d "create-dmg" ]; then
     git clone https://github.com/create-dmg/create-dmg.git
 fi
 
-rm -f "FeatherShot 1.1.8.dmg"
+rm -f "FeatherShot 1.1.9.dmg"
 
 ./create-dmg/create-dmg \
   --volname "FeatherShot" \
@@ -83,7 +83,7 @@ rm -f "FeatherShot 1.1.8.dmg"
   --icon "FeatherShot.app" 150 200 \
   --hide-extension "FeatherShot.app" \
   --app-drop-link 450 200 \
-  "FeatherShot 1.1.8.dmg" \
+  "FeatherShot 1.1.9.dmg" \
   "FeatherShot.app/"
 
 echo "==> Done! Release is ready."

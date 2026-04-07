@@ -1,6 +1,6 @@
 {
   "name": "feathershot",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Lightweight screenshot annotations — fast and distraction-free.",
   "repository": {
     "type": "git",
@@ -43,10 +43,14 @@
       "icon": "assets/icon.ico"
     },
     "nsis": {
+      "artifactName": "FeatherShot-Setup-${version}-(Windows).${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "FeatherShot-${version}-(Windows-Portable).${ext}"
     },
     "linux": {
       "target": [
@@ -67,6 +71,12 @@
       "category": "Graphics",
       "synopsis": "Lightweight screenshot annotations",
       "description": "FeatherShot — capture, annotate, and share screenshots instantly."
+    },
+    "deb": {
+      "artifactName": "FeatherShot-${version}-(Debian).${ext}"
+    },
+    "appImage": {
+      "artifactName": "FeatherShot-${version}-(Ubuntu).${ext}"
     }
   },
   "devDependencies": {

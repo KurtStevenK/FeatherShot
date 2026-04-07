@@ -5,6 +5,18 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.9] - 2026-04-07
+
+### Fixed
+
+- **Opaque selection overlays** — Replaced `transparent: true` (caused white/broken rendering on Windows) with opaque windows showing per-display screenshots dimmed. No transparency bugs.
+- **Editor opens after selection** — Fixed missing `show()` call.
+- **HiDPI canvas** — Uses `devicePixelRatio` for sharp text and lines.
+
+### Changed
+
+- **Release filenames include OS** — `(Windows)`, `(Debian)`, `(Ubuntu)` in artifact names.
+
 ## [1.1.8] - 2026-04-07
 
 ### Fixed
