@@ -5,6 +5,14 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.8] - 2026-04-07
+
+### Fixed
+
+- **webContents null error eliminated** — Replaced `did-finish-load` push pattern with `ipcMain.handle` / `ipcRenderer.invoke` pull pattern. The renderer requests its init data when ready, so there's no race condition if the window is destroyed before load completes.
+- **Overlay sizing on mixed-DPI Windows** — Added 500px padding on all sides of each overlay window to guarantee full display coverage regardless of DPI mismatch between monitors. The excess padding is off-screen and invisible.
+- **Coordinate math updated** — Uses actual window origin (including padding offset) for pixel-perfect global coordinate conversion.
+
 ## [1.1.7] - 2026-04-07
 
 ### Fixed

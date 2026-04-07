@@ -83,6 +83,18 @@ document.addEventListener('keydown', (e) => {
 
 // --- IPC ---
 ipcRenderer.on('load-screenshot', (event, dataUrl) => {
+  loadScreenshot(dataUrl);
+});
+
+// Also try pulling via handle (safer, no race condition)
+(async () => {
+  try {
+    const dataUrl = await ipcRenderer.invoke('editor-screenshot-request');
+    if (dataUrl) loadScreenshot(dataUrl);
+  } catch(e) {}
+})();
+
+function loadScreenshot(dataUrl) {
   const img = new Image();
   img.onload = () => {
     screenshotImage = img;
@@ -91,7 +103,7 @@ ipcRenderer.on('load-screenshot', (event, dataUrl) => {
     render();
   };
   img.src = dataUrl;
-});
+}
 
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {

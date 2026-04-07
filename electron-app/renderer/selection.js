@@ -1,134 +1,68 @@
 const { ipcRenderer } = require('electron');
-
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const dimLabel = document.getElementById('dimensions');
 const instructions = document.getElementById('instructions');
+let windowOrigin=null, displayBounds=null, globalBounds=null;
+let selecting=false, gsx=0,gsy=0,gex=0,gey=0;
 
-let displayBounds = null, globalBounds = null;
-let selecting = false;
-let globalStartX = 0, globalStartY = 0, globalEndX = 0, globalEndY = 0;
-
-// Use window.innerWidth/Height for canvas so it always matches actual window size
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+// Pull init data from main (safe, no did-finish-load race)
+(async()=>{
+  const data = await ipcRenderer.invoke('sel-init-request');
+  if(!data)return;
+  windowOrigin=data.windowOrigin;
+  displayBounds=data.displayBounds;
+  globalBounds=data.globalBounds;
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
   render();
-}
+})();
+window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;render();});
 
-ipcRenderer.on('sel-init', (event, { displayBounds: db, globalBounds: gb }) => {
-  displayBounds = db;
-  globalBounds = gb;
-  resizeCanvas();
+ipcRenderer.on('sel-update',(event,data)=>{
+  if(data.type==='down'){selecting=true;if(instructions)instructions.style.display='none';gsx=gex=data.gx;gsy=gey=data.gy;}
+  else if(data.type==='move'&&selecting){gex=data.gx;gey=data.gy;render();showDim(data.gx,data.gy);}
+  else if(data.type==='up'&&selecting){selecting=false;gex=data.gx;gey=data.gy;dimLabel.style.display='none';
+    const x=Math.min(gsx,gex),y=Math.min(gsy,gey),w=Math.abs(gex-gsx),h=Math.abs(gey-gsy);
+    if(w>=10&&h>=10)ipcRenderer.send('sel-done',{x,y,width:w,height:h});}
 });
 
-window.addEventListener('resize', resizeCanvas);
-
-// Receive broadcast from main — update selection state and render
-ipcRenderer.on('sel-update', (event, data) => {
-  if (data.type === 'down') {
-    selecting = true;
-    if (instructions) instructions.style.display = 'none';
-    globalStartX = globalEndX = data.gx;
-    globalStartY = globalEndY = data.gy;
-  } else if (data.type === 'move' && selecting) {
-    globalEndX = data.gx;
-    globalEndY = data.gy;
-    render();
-    showDimensions(data.gx, data.gy);
-  } else if (data.type === 'up' && selecting) {
-    selecting = false;
-    globalEndX = data.gx;
-    globalEndY = data.gy;
-    dimLabel.style.display = 'none';
-    const x = Math.min(globalStartX, globalEndX), y = Math.min(globalStartY, globalEndY);
-    const w = Math.abs(globalEndX - globalStartX), h = Math.abs(globalEndY - globalStartY);
-    if (w >= 10 && h >= 10) ipcRenderer.send('sel-done', { x, y, width: w, height: h });
-  }
-});
-
-// *** KEY FIX: Use pointer events + setPointerCapture ***
-// This ensures the window that received pointerdown keeps getting events
-// even when the pointer moves to another monitor/window.
-canvas.addEventListener('pointerdown', (e) => {
+// Pointer capture = cross-monitor dragging
+canvas.addEventListener('pointerdown',(e)=>{
   canvas.setPointerCapture(e.pointerId);
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('sel-mouse', { type: 'down', gx, gy });
+  ipcRenderer.send('sel-mouse',{type:'down',gx:windowOrigin.x+e.clientX,gy:windowOrigin.y+e.clientY});
 });
-
-canvas.addEventListener('pointermove', (e) => {
-  if (!selecting) return;
-  // With pointer capture, e.clientX/Y can be outside window bounds
-  // (negative or > window size) when pointer is on another monitor.
-  // Adding displayBounds origin gives correct global DIP coordinates.
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('sel-mouse', { type: 'move', gx, gy });
+canvas.addEventListener('pointermove',(e)=>{
+  if(!selecting)return;
+  ipcRenderer.send('sel-mouse',{type:'move',gx:windowOrigin.x+e.clientX,gy:windowOrigin.y+e.clientY});
 });
-
-canvas.addEventListener('pointerup', (e) => {
-  if (!selecting) return;
+canvas.addEventListener('pointerup',(e)=>{
+  if(!selecting)return;
   canvas.releasePointerCapture(e.pointerId);
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('sel-mouse', { type: 'up', gx, gy });
+  ipcRenderer.send('sel-mouse',{type:'up',gx:windowOrigin.x+e.clientX,gy:windowOrigin.y+e.clientY});
 });
+document.addEventListener('keydown',(e)=>{if(e.key==='Escape')ipcRenderer.send('sel-cancel');});
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') ipcRenderer.send('sel-cancel');
-});
-
-function render() {
-  if (!displayBounds) return;
-  const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
-
-  // Semi-transparent dark overlay
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
-  ctx.fillRect(0, 0, W, H);
-
-  if (!selecting && globalStartX === globalEndX) return;
-
-  // Selection rect in global CSS pixels
-  const selX = Math.min(globalStartX, globalEndX);
-  const selY = Math.min(globalStartY, globalEndY);
-  const selW = Math.abs(globalEndX - globalStartX);
-  const selH = Math.abs(globalEndY - globalStartY);
-
-  // Convert to this display's local canvas coordinates
-  // Canvas pixel = CSS pixel (1:1) because canvas.width = window.innerWidth
-  const lx = selX - displayBounds.x;
-  const ly = selY - displayBounds.y;
-
-  // Clip to this display
-  const cx = Math.max(0, lx), cy = Math.max(0, ly);
-  const cr = Math.min(W, lx + selW), cb = Math.min(H, ly + selH);
-  const cw = cr - cx, ch = cb - cy;
-
-  if (cw > 0 && ch > 0) {
-    // Clear the selection area — shows live desktop through transparent window
-    ctx.clearRect(cx, cy, cw, ch);
-
-    // Selection border (draw at full local coords, it clips naturally)
-    ctx.strokeStyle = '#0a84ff';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 3]);
-    ctx.strokeRect(lx, ly, selW, selH);
-    ctx.setLineDash([]);
+function render(){
+  if(!windowOrigin)return;
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,0.45)';
+  ctx.fillRect(0,0,W,H);
+  if(!selecting&&gsx===gex)return;
+  const sx=Math.min(gsx,gex),sy=Math.min(gsy,gey),sw=Math.abs(gex-gsx),sh=Math.abs(gey-gsy);
+  const lx=sx-windowOrigin.x,ly=sy-windowOrigin.y;
+  const cx=Math.max(0,lx),cy=Math.max(0,ly),cr=Math.min(W,lx+sw),cb=Math.min(H,ly+sh);
+  if(cr>cx&&cb>cy){
+    ctx.clearRect(cx,cy,cr-cx,cb-cy);
+    ctx.strokeStyle='#0a84ff';ctx.lineWidth=2;ctx.setLineDash([6,3]);
+    ctx.strokeRect(lx,ly,sw,sh);ctx.setLineDash([]);
   }
 }
 
-function showDimensions(gx, gy) {
-  // Only show label if cursor is on this display
-  const lx = gx - displayBounds.x, ly = gy - displayBounds.y;
-  if (lx < 0 || lx > displayBounds.width || ly < 0 || ly > displayBounds.height) {
-    dimLabel.style.display = 'none';
-    return;
-  }
-  const w = Math.abs(globalEndX - globalStartX), h = Math.abs(globalEndY - globalStartY);
-  dimLabel.textContent = `${Math.round(w)} × ${Math.round(h)}`;
-  dimLabel.style.display = 'block';
-  dimLabel.style.left = (lx + 14) + 'px';
-  dimLabel.style.top = (ly + 14) + 'px';
+function showDim(gx,gy){
+  const lx=gx-windowOrigin.x,ly=gy-windowOrigin.y;
+  if(lx<0||lx>canvas.width||ly<0||ly>canvas.height){dimLabel.style.display='none';return;}
+  dimLabel.textContent=`${Math.round(Math.abs(gex-gsx))} × ${Math.round(Math.abs(gey-gsy))}`;
+  dimLabel.style.display='block';dimLabel.style.left=(lx+14)+'px';dimLabel.style.top=(ly+14)+'px';
 }

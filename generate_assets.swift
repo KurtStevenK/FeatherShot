@@ -98,7 +98,7 @@ func drawDmgBackground() {
     titleString.draw(in: titleRect)
     
     // Draw Version
-    let subtitle = "Version 1.1.7"
+    let subtitle = "Version 1.1.8"
     let subFont = NSFont.systemFont(ofSize: 18, weight: .medium)
     let subAttr: [NSAttributedString.Key: Any] = [.font: subFont, .foregroundColor: NSColor(white: 0.4, alpha: 1.0), .paragraphStyle: pstyleCenter]
     let subString = NSAttributedString(string: subtitle, attributes: subAttr)

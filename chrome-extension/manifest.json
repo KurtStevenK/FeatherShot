@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FeatherShot",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Capture, annotate, and share screenshots instantly — right from your browser.",
   "permissions": ["activeTab", "scripting", "downloads", "storage"],
   "action": {
