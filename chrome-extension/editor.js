@@ -262,16 +262,19 @@ function drawMagnifier(x1,y1,x2,y2,c,w,zoom) {
   if (radius < 5) return;
 
   const centerX = x1, centerY = y1;
-  const srcRadius = radius / zoom;
-  const srcX = centerX - srcRadius;
-  const srcY = centerY - srcRadius;
-  const srcSize = srcRadius * 2;
+  // Account for image vs canvas size difference
+  const scaleX = img.width / canvas.width;
+  const scaleY = img.height / canvas.height;
+  const imgCX = centerX * scaleX, imgCY = centerY * scaleY;
+  const srcRX = (radius / zoom) * scaleX, srcRY = (radius / zoom) * scaleY;
+  const srcX = Math.round(imgCX - srcRX), srcY = Math.round(imgCY - srcRY);
+  const srcW = Math.round(srcRX * 2), srcH = Math.round(srcRY * 2);
 
   ctx.save();
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(img, srcX, srcY, srcSize, srcSize, centerX - radius, centerY - radius, radius * 2, radius * 2);
+  ctx.drawImage(img, srcX, srcY, srcW, srcH, centerX - radius, centerY - radius, radius * 2, radius * 2);
   ctx.restore();
 
   // Border ring

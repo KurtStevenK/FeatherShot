@@ -5,6 +5,13 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-04-07
+
+### Fixed
+
+- **Multi-Monitor Selection using Pointer Capture** — Per-display transparent overlays (no pre-capture, instant open). Uses `setPointerCapture()` so cross-monitor dragging works — the window that receives pointerdown keeps receiving all pointer events even when the cursor moves to another monitor. Canvas sized to `window.innerWidth/Height` for correct DPI handling. Screen captured only after selection completes (fast, no lag).
+- **Magnifier centering** — Fixed the magnifier zoom not being centered on the exact click position. Now properly accounts for the ratio between screenshot image pixel dimensions and canvas display dimensions when sampling the source region.
+
 ## [1.1.6] - 2026-04-07
 
 ### Fixed
@@ -131,6 +138,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.7]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.3...v1.1.4

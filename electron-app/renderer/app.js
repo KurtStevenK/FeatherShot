@@ -325,11 +325,23 @@ function drawMagnifier(ctx, x1, y1, x2, y2, color, lw, zoom) {
   const centerY = y1;
 
   // Source region from the original screenshot (before any annotations)
-  // We sample a region of size (2*radius/zoom) around the center point
-  const srcRadius = radius / zoom;
-  const srcX = centerX - srcRadius;
-  const srcY = centerY - srcRadius;
-  const srcSize = srcRadius * 2;
+  // Account for possible difference between canvas size and image size
+  const imgW = screenshotImage.width || screenshotImage.naturalWidth;
+  const imgH = screenshotImage.height || screenshotImage.naturalHeight;
+  const scaleImgX = imgW / canvas.width;
+  const scaleImgY = imgH / canvas.height;
+  
+  // Map center from canvas coordinates to image coordinates
+  const imgCenterX = centerX * scaleImgX;
+  const imgCenterY = centerY * scaleImgY;
+  
+  // Source sample region in image coordinates
+  const srcRadiusX = (radius / zoom) * scaleImgX;
+  const srcRadiusY = (radius / zoom) * scaleImgY;
+  const srcX = Math.round(imgCenterX - srcRadiusX);
+  const srcY = Math.round(imgCenterY - srcRadiusY);
+  const srcW = Math.round(srcRadiusX * 2);
+  const srcH = Math.round(srcRadiusY * 2);
 
   ctx.save();
 
@@ -341,9 +353,9 @@ function drawMagnifier(ctx, x1, y1, x2, y2, color, lw, zoom) {
   // Draw the magnified portion of the ORIGINAL screenshot
   ctx.drawImage(
     screenshotImage,
-    srcX, srcY, srcSize, srcSize,       // source rect from screenshot
-    centerX - radius, centerY - radius, // dest position
-    radius * 2, radius * 2             // dest size (fills the circle)
+    srcX, srcY, srcW, srcH,              // source rect from screenshot (image coords)
+    centerX - radius, centerY - radius,  // dest position (canvas coords)
+    radius * 2, radius * 2              // dest size (fills the circle)
   );
 
   ctx.restore();
