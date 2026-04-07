@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum Tool {
-    case stepArrow, stepRectangle, arrow, rectangle, line, questionArrow, questionRectangle, abcArrow, abcRectangle, circle
+    case stepArrow, stepRectangle, arrow, rectangle, circle, line, questionArrow, questionRectangle, abcArrow, abcRectangle, magnifier
 }
 
 struct DrawingElement: Identifiable {
@@ -11,6 +11,7 @@ struct DrawingElement: Identifiable {
     let end: CGPoint
     let color: Color
     let lineWidth: CGFloat
+    var zoomLevel: CGFloat = 2.0
 }
 
 // Convert a 1-based step number into a letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
@@ -333,5 +334,84 @@ struct EllipseView: View {
     var body: some View {
         EllipseShape(start: start, end: end)
             .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+    }
+}
+
+// Magnifier tool — circular zoom lens showing magnified screenshot content
+struct MagnifierView: View {
+    var image: NSImage
+    var start: CGPoint  // center of magnification
+    var end: CGPoint    // defines radius via distance
+    var color: Color
+    var lineWidth: CGFloat
+    var zoomLevel: CGFloat
+
+    var body: some View {
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let radius = sqrt(dx * dx + dy * dy)
+        
+        if radius >= 5 {
+            let srcRadius = radius / zoomLevel
+            let srcRect = CGRect(
+                x: start.x - srcRadius,
+                y: start.y - srcRadius,
+                width: srcRadius * 2,
+                height: srcRadius * 2
+            )
+            
+            ZStack {
+                // Magnified image content clipped to circle
+                if let croppedImage = cropNSImage(image, to: srcRect) {
+                    Image(nsImage: croppedImage)
+                        .resizable()
+                        .frame(width: radius * 2, height: radius * 2)
+                        .clipShape(Circle())
+                        .position(x: start.x, y: start.y)
+                }
+                
+                // Border ring
+                Circle()
+                    .stroke(color, lineWidth: max(3, lineWidth))
+                    .frame(width: radius * 2, height: radius * 2)
+                    .position(x: start.x, y: start.y)
+                
+                // Crosshair
+                Path { path in
+                    path.move(to: CGPoint(x: start.x - 6, y: start.y))
+                    path.addLine(to: CGPoint(x: start.x + 6, y: start.y))
+                    path.move(to: CGPoint(x: start.x, y: start.y - 6))
+                    path.addLine(to: CGPoint(x: start.x, y: start.y + 6))
+                }
+                .stroke(color, lineWidth: 1.5)
+            }
+        }
+    }
+    
+    // Crop an NSImage to a given CGRect
+    private func cropNSImage(_ nsImage: NSImage, to rect: CGRect) -> NSImage? {
+        let imgSize = nsImage.size
+        // Clamp the rect to image bounds
+        let clampedX = max(0, min(rect.origin.x, imgSize.width))
+        let clampedY = max(0, min(rect.origin.y, imgSize.height))
+        let clampedW = min(rect.width, imgSize.width - clampedX)
+        let clampedH = min(rect.height, imgSize.height - clampedY)
+        
+        if clampedW <= 0 || clampedH <= 0 { return nil }
+        
+        let cropRect = CGRect(x: clampedX, y: clampedY, width: clampedW, height: clampedH)
+        
+        let result = NSImage(size: cropRect.size)
+        result.lockFocus()
+        // NSImage uses flipped coordinates — need to flip Y for drawing
+        let flippedSrcY = imgSize.height - cropRect.origin.y - cropRect.height
+        nsImage.draw(
+            in: CGRect(origin: .zero, size: cropRect.size),
+            from: CGRect(x: cropRect.origin.x, y: flippedSrcY, width: cropRect.width, height: cropRect.height),
+            operation: .copy,
+            fraction: 1.0
+        )
+        result.unlockFocus()
+        return result
     }
 }

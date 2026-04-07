@@ -8,6 +8,7 @@ let screenshotImage = null;
 let tool = 'step-arrow'; // Default to counting arrows
 let color = '#FF3B30';
 let lineWidth = 4;
+let zoomLevel = 2.0; // Magnifier zoom (1.5–5×)
 let drawings = [];
 let currentDraw = null;
 let stepArrowCount = 0;
@@ -30,24 +31,32 @@ function letterLabel(n) {
 // --- DOM ---
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const lineWidthSlider = document.getElementById('line-width');
+const widthLabel = document.getElementById('width-label');
 
-// Tool buttons (order: step-arrow, step-rect, arrow, rect, line, question-arrow, question-rect, abc-arrow, abc-rect)
+// Tool buttons
 document.getElementById('tool-step-arrow').addEventListener('click', () => setTool('step-arrow'));
 document.getElementById('tool-step-rect').addEventListener('click', () => setTool('step-rect'));
 document.getElementById('tool-arrow').addEventListener('click', () => setTool('arrow'));
 document.getElementById('tool-rect').addEventListener('click', () => setTool('rect'));
+document.getElementById('tool-circle').addEventListener('click', () => setTool('circle'));
 document.getElementById('tool-line').addEventListener('click', () => setTool('line'));
 document.getElementById('tool-question-arrow').addEventListener('click', () => setTool('question-arrow'));
 document.getElementById('tool-question-rect').addEventListener('click', () => setTool('question-rect'));
 document.getElementById('tool-abc-arrow').addEventListener('click', () => setTool('abc-arrow'));
 document.getElementById('tool-abc-rect').addEventListener('click', () => setTool('abc-rect'));
-document.getElementById('tool-circle').addEventListener('click', () => setTool('circle'));
+document.getElementById('tool-magnifier').addEventListener('click', () => setTool('magnifier'));
 
 // Controls
 document.getElementById('color-picker').addEventListener('input', (e) => { color = e.target.value; });
-document.getElementById('line-width').addEventListener('input', (e) => {
-  lineWidth = parseInt(e.target.value);
-  document.getElementById('width-label').textContent = lineWidth + 'px';
+lineWidthSlider.addEventListener('input', (e) => {
+  if (tool === 'magnifier') {
+    zoomLevel = parseFloat(e.target.value);
+    widthLabel.textContent = zoomLevel.toFixed(1) + '×';
+  } else {
+    lineWidth = parseInt(e.target.value);
+    widthLabel.textContent = lineWidth + 'px';
+  }
 });
 
 // Actions
@@ -61,12 +70,13 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '2') setTool('step-rect');
   if (e.key === '3' || e.key === 'a') setTool('arrow');
   if (e.key === '4' || e.key === 'r') setTool('rect');
-  if (e.key === '5' || e.key === 'l') setTool('line');
-  if (e.key === '6') setTool('question-arrow');
-  if (e.key === '7') setTool('question-rect');
-  if (e.key === '8') setTool('abc-arrow');
-  if (e.key === '9') setTool('abc-rect');
-  if (e.key === '0') setTool('circle');
+  if (e.key === '5') setTool('circle');
+  if (e.key === '6' || e.key === 'l') setTool('line');
+  if (e.key === '7') setTool('question-arrow');
+  if (e.key === '8') setTool('question-rect');
+  if (e.key === '9') setTool('abc-arrow');
+  if (e.key === '0') setTool('abc-rect');
+  if (e.key === 'm' || e.key === 'M') setTool('magnifier');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
@@ -92,6 +102,10 @@ canvas.addEventListener('mousedown', (e) => {
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
   currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
+  // Store zoom level for magnifier
+  if (tool === 'magnifier') {
+    currentDraw.zoom = zoomLevel;
+  }
 });
 
 canvas.addEventListener('mousemove', (e) => {
@@ -158,6 +172,8 @@ function render() {
       drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
     } else if (d.tool === 'circle') {
       drawEllipse(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'magnifier') {
+      drawMagnifier(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.zoom || 2.0);
     } else {
       drawRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     }
@@ -183,6 +199,8 @@ function render() {
       drawAbcRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcRectCount + 1);
     } else if (currentDraw.tool === 'circle') {
       drawEllipse(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'magnifier') {
+      drawMagnifier(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, currentDraw.zoom || 2.0);
     } else {
       drawRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     }
@@ -293,6 +311,62 @@ function drawEllipse(ctx, x1, y1, x2, y2, color, lw) {
   ctx.stroke();
 }
 
+// Magnifier tool — draws a circular zoom lens showing magnified screenshot content
+function drawMagnifier(ctx, x1, y1, x2, y2, color, lw, zoom) {
+  if (!screenshotImage) return;
+  
+  // Center is start point, radius is distance to end point
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const radius = Math.sqrt(dx * dx + dy * dy);
+  if (radius < 5) return;
+
+  const centerX = x1;
+  const centerY = y1;
+
+  // Source region from the original screenshot (before any annotations)
+  // We sample a region of size (2*radius/zoom) around the center point
+  const srcRadius = radius / zoom;
+  const srcX = centerX - srcRadius;
+  const srcY = centerY - srcRadius;
+  const srcSize = srcRadius * 2;
+
+  ctx.save();
+
+  // Clip to circle
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.clip();
+
+  // Draw the magnified portion of the ORIGINAL screenshot
+  ctx.drawImage(
+    screenshotImage,
+    srcX, srcY, srcSize, srcSize,       // source rect from screenshot
+    centerX - radius, centerY - radius, // dest position
+    radius * 2, radius * 2             // dest size (fills the circle)
+  );
+
+  ctx.restore();
+
+  // Draw border ring
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(3, lw);
+  ctx.stroke();
+
+  // Draw crosshair at center
+  const crossSize = 6;
+  ctx.beginPath();
+  ctx.moveTo(centerX - crossSize, centerY);
+  ctx.lineTo(centerX + crossSize, centerY);
+  ctx.moveTo(centerX, centerY - crossSize);
+  ctx.lineTo(centerX, centerY + crossSize);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
 // Shared helper: draw a filled circle with a text label at (x, y)
 function drawCircleLabel(ctx, x, y, color, lw, label) {
   const radius = Math.max(12, lw * 3);
@@ -317,6 +391,21 @@ function setTool(t) {
   tool = t;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tool-' + t).classList.add('active');
+
+  // Switch slider between line-width mode and zoom mode
+  if (t === 'magnifier') {
+    lineWidthSlider.min = '1.5';
+    lineWidthSlider.max = '5';
+    lineWidthSlider.step = '0.5';
+    lineWidthSlider.value = zoomLevel.toString();
+    widthLabel.textContent = zoomLevel.toFixed(1) + '×';
+  } else {
+    lineWidthSlider.min = '2';
+    lineWidthSlider.max = '15';
+    lineWidthSlider.step = '1';
+    lineWidthSlider.value = lineWidth.toString();
+    widthLabel.textContent = lineWidth + 'px';
+  }
 }
 
 function undo() {
@@ -358,14 +447,13 @@ function saveAndCopy() {
   const buffer = img.toPNG();
   fs.writeFileSync(filePath, buffer);
 
-  // Flash the save button briefly
+  // Flash the save button briefly then close on Windows/Linux
   const btn = document.getElementById('btn-save');
   btn.textContent = '✓ Saved & Copied!';
   btn.style.background = '#30d158';
   setTimeout(() => {
-    btn.textContent = '💾 Save & Copy';
-    btn.style.background = '';
-  }, 1500);
+    window.close();
+  }, 800);
 }
 
 // Initial state

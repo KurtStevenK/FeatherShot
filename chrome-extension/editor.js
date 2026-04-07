@@ -1,7 +1,9 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-let img = null, tool = 'step', color = '#FF3B30', lw = 4;
+let img = null, tool = 'step', color = '#FF3B30', lw = 4, zoomLevel = 2.0;
 let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0, abcAN = 0, abcRN = 0;
+const widthSlider = document.getElementById('width');
+const wLabel = document.getElementById('w-label');
 
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
@@ -60,22 +62,28 @@ chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
   chrome.storage.local.remove(['screenshotData', 'cropRegion']);
 });
 
-// Tools (order: step arrow, step rect, arrow, rect, line, question arrow, question rect, abc arrow, abc rect)
+// Tools (reordered: step, step-rect, arrow, rect, circle, line, question-arrow, question-rect, abc-arrow, abc-rect, magnifier)
 document.getElementById('tool-step').onclick = () => setTool('step');
 document.getElementById('tool-step-rect').onclick = () => setTool('step-rect');
 document.getElementById('tool-arrow').onclick = () => setTool('arrow');
 document.getElementById('tool-rect').onclick = () => setTool('rect');
+document.getElementById('tool-circle').onclick = () => setTool('circle');
 document.getElementById('tool-line').onclick = () => setTool('line');
 document.getElementById('tool-question-arrow').onclick = () => setTool('question-arrow');
 document.getElementById('tool-question-rect').onclick = () => setTool('question-rect');
 document.getElementById('tool-abc-arrow').onclick = () => setTool('abc-arrow');
 document.getElementById('tool-abc-rect').onclick = () => setTool('abc-rect');
-document.getElementById('tool-circle').onclick = () => setTool('circle');
+document.getElementById('tool-magnifier').onclick = () => setTool('magnifier');
 
 document.getElementById('color').oninput = (e) => { color = e.target.value; };
-document.getElementById('width').oninput = (e) => {
-  lw = +e.target.value;
-  document.getElementById('w-label').textContent = lw + 'px';
+widthSlider.oninput = (e) => {
+  if (tool === 'magnifier') {
+    zoomLevel = parseFloat(e.target.value);
+    wLabel.textContent = zoomLevel.toFixed(1) + '×';
+  } else {
+    lw = +e.target.value;
+    wLabel.textContent = lw + 'px';
+  }
 };
 document.getElementById('undo').onclick = () => {
   if (drawings.length) {
@@ -95,12 +103,28 @@ function setTool(t) {
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
   const idMap = {
     'step': 'tool-step', 'step-rect': 'tool-step-rect',
-    'arrow': 'tool-arrow', 'rect': 'tool-rect', 'line': 'tool-line',
+    'arrow': 'tool-arrow', 'rect': 'tool-rect', 'circle': 'tool-circle',
+    'line': 'tool-line',
     'question-arrow': 'tool-question-arrow', 'question-rect': 'tool-question-rect',
     'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect',
-    'circle': 'tool-circle'
+    'magnifier': 'tool-magnifier'
   };
   document.getElementById(idMap[t]).classList.add('active');
+
+  // Switch slider between line-width mode and zoom mode
+  if (t === 'magnifier') {
+    widthSlider.min = '1.5';
+    widthSlider.max = '5';
+    widthSlider.step = '0.5';
+    widthSlider.value = zoomLevel.toString();
+    wLabel.textContent = zoomLevel.toFixed(1) + '×';
+  } else {
+    widthSlider.min = '2';
+    widthSlider.max = '15';
+    widthSlider.step = '1';
+    widthSlider.value = lw.toString();
+    wLabel.textContent = lw + 'px';
+  }
 }
 
 canvas.onmousedown = (e) => {
@@ -108,6 +132,7 @@ canvas.onmousedown = (e) => {
   const r = canvas.getBoundingClientRect();
   const sx = canvas.width / r.width, sy = canvas.height / r.height;
   current = { tool, color, lw, x1: (e.clientX-r.left)*sx, y1: (e.clientY-r.top)*sy, x2: 0, y2: 0 };
+  if (tool === 'magnifier') current.zoom = zoomLevel;
 };
 canvas.onmousemove = (e) => {
   if (!dragging || !current) return;
@@ -144,6 +169,7 @@ function render() {
     else if (d.tool === 'abc-arrow') { aA++; drawAbcArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aA); }
     else if (d.tool === 'abc-rect') { aR++; drawAbcRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aR); }
     else if (d.tool === 'circle') drawEllipse(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+    else if (d.tool === 'magnifier') drawMagnifier(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,d.zoom||2.0);
     else drawR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
   });
   if (current) {
@@ -156,6 +182,7 @@ function render() {
     else if (current.tool === 'abc-arrow') drawAbcArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcAN+1);
     else if (current.tool === 'abc-rect') drawAbcRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcRN+1);
     else if (current.tool === 'circle') drawEllipse(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+    else if (current.tool === 'magnifier') drawMagnifier(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,current.zoom||2.0);
     else drawR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
   }
 }
@@ -225,6 +252,41 @@ function drawEllipse(x1,y1,x2,y2,c,w) {
   if (rx<1||ry<1) return;
   ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
   ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+}
+
+// Magnifier tool — draws a circular zoom lens showing magnified screenshot content
+function drawMagnifier(x1,y1,x2,y2,c,w,zoom) {
+  if (!img) return;
+  const dx = x2 - x1, dy = y2 - y1;
+  const radius = Math.sqrt(dx*dx + dy*dy);
+  if (radius < 5) return;
+
+  const centerX = x1, centerY = y1;
+  const srcRadius = radius / zoom;
+  const srcX = centerX - srcRadius;
+  const srcY = centerY - srcRadius;
+  const srcSize = srcRadius * 2;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.drawImage(img, srcX, srcY, srcSize, srcSize, centerX - radius, centerY - radius, radius * 2, radius * 2);
+  ctx.restore();
+
+  // Border ring
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = c;
+  ctx.lineWidth = Math.max(3, w);
+  ctx.stroke();
+
+  // Crosshair
+  const cs = 6;
+  ctx.beginPath();
+  ctx.moveTo(centerX - cs, centerY); ctx.lineTo(centerX + cs, centerY);
+  ctx.moveTo(centerX, centerY - cs); ctx.lineTo(centerX, centerY + cs);
+  ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.stroke();
 }
 
 function saveAndDownload() {

@@ -5,6 +5,22 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-04-07
+
+### Added
+
+- **Magnifier Tool** — New annotation tool that creates a circular zoom lens on the screenshot. Click to set the center, drag to define the radius. Features configurable zoom level (1.5×–5×) via the slider, a colored border ring, and a crosshair at the center. Available on all platforms (macOS, Windows, Linux, Chrome Extension).
+
+### Changed
+
+- **Tool order redesigned** — Circle/Ellipse tool moved from the end of the toolbar to after Rectangle and before Line, for a more logical grouping. Consistent across all platforms.
+- **Keyboard shortcuts updated** — `5` = Circle, `6` = Line, `7` = Question Arrow, `8` = Question Rect, `9` = ABC Arrow, `0` = ABC Rect, `M` = Magnifier.
+- **Save & Copy closes editor** — On Windows and Linux, clicking "Save & Copy" now closes the annotation editor window after saving (matching macOS behavior).
+
+### Fixed
+
+- **Multi-Monitor Selection (Windows)** — Fixed overlay windows not covering full display area on Windows with DPI scaling. Overlays now use kiosk mode with screen-saver-level always-on-top to ensure complete coverage across all monitors regardless of scale factor settings.
+
 ## [1.1.3] - 2026-04-07
 
 ### Added
@@ -99,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.4]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.0...v1.1.1

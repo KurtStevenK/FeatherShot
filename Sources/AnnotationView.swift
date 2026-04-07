@@ -11,6 +11,7 @@ struct AnnotationView: View {
     @State private var selectedTool: Tool = .stepArrow
     @State private var selectedColor: Color = .red
     @State private var lineWidth: CGFloat = 4.0
+    @State private var zoomLevel: CGFloat = 2.0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -39,13 +40,15 @@ struct AnnotationView: View {
                                 }
                                 .onEnded { value in
                                     if let start = currentStart {
-                                        drawings.append(DrawingElement(
+                                        let element = DrawingElement(
                                             tool: selectedTool,
                                             start: start,
                                             end: value.location,
                                             color: selectedColor,
-                                            lineWidth: lineWidth
-                                        ))
+                                            lineWidth: lineWidth,
+                                            zoomLevel: zoomLevel
+                                        )
+                                        drawings.append(element)
                                     }
                                     currentStart = nil
                                     currentEnd = nil
@@ -94,6 +97,8 @@ struct AnnotationView: View {
                     ABCRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
                 } else if drawing.tool == .circle {
                     EllipseView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .magnifier {
+                    MagnifierView(image: image, start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, zoomLevel: drawing.zoomLevel)
                 } else {
                     RectangleShape(start: drawing.start, end: drawing.end)
                         .stroke(drawing.color, lineWidth: drawing.lineWidth)
@@ -124,6 +129,8 @@ struct AnnotationView: View {
                     ABCRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
                 } else if selectedTool == .circle {
                     EllipseView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .magnifier {
+                    MagnifierView(image: image, start: start, end: end, color: selectedColor, lineWidth: lineWidth, zoomLevel: zoomLevel)
                 } else {
                     RectangleShape(start: start, end: end)
                         .stroke(selectedColor, lineWidth: lineWidth)
@@ -187,67 +194,7 @@ struct AnnotationView: View {
                     
                     Divider().frame(height: 20)
                     
-                    // Tool 5: Line
-                    Button(action: { selectedTool = .line }) {
-                        Image(systemName: "line.diagonal")
-                            .padding(8)
-                            .background(selectedTool == .line ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .line ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Line (5)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 6: Question Arrow
-                    Button(action: { selectedTool = .questionArrow }) {
-                        Image(systemName: "questionmark.circle")
-                            .padding(8)
-                            .background(selectedTool == .questionArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .questionArrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Question Arrow (6)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 7: Question Rectangle
-                    Button(action: { selectedTool = .questionRectangle }) {
-                        Image(systemName: "questionmark.square")
-                            .padding(8)
-                            .background(selectedTool == .questionRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .questionRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Question Rectangle (7)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 8: ABC Arrow
-                    Button(action: { selectedTool = .abcArrow }) {
-                        Image(systemName: "textformat.abc")
-                            .padding(8)
-                            .background(selectedTool == .abcArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .abcArrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("ABC Arrow (8)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 9: ABC Rectangle
-                    Button(action: { selectedTool = .abcRectangle }) {
-                        Image(systemName: "character.textbox")
-                            .padding(8)
-                            .background(selectedTool == .abcRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .abcRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("ABC Rectangle (9)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 10: Circle/Ellipse
+                    // Tool 5: Circle/Ellipse (moved here from end)
                     Button(action: { selectedTool = .circle }) {
                         Image(systemName: "circle")
                             .padding(8)
@@ -255,7 +202,79 @@ struct AnnotationView: View {
                             .foregroundColor(selectedTool == .circle ? .white : .primary)
                     }
                     .buttonStyle(.plain)
-                    .help("Circle (0)")
+                    .help("Circle (5)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 6: Line
+                    Button(action: { selectedTool = .line }) {
+                        Image(systemName: "line.diagonal")
+                            .padding(8)
+                            .background(selectedTool == .line ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .line ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Line (6)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 7: Question Arrow
+                    Button(action: { selectedTool = .questionArrow }) {
+                        Image(systemName: "questionmark.circle")
+                            .padding(8)
+                            .background(selectedTool == .questionArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .questionArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Question Arrow (7)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 8: Question Rectangle
+                    Button(action: { selectedTool = .questionRectangle }) {
+                        Image(systemName: "questionmark.square")
+                            .padding(8)
+                            .background(selectedTool == .questionRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .questionRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Question Rectangle (8)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 9: ABC Arrow
+                    Button(action: { selectedTool = .abcArrow }) {
+                        Image(systemName: "textformat.abc")
+                            .padding(8)
+                            .background(selectedTool == .abcArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .abcArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("ABC Arrow (9)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 10: ABC Rectangle
+                    Button(action: { selectedTool = .abcRectangle }) {
+                        Image(systemName: "character.textbox")
+                            .padding(8)
+                            .background(selectedTool == .abcRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .abcRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("ABC Rectangle (0)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 11: Magnifier
+                    Button(action: { selectedTool = .magnifier }) {
+                        Image(systemName: "magnifyingglass")
+                            .padding(8)
+                            .background(selectedTool == .magnifier ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .magnifier ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Magnifier (M)")
                 }
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(8)
@@ -269,14 +288,23 @@ struct AnnotationView: View {
                 .labelsHidden()
                 .fixedSize()
 
-            // Line Width
+            // Line Width / Zoom Level
             HStack(spacing: 8) {
-                Slider(value: $lineWidth, in: 2...15)
-                    .frame(width: 80)
-                Text("\(Int(lineWidth))px")
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundColor(.secondary)
-                    .frame(width: 30)
+                if selectedTool == .magnifier {
+                    Slider(value: $zoomLevel, in: 1.5...5.0, step: 0.5)
+                        .frame(width: 80)
+                    Text("\(String(format: "%.1f", zoomLevel))×")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .frame(width: 30)
+                } else {
+                    Slider(value: $lineWidth, in: 2...15)
+                        .frame(width: 80)
+                    Text("\(Int(lineWidth))px")
+                        .font(.system(size: 10, design: .monospaced))
+                        .foregroundColor(.secondary)
+                        .frame(width: 30)
+                }
             }
             .fixedSize()
 

@@ -61,8 +61,27 @@ function setupIPC() {
     closeAllOverlays();
 
     if (capturedScreenshot && globalBounds) {
-      // cropRegion is in global CSS coordinates — convert to composite pixel coords
+      // cropRegion is in global CSS coordinates
+      // We need to figure out which display the selection center falls on
+      // and use that display's scale factor for accurate cropping
+      const displays = screen.getAllDisplays();
+      const selCenterX = cropRegion.x + cropRegion.width / 2;
+      const selCenterY = cropRegion.y + cropRegion.height / 2;
+
+      // Find the display containing the center of the selection
+      let targetDisplay = screen.getPrimaryDisplay();
+      for (const d of displays) {
+        if (selCenterX >= d.bounds.x && selCenterX < d.bounds.x + d.bounds.width &&
+            selCenterY >= d.bounds.y && selCenterY < d.bounds.y + d.bounds.height) {
+          targetDisplay = d;
+          break;
+        }
+      }
+
+      // Use the primary display's scale factor for the composite image
+      // since that's what we used to build the composite
       const primarySF = screen.getPrimaryDisplay().scaleFactor || 1;
+
       const pixelCrop = {
         x: Math.round((cropRegion.x - globalBounds.minX) * primarySF),
         y: Math.round((cropRegion.y - globalBounds.minY) * primarySF),
@@ -264,6 +283,8 @@ function openSelectionOverlays() {
   const primarySF = screen.getPrimaryDisplay().scaleFactor || 1;
 
   for (const display of displays) {
+    const sf = display.scaleFactor || 1;
+
     const win = new BrowserWindow({
       x: display.bounds.x,
       y: display.bounds.y,
@@ -277,6 +298,7 @@ function openSelectionOverlays() {
       resizable: false,
       movable: false,
       focusable: true,
+      enableLargerThanScreen: true,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
@@ -286,6 +308,11 @@ function openSelectionOverlays() {
     // macOS: simple fullscreen per display
     if (process.platform === 'darwin') {
       win.setSimpleFullScreen(true);
+    } else {
+      // Windows/Linux: use always-on-top at screen-saver level to cover taskbar,
+      // then enter kiosk mode to ensure full coverage regardless of DPI scaling
+      win.setAlwaysOnTop(true, 'screen-saver');
+      win.setKiosk(true);
     }
 
     win.loadFile(path.join(__dirname, 'renderer', 'selection.html'));
@@ -320,7 +347,7 @@ function openSelectionOverlays() {
         dataUrl: displayDataUrl,
         displayBounds: display.bounds, // CSS pixel bounds of this display
         globalBounds: globalBounds,    // CSS pixel bounds of all displays combined
-        scale: display.scaleFactor || 1
+        scale: sf
       });
     });
 
