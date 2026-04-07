@@ -5,6 +5,19 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-07
+
+### Fixed
+
+- **Multi-monitor selection overhauled** — Transparent overlays with `setFullScreen(true)` for guaranteed full-screen coverage on all monitors (no DPI sizing issues). No pre-capture (instant open, no double taskbar). Capture happens AFTER selection.
+- **Cross-monitor selection** — When selection spans multiple displays, each display's portion is captured individually and composited in the editor. All content from all covered monitors is visible.
+- **Editor opens after selection** — Fixed missing `show()` call.
+- **HiDPI rendering** — Canvas uses `devicePixelRatio` for sharp text and selection borders.
+
+### Changed
+
+- **Release filenames include OS** — `(Windows)`, `(Windows Setup)`, `(Debian)`, `(Ubuntu)`, `(macOS)`.
+
 ## [1.1.9] - 2026-04-07
 
 ### Fixed

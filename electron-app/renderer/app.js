@@ -86,11 +86,32 @@ ipcRenderer.on('load-screenshot', (event, dataUrl) => {
   loadScreenshot(dataUrl);
 });
 
-// Also try pulling via handle (safer, no race condition)
+// Pull screenshot data from main (handles both single and composite)
 (async () => {
   try {
-    const dataUrl = await ipcRenderer.invoke('editor-screenshot-request');
-    if (dataUrl) loadScreenshot(dataUrl);
+    const data = await ipcRenderer.invoke('editor-screenshot-request');
+    if (!data) return;
+    if (typeof data === 'string') {
+      loadScreenshot(data);
+    } else if (data.type === 'composite') {
+      // Cross-monitor: composite multiple pieces onto canvas
+      canvas.width = data.width;
+      canvas.height = data.height;
+      let loaded = 0;
+      data.pieces.forEach(p => {
+        const img = new Image();
+        img.onload = () => {
+          const ctx2 = canvas.getContext('2d');
+          ctx2.drawImage(img, 0, 0, img.width, img.height, p.destX, p.destY, p.destW, p.destH);
+          loaded++;
+          if (loaded === data.pieces.length) {
+            // Convert composite to a single image for the editor
+            loadScreenshot(canvas.toDataURL('image/png'));
+          }
+        };
+        img.src = p.dataUrl;
+      });
+    }
   } catch(e) {}
 })();
 
