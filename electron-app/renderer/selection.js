@@ -3,150 +3,122 @@ const { ipcRenderer } = require('electron');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const dimLabel = document.getElementById('dimensions');
-const instructions = document.getElementById('instructions');
 
-let displayBounds = null;  // This display's CSS pixel bounds { x, y, width, height }
-let globalBounds = null;   // All displays combined { minX, minY, maxX, maxY }
-
-// Selection state in GLOBAL CSS pixel coordinates
+let screenshotCanvas = null;
 let selecting = false;
-let globalStartX = 0, globalStartY = 0;
-let globalEndX = 0, globalEndY = 0;
+let startX = 0, startY = 0, endX = 0, endY = 0;
 
-// Initialize — receive display bounds (no screenshot needed)
-ipcRenderer.on('selection-init', (event, { displayBounds: db, globalBounds: gb }) => {
-  displayBounds = db;
-  globalBounds = gb;
+ipcRenderer.on('selection-init', (event, { captures, totalWidth, totalHeight }) => {
+  canvas.width = totalWidth;
+  canvas.height = totalHeight;
 
-  // Set canvas to match display CSS pixel dimensions
-  canvas.width = db.width;
-  canvas.height = db.height;
-  render();
+  // Composite all display captures onto an offscreen canvas
+  screenshotCanvas = document.createElement('canvas');
+  screenshotCanvas.width = totalWidth;
+  screenshotCanvas.height = totalHeight;
+  const sctx = screenshotCanvas.getContext('2d');
+
+  let loaded = 0;
+  captures.forEach(cap => {
+    const img = new Image();
+    img.onload = () => {
+      sctx.drawImage(img, cap.x, cap.y, cap.width, cap.height);
+      loaded++;
+      if (loaded === captures.length) {
+        render();
+        ipcRenderer.send('selection-ready');
+      }
+    };
+    img.onerror = () => {
+      loaded++;
+      if (loaded === captures.length) {
+        render();
+        ipcRenderer.send('selection-ready');
+      }
+    };
+    img.src = cap.dataUrl;
+  });
 });
 
-// Receive selection updates from main process (broadcast from any overlay)
-ipcRenderer.on('selection-update', (event, data) => {
-  if (data.type === 'down') {
-    selecting = true;
-    instructions.style.display = 'none';
-    globalStartX = data.globalX;
-    globalStartY = data.globalY;
-    globalEndX = data.globalX;
-    globalEndY = data.globalY;
-  } else if (data.type === 'move' && selecting) {
-    globalEndX = data.globalX;
-    globalEndY = data.globalY;
-    render();
-    // Show dimension label near local mouse position
-    const localX = data.globalX - displayBounds.x;
-    const localY = data.globalY - displayBounds.y;
-    if (localX >= 0 && localX <= displayBounds.width && localY >= 0 && localY <= displayBounds.height) {
-      updateDimensions(localX, localY);
-    } else {
-      dimLabel.style.display = 'none';
-    }
-  } else if (data.type === 'up' && selecting) {
-    selecting = false;
-    dimLabel.style.display = 'none';
-    globalEndX = data.globalX;
-    globalEndY = data.globalY;
-
-    const x = Math.min(globalStartX, globalEndX);
-    const y = Math.min(globalStartY, globalEndY);
-    const w = Math.abs(globalEndX - globalStartX);
-    const h = Math.abs(globalEndY - globalStartY);
-
-    // Minimum selection size
-    if (w < 10 || h < 10) return;
-
-    // Send global crop region to main process
-    ipcRenderer.send('selection-complete', {
-      x: x,
-      y: y,
-      width: w,
-      height: h
-    });
-  }
-});
-
-// --- Mouse events — convert local to global and send to main ---
+// Mouse events — single window, coordinates map directly to canvas
 canvas.addEventListener('mousedown', (e) => {
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('selection-mouse-event', { type: 'down', globalX: gx, globalY: gy });
+  selecting = true;
+  startX = e.clientX;
+  startY = e.clientY;
+  endX = e.clientX;
+  endY = e.clientY;
+  const instr = document.getElementById('instructions');
+  if (instr) instr.style.display = 'none';
 });
 
 canvas.addEventListener('mousemove', (e) => {
   if (!selecting) return;
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('selection-mouse-event', { type: 'move', globalX: gx, globalY: gy });
+  endX = e.clientX;
+  endY = e.clientY;
+  render();
+  updateDimensions(e.clientX, e.clientY);
 });
 
 canvas.addEventListener('mouseup', (e) => {
   if (!selecting) return;
-  const gx = displayBounds.x + e.clientX;
-  const gy = displayBounds.y + e.clientY;
-  ipcRenderer.send('selection-mouse-event', { type: 'up', globalX: gx, globalY: gy });
+  selecting = false;
+  endX = e.clientX;
+  endY = e.clientY;
+  dimLabel.style.display = 'none';
+
+  const x = Math.min(startX, endX);
+  const y = Math.min(startY, endY);
+  const w = Math.abs(endX - startX);
+  const h = Math.abs(endY - startY);
+
+  if (w < 10 || h < 10) return;
+  ipcRenderer.send('selection-complete', { x, y, width: w, height: h });
 });
 
-// Escape to cancel
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    ipcRenderer.send('selection-cancel');
-  }
+  if (e.key === 'Escape') ipcRenderer.send('selection-cancel');
 });
 
-// --- Render ---
 function render() {
-  if (!displayBounds) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!screenshotCanvas) return;
 
-  // Dark semi-transparent overlay over the live desktop
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  // Draw composite screenshot
+  ctx.drawImage(screenshotCanvas, 0, 0);
+
+  // Dark overlay
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (selecting || globalEndX !== globalStartX || globalEndY !== globalStartY) {
-    // Global selection rect in CSS pixels
-    const selX = Math.min(globalStartX, globalEndX);
-    const selY = Math.min(globalStartY, globalEndY);
-    const selW = Math.abs(globalEndX - globalStartX);
-    const selH = Math.abs(globalEndY - globalStartY);
+  if (selecting) {
+    const selX = Math.min(startX, endX);
+    const selY = Math.min(startY, endY);
+    const selW = Math.abs(endX - startX);
+    const selH = Math.abs(endY - startY);
 
-    // Convert global selection to this display's local coordinates
-    // Canvas pixels = display CSS pixels (1:1 mapping)
-    const localX = selX - displayBounds.x;
-    const localY = selY - displayBounds.y;
-    const localW = selW;
-    const localH = selH;
-
-    // Clip to this display's canvas bounds
-    const clipX = Math.max(0, localX);
-    const clipY = Math.max(0, localY);
-    const clipR = Math.min(canvas.width, localX + localW);
-    const clipB = Math.min(canvas.height, localY + localH);
-    const clipW = clipR - clipX;
-    const clipH = clipB - clipY;
-
-    if (clipW > 0 && clipH > 0) {
-      // Clear the selected area to make it transparent — shows live desktop through
-      ctx.clearRect(clipX, clipY, clipW, clipH);
+    if (selW > 0 && selH > 0) {
+      // Reveal bright screenshot in the selection area
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(selX, selY, selW, selH);
+      ctx.clip();
+      ctx.drawImage(screenshotCanvas, 0, 0);
+      ctx.restore();
 
       // Selection border
       ctx.strokeStyle = '#0a84ff';
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 3]);
-      ctx.strokeRect(localX, localY, localW, localH);
+      ctx.strokeRect(selX, selY, selW, selH);
       ctx.setLineDash([]);
     }
   }
 }
 
-function updateDimensions(mouseX, mouseY) {
-  const w = Math.abs(globalEndX - globalStartX);
-  const h = Math.abs(globalEndY - globalStartY);
+function updateDimensions(mx, my) {
+  const w = Math.abs(endX - startX);
+  const h = Math.abs(endY - startY);
   dimLabel.textContent = `${Math.round(w)} × ${Math.round(h)}`;
   dimLabel.style.display = 'block';
-  dimLabel.style.left = (mouseX + 14) + 'px';
-  dimLabel.style.top = (mouseY + 14) + 'px';
+  dimLabel.style.left = (mx + 14) + 'px';
+  dimLabel.style.top = (my + 14) + 'px';
 }

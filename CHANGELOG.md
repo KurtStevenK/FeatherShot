@@ -5,6 +5,12 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-04-07
+
+### Fixed
+
+- **Multi-Monitor Selection completely rewritten** — Replaced per-display overlay windows with a single window spanning the entire virtual desktop. This fixes: cross-monitor selection (can now drag across monitors), stretched overlays, double taskbars, wrong aspect ratios, and the JavaScript `webContents` error on Windows. The window is non-transparent (uses screenshot as background) for reliable rendering on all Windows DPI configurations.
+
 ## [1.1.5] - 2026-04-07
 
 ### Fixed
@@ -125,6 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.6]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.2...v1.1.3
