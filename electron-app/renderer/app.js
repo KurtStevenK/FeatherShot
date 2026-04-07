@@ -12,17 +12,35 @@ let drawings = [];
 let currentDraw = null;
 let stepArrowCount = 0;
 let stepRectCount = 0;
+let abcArrowCount = 0;
+let abcRectCount = 0;
 let isDragging = false;
+
+// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
+function letterLabel(n) {
+  let num = n - 1;
+  let result = '';
+  do {
+    result = String.fromCharCode(97 + (num % 26)) + result;
+    num = Math.floor(num / 26) - 1;
+  } while (num >= 0);
+  return result;
+}
 
 // --- DOM ---
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// Tool buttons (order: step-arrow, step-rect, arrow, rect)
+// Tool buttons (order: step-arrow, step-rect, arrow, rect, line, question-arrow, question-rect, abc-arrow, abc-rect)
 document.getElementById('tool-step-arrow').addEventListener('click', () => setTool('step-arrow'));
 document.getElementById('tool-step-rect').addEventListener('click', () => setTool('step-rect'));
 document.getElementById('tool-arrow').addEventListener('click', () => setTool('arrow'));
 document.getElementById('tool-rect').addEventListener('click', () => setTool('rect'));
+document.getElementById('tool-line').addEventListener('click', () => setTool('line'));
+document.getElementById('tool-question-arrow').addEventListener('click', () => setTool('question-arrow'));
+document.getElementById('tool-question-rect').addEventListener('click', () => setTool('question-rect'));
+document.getElementById('tool-abc-arrow').addEventListener('click', () => setTool('abc-arrow'));
+document.getElementById('tool-abc-rect').addEventListener('click', () => setTool('abc-rect'));
 
 // Controls
 document.getElementById('color-picker').addEventListener('input', (e) => { color = e.target.value; });
@@ -42,6 +60,11 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '2') setTool('step-rect');
   if (e.key === '3' || e.key === 'a') setTool('arrow');
   if (e.key === '4' || e.key === 'r') setTool('rect');
+  if (e.key === '5' || e.key === 'l') setTool('line');
+  if (e.key === '6') setTool('question-arrow');
+  if (e.key === '7') setTool('question-rect');
+  if (e.key === '8') setTool('abc-arrow');
+  if (e.key === '9') setTool('abc-rect');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
@@ -87,6 +110,12 @@ canvas.addEventListener('mouseup', () => {
     } else if (currentDraw.tool === 'step-rect') {
       stepRectCount++;
       currentDraw.stepNumber = stepRectCount;
+    } else if (currentDraw.tool === 'abc-arrow') {
+      abcArrowCount++;
+      currentDraw.stepNumber = abcArrowCount;
+    } else if (currentDraw.tool === 'abc-rect') {
+      abcRectCount++;
+      currentDraw.stepNumber = abcRectCount;
     }
     drawings.push(currentDraw);
     currentDraw = null;
@@ -103,7 +132,7 @@ function render() {
   ctx.drawImage(screenshotImage, 0, 0);
 
   // Draw completed
-  let stepA = 0, stepR = 0;
+  let stepA = 0, stepR = 0, abcA = 0, abcR = 0;
   drawings.forEach(d => {
     if (d.tool === 'step-arrow') {
       stepA++;
@@ -113,6 +142,18 @@ function render() {
       drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepR);
     } else if (d.tool === 'arrow') {
       drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'line') {
+      drawLine(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'question-arrow') {
+      drawQuestionArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'question-rect') {
+      drawQuestionRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'abc-arrow') {
+      abcA++;
+      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcA);
+    } else if (d.tool === 'abc-rect') {
+      abcR++;
+      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
     } else {
       drawRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     }
@@ -126,11 +167,23 @@ function render() {
       drawStepRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepRectCount + 1);
     } else if (currentDraw.tool === 'arrow') {
       drawArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'line') {
+      drawLine(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'question-arrow') {
+      drawQuestionArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'question-rect') {
+      drawQuestionRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'abc-arrow') {
+      drawAbcArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcArrowCount + 1);
+    } else if (currentDraw.tool === 'abc-rect') {
+      drawAbcRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcRectCount + 1);
     } else {
       drawRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     }
   }
 }
+
+// --- Drawing Functions ---
 
 function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
   const headLength = 12 + lw * 1.5;
@@ -166,23 +219,19 @@ function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
   ctx.fill();
 }
 
+function drawLine(ctx, x1, y1, x2, y2, color, lw) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+}
+
 function drawStepArrow(ctx, x1, y1, x2, y2, color, lw, num) {
   drawArrow(ctx, x1, y1, x2, y2, color, lw);
-
-  const radius = Math.max(12, lw * 3);
-
-  // Circle
-  ctx.beginPath();
-  ctx.arc(x1, y1, radius, 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-
-  // Number
-  ctx.fillStyle = '#fff';
-  ctx.font = `bold ${radius * 1.2}px -apple-system, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(num.toString(), x1, y1);
+  drawCircleLabel(ctx, x1, y1, color, lw, num.toString());
 }
 
 function drawRect(ctx, x1, y1, x2, y2, color, lw) {
@@ -195,23 +244,52 @@ function drawRect(ctx, x1, y1, x2, y2, color, lw) {
 
 function drawStepRect(ctx, x1, y1, x2, y2, color, lw, num) {
   drawRect(ctx, x1, y1, x2, y2, color, lw);
-
-  const radius = Math.max(12, lw * 3);
   const cx = Math.min(x1, x2);
   const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, num.toString());
+}
 
-  // Circle at top-left corner
+function drawQuestionArrow(ctx, x1, y1, x2, y2, color, lw) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, '?');
+}
+
+function drawQuestionRect(ctx, x1, y1, x2, y2, color, lw) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, '?');
+}
+
+function drawAbcArrow(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, letterLabel(num));
+}
+
+function drawAbcRect(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, letterLabel(num));
+}
+
+// Shared helper: draw a filled circle with a text label at (x, y)
+function drawCircleLabel(ctx, x, y, color, lw, label) {
+  const radius = Math.max(12, lw * 3);
+
+  // Circle
   ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
 
-  // Number
+  // Label text — shrink font for multi-char labels
+  const fontSize = label.length > 1 ? radius * 0.9 : radius * 1.2;
   ctx.fillStyle = '#fff';
-  ctx.font = `bold ${radius * 1.2}px -apple-system, sans-serif`;
+  ctx.font = `bold ${fontSize}px -apple-system, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(num.toString(), cx, cy);
+  ctx.fillText(label, x, y);
 }
 
 // --- Actions ---
@@ -226,6 +304,8 @@ function undo() {
     const removed = drawings.pop();
     if (removed.tool === 'step-arrow') stepArrowCount = Math.max(0, stepArrowCount - 1);
     if (removed.tool === 'step-rect') stepRectCount = Math.max(0, stepRectCount - 1);
+    if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
+    if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
     render();
     updateUndoState();
   }
@@ -235,6 +315,8 @@ function clearAll() {
   drawings = [];
   stepArrowCount = 0;
   stepRectCount = 0;
+  abcArrowCount = 0;
+  abcRectCount = 0;
   render();
   updateUndoState();
 }

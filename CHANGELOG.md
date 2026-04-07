@@ -5,6 +5,19 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-04-07
+
+### Added
+
+- **Line Tool** — New annotation tool that draws simple straight lines without arrowheads.
+- **Question Arrow & Rectangle** — New annotation tools that draw arrows and rectangles with a "?" circle.
+- **ABC Arrow & Rectangle** — New annotation tools that draw arrows and rectangles with an auto-incrementing letter label (a, b, ..., z, aa, ab).
+
+### Fixed
+
+- **Multi-Monitor Support (Electron)** — Fixed a bug where taking a screenshot on a mixed-resolution multi-monitor setup would only capture a portion of the primary display. The tool now correctly captures and composites all displays.
+- **macOS Editor Overflow** — Capturing tall screenshots no longer pushes the toolbar off-screen. Large images now smoothly scroll vertically and horizontally within the editor.
+
 ## [1.1.1] - 2026-04-06
 
 ### Added
@@ -76,6 +89,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.1.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/KurtStevenK/FeatherShot/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.0.0...v1.0.1

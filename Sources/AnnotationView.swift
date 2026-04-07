@@ -14,50 +14,50 @@ struct AnnotationView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Main Interaction Area
-            // Center everything so small screenshots are visible and clear
-            ZStack(alignment: .center) {
-                Color.black.opacity(0.12)
-                    .ignoresSafeArea()
-                
-                // The canvas area is STRICTLY the size of the image
-                // Centering here ensures the tiny image is visible
-                drawingContent
-                    .frame(width: image.size.width, height: image.size.height)
-                    .background(Color.white.opacity(0.05)) // Visual hint for image bounds
-                    .overlay(
-                        Rectangle()
-                            .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                    )
-                    .shadow(color: .black.opacity(0.2), radius: 10)
-                    .contentShape(Rectangle())
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                if currentStart == nil {
-                                    currentStart = value.startLocation
+            // Scrollable image area — allows large screenshots to scroll
+            // instead of pushing the toolbar off-screen
+            ScrollView([.horizontal, .vertical]) {
+                ZStack(alignment: .center) {
+                    Color.black.opacity(0.12)
+                    
+                    drawingContent
+                        .frame(width: image.size.width, height: image.size.height)
+                        .background(Color.white.opacity(0.05))
+                        .overlay(
+                            Rectangle()
+                                .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                        )
+                        .shadow(color: .black.opacity(0.2), radius: 10)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    if currentStart == nil {
+                                        currentStart = value.startLocation
+                                    }
+                                    currentEnd = value.location
                                 }
-                                currentEnd = value.location
-                            }
-                            .onEnded { value in
-                                if let start = currentStart {
-                                    drawings.append(DrawingElement(
-                                        tool: selectedTool,
-                                        start: start,
-                                        end: value.location,
-                                        color: selectedColor,
-                                        lineWidth: lineWidth
-                                    ))
+                                .onEnded { value in
+                                    if let start = currentStart {
+                                        drawings.append(DrawingElement(
+                                            tool: selectedTool,
+                                            start: start,
+                                            end: value.location,
+                                            color: selectedColor,
+                                            lineWidth: lineWidth
+                                        ))
+                                    }
+                                    currentStart = nil
+                                    currentEnd = nil
                                 }
-                                currentStart = nil
-                                currentEnd = nil
-                            }
-                    )
+                        )
+                }
+                .frame(width: max(image.size.width, 600), height: max(image.size.height, 300))
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
 
-            // Toolbar
+            // Toolbar — always visible at the bottom
             toolbar
         }
     }
@@ -80,6 +80,18 @@ struct AnnotationView: View {
                 } else if drawing.tool == .stepRectangle {
                     let stepNum = drawings[0...index].filter { $0.tool == .stepRectangle }.count
                     StepRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
+                } else if drawing.tool == .line {
+                    LineView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .questionArrow {
+                    QuestionArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .questionRectangle {
+                    QuestionRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .abcArrow {
+                    let stepNum = drawings[0...index].filter { $0.tool == .abcArrow }.count
+                    ABCArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
+                } else if drawing.tool == .abcRectangle {
+                    let stepNum = drawings[0...index].filter { $0.tool == .abcRectangle }.count
+                    ABCRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
                 } else {
                     RectangleShape(start: drawing.start, end: drawing.end)
                         .stroke(drawing.color, lineWidth: drawing.lineWidth)
@@ -96,6 +108,18 @@ struct AnnotationView: View {
                 } else if selectedTool == .stepRectangle {
                     let stepNum = drawings.filter { $0.tool == .stepRectangle }.count + 1
                     StepRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
+                } else if selectedTool == .line {
+                    LineView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .questionArrow {
+                    QuestionArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .questionRectangle {
+                    QuestionRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .abcArrow {
+                    let stepNum = drawings.filter { $0.tool == .abcArrow }.count + 1
+                    ABCArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
+                } else if selectedTool == .abcRectangle {
+                    let stepNum = drawings.filter { $0.tool == .abcRectangle }.count + 1
+                    ABCRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
                 } else {
                     RectangleShape(start: start, end: end)
                         .stroke(selectedColor, lineWidth: lineWidth)
@@ -107,54 +131,120 @@ struct AnnotationView: View {
     }
     
     var toolbar: some View {
-        HStack(spacing: 12) {
-            // Tool Selection — counting tools first, then plain tools
-            HStack(spacing: 0) {
-                Button(action: { selectedTool = .stepArrow }) {
-                    Image(systemName: "list.number")
-                        .padding(8)
-                        .background(selectedTool == .stepArrow ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTool == .stepArrow ? .white : .primary)
+        HStack(spacing: 8) {
+            // Tool Selection — counting tools first, then plain tools, then special tools
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 0) {
+                    // Tool 1: Step Arrow
+                    Button(action: { selectedTool = .stepArrow }) {
+                        Image(systemName: "list.number")
+                            .padding(8)
+                            .background(selectedTool == .stepArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .stepArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Step Arrow (1)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 2: Step Rectangle
+                    Button(action: { selectedTool = .stepRectangle }) {
+                        Image(systemName: "number.square")
+                            .padding(8)
+                            .background(selectedTool == .stepRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .stepRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Step Rectangle (2)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 3: Arrow
+                    Button(action: { selectedTool = .arrow }) {
+                        Image(systemName: "arrow.up.right")
+                            .padding(8)
+                            .background(selectedTool == .arrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .arrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Arrow (3)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 4: Rectangle
+                    Button(action: { selectedTool = .rectangle }) {
+                        Image(systemName: "square")
+                            .padding(8)
+                            .background(selectedTool == .rectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .rectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Rectangle (4)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 5: Line
+                    Button(action: { selectedTool = .line }) {
+                        Image(systemName: "line.diagonal")
+                            .padding(8)
+                            .background(selectedTool == .line ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .line ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Line (5)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 6: Question Arrow
+                    Button(action: { selectedTool = .questionArrow }) {
+                        Image(systemName: "questionmark.circle")
+                            .padding(8)
+                            .background(selectedTool == .questionArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .questionArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Question Arrow (6)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 7: Question Rectangle
+                    Button(action: { selectedTool = .questionRectangle }) {
+                        Image(systemName: "questionmark.square")
+                            .padding(8)
+                            .background(selectedTool == .questionRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .questionRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Question Rectangle (7)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 8: ABC Arrow
+                    Button(action: { selectedTool = .abcArrow }) {
+                        Image(systemName: "textformat.abc")
+                            .padding(8)
+                            .background(selectedTool == .abcArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .abcArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("ABC Arrow (8)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    // Tool 9: ABC Rectangle
+                    Button(action: { selectedTool = .abcRectangle }) {
+                        Image(systemName: "character.textbox")
+                            .padding(8)
+                            .background(selectedTool == .abcRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .abcRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("ABC Rectangle (9)")
                 }
-                .buttonStyle(.plain)
-                .help("Step Arrow")
-                
-                Divider().frame(height: 20)
-                
-                Button(action: { selectedTool = .stepRectangle }) {
-                    Image(systemName: "number.square")
-                        .padding(8)
-                        .background(selectedTool == .stepRectangle ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTool == .stepRectangle ? .white : .primary)
-                }
-                .buttonStyle(.plain)
-                .help("Step Rectangle")
-                
-                Divider().frame(height: 20)
-                
-                Button(action: { selectedTool = .arrow }) {
-                    Image(systemName: "arrow.up.right")
-                        .padding(8)
-                        .background(selectedTool == .arrow ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTool == .arrow ? .white : .primary)
-                }
-                .buttonStyle(.plain)
-                .help("Arrow")
-                
-                Divider().frame(height: 20)
-                
-                Button(action: { selectedTool = .rectangle }) {
-                    Image(systemName: "square")
-                        .padding(8)
-                        .background(selectedTool == .rectangle ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTool == .rectangle ? .white : .primary)
-                }
-                .buttonStyle(.plain)
-                .help("Rectangle")
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+                .fixedSize()
             }
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(8)
-            .fixedSize()
 
             Divider().frame(height: 24)
 
@@ -174,7 +264,7 @@ struct AnnotationView: View {
             }
             .fixedSize()
 
-            Spacer(minLength: 20)
+            Spacer(minLength: 12)
 
             // Actions
             HStack(spacing: 10) {

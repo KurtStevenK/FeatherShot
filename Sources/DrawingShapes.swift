@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum Tool {
-    case stepArrow, stepRectangle, arrow, rectangle
+    case stepArrow, stepRectangle, arrow, rectangle, line, questionArrow, questionRectangle, abcArrow, abcRectangle
 }
 
 struct DrawingElement: Identifiable {
@@ -11,6 +11,17 @@ struct DrawingElement: Identifiable {
     let end: CGPoint
     let color: Color
     let lineWidth: CGFloat
+}
+
+// Convert a 1-based step number into a letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
+func letterLabel(_ n: Int) -> String {
+    var num = n - 1
+    var result = ""
+    repeat {
+        result = String(Character(UnicodeScalar(97 + (num % 26))!)) + result
+        num = num / 26 - 1
+    } while num >= 0
+    return result
 }
 
 struct RectangleShape: Shape {
@@ -84,6 +95,22 @@ struct ArrowView: View {
     }
 }
 
+// Simple line tool — just a straight line, no arrowhead
+struct LineView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    
+    var body: some View {
+        Path { path in
+            path.move(to: start)
+            path.addLine(to: end)
+        }
+        .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+    }
+}
+
 // View for drawing counting step arrows
 struct StepArrowView: View {
     var start: CGPoint
@@ -148,6 +175,132 @@ struct StepRectangleView: View {
             // The number text
             Text("\(stepNumber)")
                 .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: circleX, y: circleY)
+        }
+    }
+}
+
+// View for drawing arrows with question mark
+struct QuestionArrowView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        
+        ZStack(alignment: .topLeading) {
+            ArrowView(start: start, end: end, color: color, lineWidth: lineWidth)
+            
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: start.x, y: start.y)
+                
+            Text("?")
+                .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: start.x, y: start.y)
+        }
+    }
+}
+
+// View for drawing rectangles with question mark
+struct QuestionRectangleView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        let drawingRect = CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: abs(end.x - start.x),
+            height: abs(end.y - start.y)
+        )
+        let circleX = drawingRect.minX
+        let circleY = drawingRect.minY
+        
+        ZStack(alignment: .topLeading) {
+            RectangleShape(start: start, end: end)
+                .stroke(color, lineWidth: lineWidth)
+            
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: circleX, y: circleY)
+                
+            Text("?")
+                .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: circleX, y: circleY)
+        }
+    }
+}
+
+// View for drawing arrows with auto-incrementing letter label (a, b, …, z, aa, ab, …)
+struct ABCArrowView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    var stepNumber: Int
+    
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        let label = letterLabel(stepNumber)
+        
+        ZStack(alignment: .topLeading) {
+            ArrowView(start: start, end: end, color: color, lineWidth: lineWidth)
+            
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: start.x, y: start.y)
+                
+            Text(label)
+                .font(.system(size: radius * (label.count > 1 ? 0.9 : 1.2), weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: start.x, y: start.y)
+        }
+    }
+}
+
+// View for drawing rectangles with auto-incrementing letter label
+struct ABCRectangleView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    var stepNumber: Int
+    
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        let drawingRect = CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: abs(end.x - start.x),
+            height: abs(end.y - start.y)
+        )
+        let circleX = drawingRect.minX
+        let circleY = drawingRect.minY
+        let label = letterLabel(stepNumber)
+        
+        ZStack(alignment: .topLeading) {
+            RectangleShape(start: start, end: end)
+                .stroke(color, lineWidth: lineWidth)
+            
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: circleX, y: circleY)
+                
+            Text(label)
+                .font(.system(size: radius * (label.count > 1 ? 0.9 : 1.2), weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .position(x: circleX, y: circleY)
         }

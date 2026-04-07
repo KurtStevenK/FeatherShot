@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.1.1-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.1.2-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.1.1:** **Step Rectangle** tool, **area selection** on all platforms (Windows, Linux, Chrome), macOS editor window fixes, and reordered toolbar with counting tools first.
+> **New in v1.1.2:** **Line** tool, **Question / ABC** tools (arrows & rectangles), and multi-monitor capture fixes for Windows/Linux.
 
 ---
 
@@ -62,6 +62,11 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 | **Step Rectangle** | `1▢ 2▢ 3▢` | Rectangles with **auto-incrementing numbered circles** at the top-left corner — highlight multiple regions with ordered callouts. |
 | **Arrow** | `↗` | Draw clean, directional arrows with elegant filled arrowheads. |
 | **Rectangle** | `▢` | Highlight regions with outlined rectangles to draw attention to specific areas. |
+| **Line** | `╱` | Draw simple straight lines without arrowheads. |
+| **Question Arrow** | `?→` | Arrow with a **Question Mark** circle at the start — perfect for marking unknown or questionable areas. |
+| **Question Rectangle** | `?▢` | Rectangle with a **Question Mark** circle at the top-left corner. |
+| **ABC Arrow** | `a→ b→ c→` | Arrows with **auto-incrementing lettered circles** (a, b, ..., z, aa, ab...) at the start. |
+| **ABC Rectangle** | `a▢ b▢ c▢` | Rectangles with **auto-incrementing lettered circles** at the top-left corner. |
 
 ### Additional Controls
 
@@ -192,7 +197,7 @@ A lean, 3-file Swift application:
 Sources/
 ├── AppMain.swift          # Menu bar app lifecycle, screen capture, window management
 ├── AnnotationView.swift   # SwiftUI editor with canvas, toolbar, save/export
-└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, StepArrow, Rectangle, StepRectangle)
+└── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, Line, Step variants, Question variants, ABC variants)
 ```
 
 ### Windows & Linux (Electron)

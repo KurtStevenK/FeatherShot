@@ -140,13 +140,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.annotationWindow?.close()
         }
 
-        // Clamp window to visible screen to prevent buttons hiding behind toolbar
+        // Use visibleFrame to respect the Dock and menu bar
         let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
         let toolbarHeight: CGFloat = 60
         let padding: CGFloat = 40
         let maxWidth = screenFrame.width - padding
         let maxHeight = screenFrame.height - padding
 
+        // Clamp window to screen bounds — ScrollView inside handles overflow
         let windowWidth = min(max(nsImage.size.width, 600), maxWidth)
         let windowHeight = min(max(nsImage.size.height, 300) + toolbarHeight, maxHeight)
 
@@ -163,8 +164,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.makeKeyAndOrderFront(nil)
         window.level = .floating
         window.titlebarAppearsTransparent = true
-        window.titleVisibility = .hidden // Cleaner look
+        window.titleVisibility = .hidden
+        // Fixed min size — image scrolls if larger than window
         window.minSize = NSSize(width: 600, height: 360)
+        // Prevent window from extending behind the Dock or off-screen
+        window.maxSize = NSSize(width: screenFrame.width, height: screenFrame.height)
 
         self.annotationWindow = window
         NSApp.activate(ignoringOtherApps: true)

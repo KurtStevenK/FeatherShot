@@ -1,7 +1,18 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let img = null, tool = 'step', color = '#FF3B30', lw = 4;
-let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0;
+let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0, abcAN = 0, abcRN = 0;
+
+// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
+function letterLabel(n) {
+  let num = n - 1;
+  let result = '';
+  do {
+    result = String.fromCharCode(97 + (num % 26)) + result;
+    num = Math.floor(num / 26) - 1;
+  } while (num >= 0);
+  return result;
+}
 
 // Load screenshot and apply crop if available
 chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
@@ -49,11 +60,16 @@ chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
   chrome.storage.local.remove(['screenshotData', 'cropRegion']);
 });
 
-// Tools (order: step arrow, step rect, arrow, rect)
+// Tools (order: step arrow, step rect, arrow, rect, line, question arrow, question rect, abc arrow, abc rect)
 document.getElementById('tool-step').onclick = () => setTool('step');
 document.getElementById('tool-step-rect').onclick = () => setTool('step-rect');
 document.getElementById('tool-arrow').onclick = () => setTool('arrow');
 document.getElementById('tool-rect').onclick = () => setTool('rect');
+document.getElementById('tool-line').onclick = () => setTool('line');
+document.getElementById('tool-question-arrow').onclick = () => setTool('question-arrow');
+document.getElementById('tool-question-rect').onclick = () => setTool('question-rect');
+document.getElementById('tool-abc-arrow').onclick = () => setTool('abc-arrow');
+document.getElementById('tool-abc-rect').onclick = () => setTool('abc-rect');
 
 document.getElementById('color').oninput = (e) => { color = e.target.value; };
 document.getElementById('width').oninput = (e) => {
@@ -65,17 +81,24 @@ document.getElementById('undo').onclick = () => {
     const r = drawings.pop();
     if (r.tool === 'step') stepN--;
     if (r.tool === 'step-rect') stepRN--;
+    if (r.tool === 'abc-arrow') abcAN--;
+    if (r.tool === 'abc-rect') abcRN--;
     render();
   }
 };
-document.getElementById('clear').onclick = () => { drawings = []; stepN = 0; stepRN = 0; render(); };
+document.getElementById('clear').onclick = () => { drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0; render(); };
 document.getElementById('save').onclick = saveAndDownload;
 
 function setTool(t) {
   tool = t;
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  const id = t === 'step' ? 'tool-step' : t === 'step-rect' ? 'tool-step-rect' : t === 'rect' ? 'tool-rect' : 'tool-arrow';
-  document.getElementById(id).classList.add('active');
+  const idMap = {
+    'step': 'tool-step', 'step-rect': 'tool-step-rect',
+    'arrow': 'tool-arrow', 'rect': 'tool-rect', 'line': 'tool-line',
+    'question-arrow': 'tool-question-arrow', 'question-rect': 'tool-question-rect',
+    'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect'
+  };
+  document.getElementById(idMap[t]).classList.add('active');
 }
 
 canvas.onmousedown = (e) => {
@@ -95,6 +118,8 @@ canvas.onmouseup = () => {
   if (current) {
     if (current.tool === 'step') { stepN++; current.n = stepN; }
     if (current.tool === 'step-rect') { stepRN++; current.n = stepRN; }
+    if (current.tool === 'abc-arrow') { abcAN++; current.n = abcAN; }
+    if (current.tool === 'abc-rect') { abcRN++; current.n = abcRN; }
     drawings.push(current);
     current = null;
   }
@@ -106,17 +131,27 @@ function render() {
   if (!img) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0);
-  let sA = 0, sR = 0;
+  let sA = 0, sR = 0, aA = 0, aR = 0;
   drawings.forEach(d => {
     if (d.tool === 'step') { sA++; drawStep(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,sA); }
     else if (d.tool === 'step-rect') { sR++; drawStepR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,sR); }
     else if (d.tool === 'arrow') drawArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+    else if (d.tool === 'line') drawLine(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+    else if (d.tool === 'question-arrow') drawQArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+    else if (d.tool === 'question-rect') drawQRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+    else if (d.tool === 'abc-arrow') { aA++; drawAbcArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aA); }
+    else if (d.tool === 'abc-rect') { aR++; drawAbcRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aR); }
     else drawR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
   });
   if (current) {
     if (current.tool === 'step') drawStep(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,stepN+1);
     else if (current.tool === 'step-rect') drawStepR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,stepRN+1);
     else if (current.tool === 'arrow') drawArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+    else if (current.tool === 'line') drawLine(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+    else if (current.tool === 'question-arrow') drawQArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+    else if (current.tool === 'question-rect') drawQRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+    else if (current.tool === 'abc-arrow') drawAbcArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcAN+1);
+    else if (current.tool === 'abc-rect') drawAbcRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcRN+1);
     else drawR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
   }
 }
@@ -132,12 +167,22 @@ function drawArrow(x1,y1,x2,y2,c,w) {
   ctx.closePath(); ctx.fillStyle=c; ctx.fill();
 }
 
+function drawLine(x1,y1,x2,y2,c,w) {
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+}
+
+function circleLabel(x,y,c,w,label) {
+  const r=Math.max(12,w*3);
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
+  const fs = label.length > 1 ? r*0.9 : r*1.2;
+  ctx.fillStyle='#fff'; ctx.font=`bold ${fs}px sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(label,x,y);
+}
+
 function drawStep(x1,y1,x2,y2,c,w,n) {
   drawArrow(x1,y1,x2,y2,c,w);
-  const r=Math.max(12,w*3);
-  ctx.beginPath(); ctx.arc(x1,y1,r,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font=`bold ${r*1.2}px sans-serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n+'',x1,y1);
+  circleLabel(x1,y1,c,w,n+'');
 }
 
 function drawR(x1,y1,x2,y2,c,w) {
@@ -147,11 +192,27 @@ function drawR(x1,y1,x2,y2,c,w) {
 
 function drawStepR(x1,y1,x2,y2,c,w,n) {
   drawR(x1,y1,x2,y2,c,w);
-  const r=Math.max(12,w*3);
-  const cx=Math.min(x1,x2), cy=Math.min(y1,y2);
-  ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
-  ctx.fillStyle='#fff'; ctx.font=`bold ${r*1.2}px sans-serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(n+'',cx,cy);
+  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,n+'');
+}
+
+function drawQArrow(x1,y1,x2,y2,c,w) {
+  drawArrow(x1,y1,x2,y2,c,w);
+  circleLabel(x1,y1,c,w,'?');
+}
+
+function drawQRect(x1,y1,x2,y2,c,w) {
+  drawR(x1,y1,x2,y2,c,w);
+  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,'?');
+}
+
+function drawAbcArrow(x1,y1,x2,y2,c,w,n) {
+  drawArrow(x1,y1,x2,y2,c,w);
+  circleLabel(x1,y1,c,w,letterLabel(n));
+}
+
+function drawAbcRect(x1,y1,x2,y2,c,w,n) {
+  drawR(x1,y1,x2,y2,c,w);
+  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,letterLabel(n));
 }
 
 function saveAndDownload() {

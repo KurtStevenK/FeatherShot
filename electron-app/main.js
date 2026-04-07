@@ -89,29 +89,147 @@ async function captureScreen() {
     const totalWidth = maxX - minX;
     const totalHeight = maxY - minY;
 
-    // Use primary display scale factor for thumbnail
-    const primaryDisplay = screen.getPrimaryDisplay();
-    const scaleFactor = primaryDisplay.scaleFactor;
-
+    // Capture each screen individually for reliable multi-monitor support
     const sources = await desktopCapturer.getSources({
       types: ['screen'],
       thumbnailSize: {
-        width: totalWidth * scaleFactor,
-        height: totalHeight * scaleFactor
+        width: 1, // Minimal default — we resize per-source below
+        height: 1
       }
     });
 
-    if (sources.length > 0) {
-      // Use the first screen source (covers all displays on most OSes)
-      capturedScreenshot = sources[0].thumbnail;
-      openSelectionOverlay(scaleFactor);
+    // For each display, find its matching source and capture at correct resolution
+    const displayCaptures = [];
+
+    for (const display of displays) {
+      const sf = display.scaleFactor || 1;
+      const capW = display.bounds.width * sf;
+      const capH = display.bounds.height * sf;
+
+      // Re-capture with the right thumbnail size for this display
+      const perDisplaySources = await desktopCapturer.getSources({
+        types: ['screen'],
+        thumbnailSize: { width: capW, height: capH }
+      });
+
+      // Match source to display by display_id in the source id or by index
+      let matched = null;
+      for (const src of perDisplaySources) {
+        // Electron source IDs often contain the display id, e.g. "screen:0:0"
+        // Try matching by display index
+        const srcIdMatch = src.display_id;
+        if (srcIdMatch && srcIdMatch === display.id.toString()) {
+          matched = src;
+          break;
+        }
+      }
+
+      // Fallback: if only one source is returned or no display_id match, use positional matching
+      if (!matched && perDisplaySources.length > 0) {
+        const displayIndex = displays.indexOf(display);
+        if (displayIndex < perDisplaySources.length) {
+          matched = perDisplaySources[displayIndex];
+        } else {
+          matched = perDisplaySources[0];
+        }
+      }
+
+      if (matched) {
+        displayCaptures.push({
+          thumbnail: matched.thumbnail,
+          bounds: display.bounds,
+          scaleFactor: sf
+        });
+      }
     }
+
+    if (displayCaptures.length === 0) {
+      console.error('No display captures obtained');
+      return;
+    }
+
+    // If only one display, use it directly
+    if (displayCaptures.length === 1) {
+      capturedScreenshot = displayCaptures[0].thumbnail;
+      openSelectionOverlay();
+      return;
+    }
+
+    // Composite all display captures onto a single canvas
+    // Use the primary display scale factor for the composite
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const compositeSF = primaryDisplay.scaleFactor || 1;
+    const compositeW = totalWidth * compositeSF;
+    const compositeH = totalHeight * compositeSF;
+
+    // We need to create a BrowserWindow offscreen to use canvas for compositing
+    const compositeWindow = new BrowserWindow({
+      width: compositeW,
+      height: compositeH,
+      show: false,
+      webPreferences: {
+        offscreen: true,
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+
+    const captureData = displayCaptures.map(dc => ({
+      dataUrl: dc.thumbnail.toDataURL(),
+      x: (dc.bounds.x - minX) * compositeSF,
+      y: (dc.bounds.y - minY) * compositeSF,
+      w: dc.bounds.width * compositeSF,
+      h: dc.bounds.height * compositeSF
+    }));
+
+    const htmlContent = `
+      <html><body style="margin:0;padding:0;">
+      <canvas id="c" width="${compositeW}" height="${compositeH}"></canvas>
+      <script>
+        const {ipcRenderer} = require('electron');
+        const canvas = document.getElementById('c');
+        const ctx = canvas.getContext('2d');
+        const captures = ${JSON.stringify(captureData)};
+        let loaded = 0;
+
+        captures.forEach(cap => {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, cap.x, cap.y, cap.w, cap.h);
+            loaded++;
+            if (loaded === captures.length) {
+              ipcRenderer.send('composite-ready', canvas.toDataURL('image/png'));
+            }
+          };
+          img.src = cap.dataUrl;
+        });
+      </script>
+      </body></html>
+    `;
+
+    compositeWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent));
+
+    ipcMain.once('composite-ready', (event, compositeDataUrl) => {
+      compositeWindow.close();
+      capturedScreenshot = nativeImage.createFromDataURL(compositeDataUrl);
+      openSelectionOverlay();
+    });
+
+    // Timeout fallback — if compositing takes too long, use first source
+    setTimeout(() => {
+      if (!capturedScreenshot) {
+        compositeWindow.close();
+        capturedScreenshot = displayCaptures[0].thumbnail;
+        openSelectionOverlay();
+      }
+    }, 5000);
+
   } catch (err) {
     console.error('Screenshot capture failed:', err);
   }
 }
 
-function openSelectionOverlay(scaleFactor) {
+function openSelectionOverlay() {
   if (selectionWindow) {
     selectionWindow.close();
   }
@@ -126,6 +244,9 @@ function openSelectionOverlay(scaleFactor) {
     maxX = Math.max(maxX, x + width);
     maxY = Math.max(maxY, y + height);
   }
+
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const scaleFactor = primaryDisplay.scaleFactor || 1;
 
   selectionWindow = new BrowserWindow({
     x: minX,
