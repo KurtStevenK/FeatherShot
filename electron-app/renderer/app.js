@@ -422,8 +422,11 @@ function drawCircleLabel(ctx, x, y, color, lw, label) {
 // --- Actions ---
 function setTool(t) {
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + t).classList.add('active');
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    const isActive = b.id === 'tool-' + t;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive);
+  });
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {
