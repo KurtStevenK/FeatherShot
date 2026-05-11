@@ -99,7 +99,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             CGRequestScreenCaptureAccess()
         }
 
-        let tempPath = "/tmp/feathershot_temp.png"
+        // Use a secure, user-specific temporary directory instead of a hardcoded /tmp path.
+        // This prevents symlink attacks and ensures isolation between users.
+        let tempPath = FileManager.default.temporaryDirectory.appendingPathComponent("feathershot_temp.png").path
         
         // Remove old temp file to ensure we don't load a stale image
         try? FileManager.default.removeItem(atPath: tempPath)
