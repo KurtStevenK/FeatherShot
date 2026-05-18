@@ -464,7 +464,9 @@ function clearAll() {
 }
 
 function updateUndoState() {
-  document.getElementById('btn-undo').disabled = drawings.length === 0;
+  const hasNoDrawings = drawings.length === 0;
+  document.getElementById('btn-undo').disabled = hasNoDrawings;
+  document.getElementById('btn-clear').disabled = hasNoDrawings;
 }
 
 function saveAndCopy() {
