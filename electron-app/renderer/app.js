@@ -16,6 +16,8 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
+let cachedRect = null; // Performance: Cache bounding rect during dragging to avoid layout thrashing
+let renderRequested = false; // Performance: Throttle rendering with requestAnimationFrame
 
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
@@ -117,7 +119,8 @@ function loadScreenshot(dataUrl) {
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  const rect = canvas.getBoundingClientRect();
+  cachedRect = canvas.getBoundingClientRect();
+  const rect = cachedRect;
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   const x = (e.clientX - rect.left) * scaleX;
@@ -131,12 +134,20 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (!isDragging || !currentDraw) return;
-  const rect = canvas.getBoundingClientRect();
+  const rect = cachedRect || canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   currentDraw.endX = (e.clientX - rect.left) * scaleX;
   currentDraw.endY = (e.clientY - rect.top) * scaleY;
-  render();
+
+  // Performance: Throttle rendering to once per animation frame
+  if (!renderRequested) {
+    renderRequested = true;
+    requestAnimationFrame(() => {
+      render();
+      renderRequested = false;
+    });
+  }
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -158,6 +169,7 @@ canvas.addEventListener('mouseup', () => {
     currentDraw = null;
   }
   isDragging = false;
+  cachedRect = null;
   render();
   updateUndoState();
 });

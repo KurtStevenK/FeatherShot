@@ -1,0 +1,3 @@
+## 2026-05-25 - Caching Bounding Rect and Throttling Renderer
+**Learning:** Calling `getBoundingClientRect()` inside high-frequency events like `mousemove` triggers synchronous layout recalculations (layout thrashing), which is expensive. Additionally, triggering full canvas re-renders synchronously on every `mousemove` can lead to "frame piling" where the browser falls behind the input rate, causing visible jank.
+**Action:** Always cache layout-triggering properties (like bounding boxes) at the start of a gesture (e.g., `mousedown`) and use `requestAnimationFrame` to throttle rendering to the display's actual refresh rate.
