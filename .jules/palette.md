@@ -1,0 +1,3 @@
+## 2025-05-15 - [Dynamic Slider Accessibility & Consistency]
+**Learning:** In multi-purpose interfaces where a single control (like a slider) changes function based on the selected tool, updating the `aria-label` dynamically is critical for screen reader users to understand the current context. Additionally, global destructive actions like "Clear All" should be programmatically disabled when the application state is empty to provide clear feedback and prevent unnecessary interactions.
+**Action:** Always update accessibility attributes (`aria-label`, `aria-description`) when a control's purpose changes. Use `aria-hidden="true"` for redundant visual labels next to accessible controls. Synchronize the `disabled` state of global actions with the underlying data state.
