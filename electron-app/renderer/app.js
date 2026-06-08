@@ -431,12 +431,16 @@ function setTool(t) {
     lineWidthSlider.max = '5';
     lineWidthSlider.step = '0.5';
     lineWidthSlider.value = zoomLevel.toString();
+    lineWidthSlider.title = 'Zoom Level';
+    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
     widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     lineWidthSlider.min = '2';
     lineWidthSlider.max = '15';
     lineWidthSlider.step = '1';
     lineWidthSlider.value = lineWidth.toString();
+    lineWidthSlider.title = 'Line Width';
+    lineWidthSlider.setAttribute('aria-label', 'Line Width');
     widthLabel.textContent = lineWidth + 'px';
   }
 }
@@ -464,7 +468,9 @@ function clearAll() {
 }
 
 function updateUndoState() {
-  document.getElementById('btn-undo').disabled = drawings.length === 0;
+  const hasDrawings = drawings.length > 0;
+  document.getElementById('btn-undo').disabled = !hasDrawings;
+  document.getElementById('btn-clear').disabled = !hasDrawings;
 }
 
 function saveAndCopy() {
