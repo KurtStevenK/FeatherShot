@@ -1,11 +1,33 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{ if(process.platform==='darwin')app.dock.hide(); createTray(); setupIPC(); });
+app.whenReady().then(()=>{
+  if(process.platform==='darwin')app.dock.hide();
+  setupSecurity();
+  createTray();
+  setupIPC();
+});
+
+function setupSecurity() {
+  // Deny all permission requests (camera, mic, etc.) to minimize attack surface
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(false);
+  });
+
+  // Restrict navigation and prevent unauthorized window creation
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('will-navigate', (event, navigationUrl) => {
+      event.preventDefault();
+    });
+    contents.setWindowOpenHandler(() => {
+      return { action: 'deny' };
+    });
+  });
+}
 
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
