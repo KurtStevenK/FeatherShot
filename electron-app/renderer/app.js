@@ -159,7 +159,7 @@ canvas.addEventListener('mouseup', () => {
   }
   isDragging = false;
   render();
-  updateUndoState();
+  updateActionStates();
 });
 
 // --- Render ---
@@ -422,8 +422,11 @@ function drawCircleLabel(ctx, x, y, color, lw, label) {
 // --- Actions ---
 function setTool(t) {
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + t).classList.add('active');
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    const isActive = b.id === 'tool-' + t;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive);
+  });
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {
@@ -449,22 +452,27 @@ function undo() {
     if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
     if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
     render();
-    updateUndoState();
+    updateActionStates();
   }
 }
 
 function clearAll() {
+  if (drawings.length === 0) return;
+  if (!confirm('Are you sure you want to clear all annotations?')) return;
+
   drawings = [];
   stepArrowCount = 0;
   stepRectCount = 0;
   abcArrowCount = 0;
   abcRectCount = 0;
   render();
-  updateUndoState();
+  updateActionStates();
 }
 
-function updateUndoState() {
-  document.getElementById('btn-undo').disabled = drawings.length === 0;
+function updateActionStates() {
+  const hasDrawings = drawings.length > 0;
+  document.getElementById('btn-undo').disabled = !hasDrawings;
+  document.getElementById('btn-clear').disabled = !hasDrawings;
 }
 
 function saveAndCopy() {
@@ -490,4 +498,4 @@ function saveAndCopy() {
 }
 
 // Initial state
-updateUndoState();
+updateActionStates();
