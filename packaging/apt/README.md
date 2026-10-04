@@ -27,7 +27,7 @@ FeatherShot tagged releases run `packaging/apt/publish.sh` in [`.github/workflow
 
 | Secret | Purpose |
 |--------|---------|
-| **`TAP_TOKEN`** | GitHub PAT — clone/push [`KurtStevenK/apt`](https://github.com/KurtStevenK/apt) (`gh-pages`). Same token as [homebrew-tap](../homebrew/README.md) (`repo` or fine-grained Contents write). |
+| **`TAP_TOKEN`** | GitHub PAT — clone/push [`KurtStevenK/apt`](https://github.com/KurtStevenK/apt) and [`KurtStevenK/arch`](https://github.com/KurtStevenK/arch) (`gh-pages`). Same token as [homebrew-tap](../homebrew/README.md) (`repo` or fine-grained Contents write). |
 | **`APT_GPG_PRIVATE_KEY`** | Full armored **private** GPG key used to sign `InRelease` / `Release.gpg` and publish `gpg.key` |
 | **`APT_GPG_PASSPHRASE`** | Only if the signing key has a passphrase (cursor-auto-runner key has none) |
 

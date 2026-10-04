@@ -214,6 +214,7 @@ jobs:
             electron-app/dist/*.exe
             electron-app/dist/*.deb
             electron-app/dist/*.AppImage
+            electron-app/dist/*.pkg.tar.zst
             choco-pkg/*.nupkg
 
   # ─── Chrome Extension ──────────────────────────────────────────────
@@ -260,6 +261,7 @@ jobs:
             release-artifacts/**/*.exe
             release-artifacts/**/*.deb
             release-artifacts/**/*.AppImage
+            release-artifacts/**/*.pkg.tar.zst
             release-artifacts/**/*.zip
             release-artifacts/**/*.nupkg
 
@@ -349,6 +351,56 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .gitattributes pool dists gpg.key .nojekyll 2>/dev/null || git add pool dists gpg.key .nojekyll
+          git diff --cached --quiet || git commit -m "feathershot $VERSION"
+          git push -u origin gh-pages || {
+            git fetch origin gh-pages
+            git rebase origin/gh-pages
+            git push -u origin gh-pages
+          }
+
+      - name: Update Arch repository
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${TAP_TOKEN:-}" || -z "${APT_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "::notice::Skipping Arch publish (TAP_TOKEN or APT_GPG_PRIVATE_KEY not set)"
+            exit 0
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          PKG=$(find release-artifacts -name "FeatherShot-${VERSION}-*(Arch)*.pkg.tar.zst" | head -1)
+          if [[ -z "$PKG" ]]; then
+            PKG=$(find release-artifacts -name "*.pkg.tar.zst" | head -1)
+          fi
+          if [[ -z "$PKG" ]]; then
+            echo "pacman artifact not found" >&2
+            find release-artifacts -type f >&2 || true
+            exit 1
+          fi
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/arch.git" arch-repo
+          cd arch-repo
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout -B gh-pages origin/gh-pages
+          elif git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
+          fi
+          cd "$GITHUB_WORKSPACE"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
+            -e APT_GPG_PRIVATE_KEY \
+            -e APT_GPG_PASSPHRASE \
+            archlinux:latest \
+            bash -c "pacman -Sy --noconfirm pacman-contrib gnupg && bash $GITHUB_WORKSPACE/packaging/arch/publish.sh $GITHUB_WORKSPACE/arch-repo $GITHUB_WORKSPACE/$PKG"
+          cd arch-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add x86_64 gpg.key .nojekyll 2>/dev/null || git add x86_64 gpg.key .nojekyll
           git diff --cached --quiet || git commit -m "feathershot $VERSION"
           git push -u origin gh-pages || {
             git fetch origin gh-pages

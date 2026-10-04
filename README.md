@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.16:** **Check for Updates** and version in the tray/menu context menu. **v1.3.13+** adds Chocolatey, Homebrew, and APT installs; **v1.3.14** adds `!` badge tools; **v1.3.15** adds draggable text annotations.
+> **New in v1.3.16:** **Check for Updates** and version in the tray/menu context menu. **v1.3.13+** adds Chocolatey, Homebrew, APT, and Arch (pacman) installs; **v1.3.14** adds `!` badge tools; **v1.3.15** adds draggable text annotations.
 
 ---
 
@@ -59,6 +59,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 | **Windows** | `choco install feathershot` |
 | **macOS** | `brew install --cask KurtStevenK/tap/feathershot` ([tap setup](packaging/homebrew/README.md)) |
 | **Debian / Ubuntu** | `apt-get install feathershot` after [adding the APT repo](packaging/apt/README.md) |
+| **Arch Linux** | `pacman -S feathershot` after [adding the pacman repo](packaging/arch/README.md) |
 
 ### Updates
 
