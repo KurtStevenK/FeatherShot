@@ -85,4 +85,4 @@ else
 fi
 
 echo "Done. Distribution secrets set on $REPO"
-echo "Re-run the v1.3.16 release workflow (or tag a patch) to publish Homebrew tap, APT, and Chocolatey."
+echo "Re-run the latest release workflow (or tag a patch) to publish Homebrew tap, APT, Arch, and Chocolatey."
