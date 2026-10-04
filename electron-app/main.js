@@ -12,35 +12,6 @@ app.whenReady().then(()=>{
   setupIPC();
 });
 
-function setupSecurity() {
-  // 1. Deny all permission requests (camera, microphone, location, etc.)
-  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(false);
-  });
-
-  // Also handle sessions created in the future
-  app.on('session-created', (s) => {
-    s.setPermissionRequestHandler((webContents, permission, callback) => {
-      callback(false);
-    });
-  });
-
-  // 2. Restrict navigation to local files only
-  app.on('web-contents-created', (event, contents) => {
-    contents.on('will-navigate', (event, navigationUrl) => {
-      const parsedUrl = new URL(navigationUrl);
-      if (parsedUrl.protocol !== 'file:') {
-        event.preventDefault();
-      }
-    });
-
-    // 3. Disable creation of new windows
-    contents.setWindowOpenHandler(() => {
-      return { action: 'deny' };
-    });
-  });
-}
-
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
   tray.setToolTip('FeatherShot');
@@ -174,6 +145,30 @@ function openEditor(screenshotData) {
     editorWindow.focus();
   });
   editorWindow.on('closed',()=>{editorWindow=null;});
+}
+
+function setupSecurity() {
+  // Deny all permission requests (camera, microphone, etc.)
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => callback(false));
+  app.on('session-created', (session) => {
+    session.setPermissionRequestHandler((webContents, permission, callback) => callback(false));
+  });
+
+  // Harden webContents (block unauthorized navigation and window creation)
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('will-navigate', (event, navigationUrl) => {
+      const parsedUrl = new URL(navigationUrl);
+      if (parsedUrl.protocol !== 'file:') {
+        console.warn('Blocked unauthorized navigation to:', navigationUrl);
+        event.preventDefault();
+      }
+    });
+
+    contents.setWindowOpenHandler(() => {
+      console.warn('Blocked unauthorized window creation');
+      return { action: 'deny' };
+    });
+  });
 }
 
 app.on('window-all-closed',(e)=>e.preventDefault());
