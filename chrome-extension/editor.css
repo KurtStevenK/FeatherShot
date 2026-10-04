@@ -21,7 +21,20 @@ body {
   justify-content: center;
   overflow: auto;
   background: #0a0a0a;
+  position: relative;
 }
+
+#text-editor {
+  position: absolute;
+  z-index: 10;
+  min-width: 120px;
+  padding: 4px 8px;
+  font: 600 18px sans-serif;
+  border: 2px solid #007aff;
+  border-radius: 6px;
+}
+
+.text-editor-hidden { display: none; }
 
 #canvas {
   cursor: crosshair;

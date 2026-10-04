@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.12-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.16-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.12:** **Signed + notarized macOS DMG** on GitHub Releases (use [v1.3.12](https://github.com/KurtStevenK/FeatherShot/releases/tag/v1.3.12) for Gatekeeper-friendly download). **v1.3.1** added Jules security/performance/a11y work; **v1.3.0** brought CI, shared ABC labels, and Swift tests.
+> **New in v1.3.16:** **Check for Updates** and version in the tray/menu context menu. **v1.3.13+** adds Chocolatey, Homebrew, and APT installs; **v1.3.14** adds `!` badge tools; **v1.3.15** adds draggable text annotations.
 
 ---
 
@@ -51,6 +51,19 @@ No Dock icon. No bloat. No subscription.
 | 🌐 **Chrome** | [Extension `.zip`](https://github.com/KurtStevenK/FeatherShot/releases/latest) | Chrome, Edge, Brave, Arc |
 
 Or **build from source** — see [Build Instructions](#-build-from-source) below.
+
+### Package managers
+
+| Platform | Install |
+| --- | --- |
+| **Windows** | `choco install feathershot` |
+| **macOS** | `brew install --cask KurtStevenK/tap/feathershot` ([tap setup](packaging/homebrew/README.md)) |
+| **Debian / Ubuntu** | `apt-get install feathershot` after [adding the APT repo](packaging/apt/README.md) |
+
+### Updates
+
+- **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`).
+- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (Windows uses in-app updater; Linux `.deb` shows `apt upgrade` instructions).
 
 ---
 
@@ -66,6 +79,9 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 | **Line** | `╱` | Draw simple straight lines without arrowheads. |
 | **Question Arrow** | `?→` | Arrow with a **Question Mark** circle at the start — perfect for marking unknown or questionable areas. |
 | **Question Rectangle** | `?▢` | Rectangle with a **Question Mark** circle at the top-left corner. |
+| **Exclamation Arrow** | `!→` | Arrow with an **exclamation** badge at the start (shortcut `-`). |
+| **Exclamation Rectangle** | `!▢` | Rectangle with an **exclamation** badge at the top-left (shortcut `=`). |
+| **Text** | `T` | Free-floating text — click to place, edit inline, drag to position. |
 | **ABC Arrow** | `a→ b→ c→` | Arrows with **auto-incrementing lettered circles** (a, b, ..., z, aa, ab...) at the start. |
 | **ABC Rectangle** | `a▢ b▢ c▢` | Rectangles with **auto-incrementing lettered circles** at the top-left corner. |
 | **Magnifier** | `🔍` | Creates a circular zoom lens on the screenshot with **configurable zoom** (1.5×–5×). Click to set center, drag to set radius. |

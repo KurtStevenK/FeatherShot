@@ -44,6 +44,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         contextMenu = NSMenu()
         contextMenu?.addItem(NSMenuItem(title: "Take Screenshot", action: #selector(captureScreen), keyEquivalent: "s"))
         contextMenu?.addItem(NSMenuItem.separator())
+        contextMenu?.addItem(NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: ""))
+        let versionItem = NSMenuItem(title: "Version \(UpdateChecker.currentVersion)", action: nil, keyEquivalent: "")
+        versionItem.isEnabled = false
+        contextMenu?.addItem(versionItem)
+        contextMenu?.addItem(NSMenuItem.separator())
         contextMenu?.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
         
         if let button = statusItem?.button {
@@ -79,6 +84,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func quitApp() {
         NSApplication.shared.terminate(nil)
+    }
+
+    @objc func checkForUpdates() {
+        UpdateChecker.checkForUpdates()
     }
     
     func showPermissionAlert() {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rendered by CI: __VERSION__ -> release version, __EXESHA__ -> SHA-256 of the x64 NSIS installer. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>feathershot</id>
+    <version>__VERSION__</version>
+    <title>FeatherShot</title>
+    <authors>KurtStevenK</authors>
+    <owners>KurtStevenK</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Lightweight screenshot annotations — capture, annotate, and share screenshots instantly.</description>
+    <summary>Fast screenshot annotation tool for Windows.</summary>
+    <releaseNotes>https://github.com/KurtStevenK/FeatherShot/releases/tag/v__VERSION__</releaseNotes>
+    <projectUrl>https://github.com/KurtStevenK/FeatherShot</projectUrl>
+    <projectSourceUrl>https://github.com/KurtStevenK/FeatherShot</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/KurtStevenK/FeatherShot/issues</bugTrackerUrl>
+    <packageSourceUrl>https://github.com/KurtStevenK/FeatherShot/tree/main/packaging/chocolatey</packageSourceUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/KurtStevenK/FeatherShot@v__VERSION__/icon_1024.png</iconUrl>
+    <licenseUrl>https://github.com/KurtStevenK/FeatherShot/blob/main/LICENSE</licenseUrl>
+    <tags>screenshot annotation screen-capture electron tray</tags>
+    <copyright>Copyright KurtStevenK</copyright>
+  </metadata>
+</package>

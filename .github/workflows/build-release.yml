@@ -187,6 +187,25 @@ jobs:
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
 
+      - name: Build Chocolatey package
+        if: matrix.platform == 'win' && startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          EXE=$(find electron-app/dist -name "FeatherShot-Setup-${VERSION}-*.exe" | head -1)
+          if [[ -z "$EXE" ]]; then
+            echo "Windows installer not found for version $VERSION" >&2
+            ls -la electron-app/dist || true
+            exit 1
+          fi
+          SHA=$(sha256sum "$EXE" | cut -d' ' -f1)
+          PKG=choco-pkg
+          mkdir -p "$PKG/tools"
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__EXESHA__/$SHA/g" packaging/chocolatey/feathershot.nuspec > "$PKG/feathershot.nuspec"
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__EXESHA__/$SHA/g" packaging/chocolatey/tools/chocolateyinstall.ps1 > "$PKG/tools/chocolateyinstall.ps1"
+          (cd "$PKG" && choco pack)
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -195,6 +214,7 @@ jobs:
             electron-app/dist/*.exe
             electron-app/dist/*.deb
             electron-app/dist/*.AppImage
+            choco-pkg/*.nupkg
 
   # ─── Chrome Extension ──────────────────────────────────────────────
   build-chrome:
@@ -241,3 +261,131 @@ jobs:
             release-artifacts/**/*.deb
             release-artifacts/**/*.AppImage
             release-artifacts/**/*.zip
+            release-artifacts/**/*.nupkg
+
+      - name: Verify publish secrets
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${TAP_TOKEN:-}" ]]; then
+            echo "::warning::TAP_TOKEN not set — skipping Homebrew tap and APT publish"
+            exit 0
+          fi
+          if [[ -z "${APT_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "::warning::APT_GPG_PRIVATE_KEY not set — skipping APT publish"
+          fi
+
+      - name: Update Homebrew tap
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${TAP_TOKEN:-}" ]]; then
+            echo "::notice::Skipping Homebrew tap (TAP_TOKEN not set)"
+            exit 0
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          DMG=$(find release-artifacts -name "FeatherShot-${VERSION}-*.dmg" | head -1)
+          if [[ -z "$DMG" ]]; then
+            echo "DMG not found for version $VERSION" >&2
+            find release-artifacts -type f >&2 || true
+            exit 1
+          fi
+          SHA=$(shasum -a 256 "$DMG" | cut -d' ' -f1)
+          mkdir -p Casks
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" packaging/homebrew/feathershot.rb > Casks/feathershot.rb
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/homebrew-tap.git" tap
+          mkdir -p tap/Casks
+          cp Casks/feathershot.rb tap/Casks/feathershot.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Casks/feathershot.rb
+          git diff --cached --quiet || git commit -m "feathershot $VERSION"
+          git push
+
+      - name: Update APT repository
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+          APT_GPG_PRIVATE_KEY: ${{ secrets.APT_GPG_PRIVATE_KEY }}
+          APT_GPG_PASSPHRASE: ${{ secrets.APT_GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${TAP_TOKEN:-}" || -z "${APT_GPG_PRIVATE_KEY:-}" ]]; then
+            echo "::notice::Skipping APT publish (TAP_TOKEN or APT_GPG_PRIVATE_KEY not set)"
+            exit 0
+          fi
+          VERSION="${GITHUB_REF_NAME#v}"
+          DEB=$(find release-artifacts -name "feathershot_${VERSION}_amd64.deb" -o -name "*${VERSION}*Debian*.deb" | head -1)
+          if [[ -z "$DEB" ]]; then
+            DEB=$(find release-artifacts -name "*.deb" | head -1)
+          fi
+          if [[ -z "$DEB" ]]; then
+            echo "deb artifact not found" >&2
+            find release-artifacts -type f >&2 || true
+            exit 1
+          fi
+          sudo apt-get update
+          sudo apt-get install -y apt-utils gnupg gzip git-lfs
+          git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/apt.git" apt-repo
+          cd apt-repo
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout -B gh-pages origin/gh-pages
+          elif git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . 2>/dev/null || true
+          fi
+          git lfs install --local
+          git config lfs.https://github.com/.extraheader "AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TAP_TOKEN" | base64 -w 0)"
+          git lfs track "*.deb"
+          bash "$GITHUB_WORKSPACE/packaging/apt/publish.sh" "$(pwd)" "$GITHUB_WORKSPACE/$DEB"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .gitattributes pool dists gpg.key .nojekyll 2>/dev/null || git add pool dists gpg.key .nojekyll
+          git diff --cached --quiet || git commit -m "feathershot $VERSION"
+          git push -u origin gh-pages || {
+            git fetch origin gh-pages
+            git rebase origin/gh-pages
+            git push -u origin gh-pages
+          }
+
+  chocolatey:
+    needs: release
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: electron-win
+          path: artifacts
+      - name: Push to Chocolatey
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rc=0
+          bash packaging/chocolatey/should-push.sh feathershot || rc=$?
+          if [[ $rc -eq 2 ]]; then
+            echo "::notice title=Chocolatey::Skipping push while no approved package version exists. Run chocolatey-push workflow after approval."
+            exit 0
+          fi
+          if [[ $rc -ne 0 ]]; then
+            exit $rc
+          fi
+          if [[ -z "${CHOCOLATEY_API_KEY:-}" ]]; then
+            echo "::warning::CHOCOLATEY_API_KEY not set — skipping Chocolatey push"
+            exit 0
+          fi
+          choco apikey add --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
+          while IFS= read -r -d '' f; do
+            choco push "$f" --source https://push.chocolatey.org/
+          done < <(find artifacts -name '*.nupkg' -print0)

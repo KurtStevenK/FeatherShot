@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
+const { initUpdater, checkForUpdatesInteractive } = require('./updater');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
@@ -8,17 +9,30 @@ if (!gotTheLock) app.quit();
 app.whenReady().then(()=>{
   if(process.platform==='darwin')app.dock.hide();
   setupSecurity();
+  initUpdater(refreshTrayMenu);
   createTray();
   setupIPC();
 });
 
+function buildTrayMenu() {
+  return Menu.buildFromTemplate([
+    { label: 'Take Screenshot', click: () => startSelection() },
+    { type: 'separator' },
+    { label: 'Check for Updates…', click: () => checkForUpdatesInteractive() },
+    { label: `Version ${app.getVersion()}`, enabled: false },
+    { type: 'separator' },
+    { label: 'Quit', click: () => app.quit() },
+  ]);
+}
+
+function refreshTrayMenu() {
+  if (tray) tray.setContextMenu(buildTrayMenu());
+}
+
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
   tray.setToolTip('FeatherShot');
-  tray.setContextMenu(Menu.buildFromTemplate([
-    {label:'Take Screenshot',click:()=>startSelection()},{type:'separator'},
-    {label:'Quit',click:()=>app.quit()}
-  ]));
+  tray.setContextMenu(buildTrayMenu());
   tray.on('click',()=>startSelection());
 }
 

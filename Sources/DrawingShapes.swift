@@ -1,17 +1,22 @@
 import SwiftUI
 
 enum Tool {
-    case stepArrow, stepRectangle, arrow, rectangle, circle, line, questionArrow, questionRectangle, abcArrow, abcRectangle, magnifier
+    case stepArrow, stepRectangle, arrow, rectangle, circle, line
+    case questionArrow, questionRectangle, abcArrow, abcRectangle
+    case exclamationArrow, exclamationRectangle
+    case magnifier, text
 }
 
 struct DrawingElement: Identifiable {
     let id = UUID()
     let tool: Tool
-    let start: CGPoint
-    let end: CGPoint
+    var start: CGPoint
+    var end: CGPoint
     let color: Color
     let lineWidth: CGFloat
     var zoomLevel: CGFloat = 2.0
+    var text: String = ""
+    var fontSize: CGFloat = 24
 }
 
 // Convert a 1-based step number into a letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
@@ -205,6 +210,67 @@ struct QuestionArrowView: View {
                 .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .position(x: start.x, y: start.y)
+        }
+    }
+}
+
+// View for drawing arrows with exclamation mark
+struct ExclamationArrowView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+
+        ZStack(alignment: .topLeading) {
+            ArrowView(start: start, end: end, color: color, lineWidth: lineWidth)
+
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: start.x, y: start.y)
+
+            Text("!")
+                .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: start.x, y: start.y)
+        }
+    }
+}
+
+// View for drawing rectangles with exclamation mark
+struct ExclamationRectangleView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+
+    var body: some View {
+        let radius = max(12.0, lineWidth * 3.0)
+        let drawingRect = CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: abs(end.x - start.x),
+            height: abs(end.y - start.y)
+        )
+        let circleX = drawingRect.minX
+        let circleY = drawingRect.minY
+
+        ZStack(alignment: .topLeading) {
+            RectangleShape(start: start, end: end)
+                .stroke(color, lineWidth: lineWidth)
+
+            Circle()
+                .fill(color)
+                .frame(width: radius * 2, height: radius * 2)
+                .position(x: circleX, y: circleY)
+
+            Text("!")
+                .font(.system(size: radius * 1.2, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
+                .position(x: circleX, y: circleY)
         }
     }
 }

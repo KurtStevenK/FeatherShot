@@ -5,6 +5,33 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.16] - 2026-10-04
+
+### Added
+
+- **Tray / menu-bar updates** — Context menu shows **Version x.y.z** and **Check for Updates…** on macOS (GitHub Releases) and Windows/Linux Electron (`electron-updater` on Windows; apt instructions on Linux `.deb`).
+
+## [1.3.15] - 2026-10-04
+
+### Added
+
+- **Text annotation** — Place text on the canvas, edit inline, and drag to reposition (macOS, Electron, Chrome extension).
+
+## [1.3.14] - 2026-10-04
+
+### Added
+
+- **Exclamation Arrow & Rectangle** — Same badge style as `?` tools, with **`!`** (macOS, Electron, Chrome). Shortcuts **`-`** / **`=`**.
+
+## [1.3.13] - 2026-10-04
+
+### Added
+
+- **Chocolatey** — `choco install feathershot` (Windows NSIS installer from GitHub Releases).
+- **Homebrew** — `brew install --cask KurtStevenK/tap/feathershot` (native macOS DMG).
+- **APT** — `feathershot` package on [KurtStevenK/apt](https://github.com/KurtStevenK/apt) (see [`packaging/apt/README.md`](packaging/apt/README.md)).
+- **CI** — Release workflow builds `.nupkg`, updates homebrew-tap and apt repo; optional [`chocolatey-push`](.github/workflows/chocolatey-push.yml) workflow.
+
 ## [1.3.12] - 2026-10-04
 
 ### Fixed
@@ -314,6 +341,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.16]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.15...v1.3.16
+[1.3.15]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.14...v1.3.15
+[1.3.14]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.13...v1.3.14
+[1.3.13]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.9...v1.3.10

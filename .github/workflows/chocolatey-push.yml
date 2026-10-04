@@ -1,0 +1,58 @@
+name: Chocolatey push
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (e.g. v1.3.13)
+        required: true
+        default: v1.3.13
+
+jobs:
+  push:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Download nupkg from GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${{ inputs.tag }}"
+          VERSION="${TAG#v}"
+          mkdir -p artifacts
+          gh release download "$TAG" \
+            --repo "${{ github.repository }}" \
+            --pattern "feathershot.${VERSION}.nupkg" \
+            --dir artifacts
+          ls -la artifacts
+
+      - name: Push to Chocolatey
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rc=0
+          bash packaging/chocolatey/should-push.sh feathershot || rc=$?
+          if [[ $rc -eq 2 ]]; then
+            echo "::error::Chocolatey still blocking push. Wait for moderation, then re-run." >&2
+            exit 1
+          fi
+          if [[ $rc -ne 0 ]]; then
+            exit $rc
+          fi
+          if [[ -z "${CHOCOLATEY_API_KEY:-}" ]]; then
+            echo "CHOCOLATEY_API_KEY is required" >&2
+            exit 1
+          fi
+          choco apikey add --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
+          while IFS= read -r -d '' f; do
+            choco push "$f" --source https://push.chocolatey.org/
+          done < <(find artifacts -name '*.nupkg' -print0)

@@ -10,6 +10,7 @@
   <div id="editor">
     <div id="canvas-container">
       <canvas id="canvas"></canvas>
+      <textarea id="text-editor" class="text-editor-hidden" rows="1"></textarea>
     </div>
 
     <div id="toolbar">
@@ -37,6 +38,15 @@
         </button>
         <button id="tool-question-rect" class="tool-btn" title="Question Rectangle (8)" aria-label="Question Rectangle (Shortcut: 8)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="7" font-weight="bold" fill="currentColor">?</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="tool-exclamation-arrow" class="tool-btn" title="Exclamation Arrow (-)" aria-label="Exclamation Arrow (Shortcut: -)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="9" font-weight="bold" fill="currentColor">!</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+        <button id="tool-exclamation-rect" class="tool-btn" title="Exclamation Rectangle (=)" aria-label="Exclamation Rectangle (Shortcut: =)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="8" font-weight="bold" fill="currentColor">!</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+        </button>
+        <button id="tool-text" class="tool-btn" title="Text (T)" aria-label="Text annotation (Shortcut: T)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 5h12M12 5v14M8 19h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
         <button id="tool-abc-arrow" class="tool-btn" title="ABC Arrow (9)" aria-label="ABC Arrow (Shortcut: 9)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="8" fill="currentColor">a</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>

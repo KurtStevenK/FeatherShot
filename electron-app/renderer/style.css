@@ -34,6 +34,23 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+#text-editor {
+  position: absolute;
+  z-index: 10;
+  min-width: 120px;
+  max-width: 320px;
+  padding: 4px 8px;
+  font: 600 18px -apple-system, BlinkMacSystemFont, sans-serif;
+  border: 2px solid #007aff;
+  border-radius: 6px;
+  resize: none;
+  outline: none;
+}
+
+.text-editor-hidden {
+  display: none;
+}
+
 /* Toolbar */
 #toolbar {
   display: flex;

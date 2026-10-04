@@ -13,6 +13,10 @@ struct AnnotationView: View {
     @State private var lineWidth: CGFloat = 4.0
     @State private var zoomLevel: CGFloat = 2.0
     @State private var isSaved = false
+    @State private var editingTextId: UUID?
+    @State private var editingTextBuffer: String = ""
+    @State private var draggingTextId: UUID?
+    @State private var textGestureStart: CGPoint?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -29,32 +33,10 @@ struct AnnotationView: View {
                             Rectangle()
                                 .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
                         )
+                        .overlay(textEditingOverlay)
                         .shadow(color: .black.opacity(0.2), radius: 10)
                         .contentShape(Rectangle())
-                        .gesture(
-                            DragGesture(minimumDistance: 0)
-                                .onChanged { value in
-                                    if currentStart == nil {
-                                        currentStart = value.startLocation
-                                    }
-                                    currentEnd = value.location
-                                }
-                                .onEnded { value in
-                                    if let start = currentStart {
-                                        let element = DrawingElement(
-                                            tool: selectedTool,
-                                            start: start,
-                                            end: value.location,
-                                            color: selectedColor,
-                                            lineWidth: lineWidth,
-                                            zoomLevel: zoomLevel
-                                        )
-                                        drawings.append(element)
-                                    }
-                                    currentStart = nil
-                                    currentEnd = nil
-                                }
-                        )
+                        .gesture(canvasDragGesture)
                 }
                 .frame(width: max(image.size.width, 600), height: max(image.size.height, 300))
             }
@@ -90,6 +72,15 @@ struct AnnotationView: View {
                     QuestionArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .questionRectangle {
                     QuestionRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .exclamationArrow {
+                    ExclamationArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .exclamationRectangle {
+                    ExclamationRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .text {
+                    Text(drawing.text)
+                        .font(.system(size: drawing.fontSize, weight: .semibold))
+                        .foregroundColor(drawing.color)
+                        .position(x: drawing.start.x, y: drawing.start.y)
                 } else if drawing.tool == .abcArrow {
                     let stepNum = drawings[0...index].filter { $0.tool == .abcArrow }.count
                     ABCArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
@@ -122,6 +113,10 @@ struct AnnotationView: View {
                     QuestionArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .questionRectangle {
                     QuestionRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .exclamationArrow {
+                    ExclamationArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .exclamationRectangle {
+                    ExclamationRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .abcArrow {
                     let stepNum = drawings.filter { $0.tool == .abcArrow }.count + 1
                     ABCArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
@@ -243,6 +238,39 @@ struct AnnotationView: View {
                     
                     Divider().frame(height: 20)
                     
+                    Button(action: { selectedTool = .exclamationArrow }) {
+                        Image(systemName: "exclamationmark.circle")
+                            .padding(8)
+                            .background(selectedTool == .exclamationArrow ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .exclamationArrow ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Exclamation Arrow (-)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    Button(action: { selectedTool = .exclamationRectangle }) {
+                        Image(systemName: "exclamationmark.square")
+                            .padding(8)
+                            .background(selectedTool == .exclamationRectangle ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .exclamationRectangle ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Exclamation Rectangle (=)")
+                    
+                    Divider().frame(height: 20)
+                    
+                    Button(action: { selectedTool = .text }) {
+                        Image(systemName: "character.cursor.ibeam")
+                            .padding(8)
+                            .background(selectedTool == .text ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTool == .text ? .white : .primary)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Text (T)")
+                    
+                    Divider().frame(height: 20)
+                    
                     // Tool 9: ABC Arrow
                     Button(action: { selectedTool = .abcArrow }) {
                         Image(systemName: "textformat.abc")
@@ -347,6 +375,122 @@ struct AnnotationView: View {
         .padding(.vertical, 12)
         .background(Color(NSColor.windowBackgroundColor))
         .frame(minWidth: 550)
+    }
+
+    @ViewBuilder
+    private var textEditingOverlay: some View {
+        if let id = editingTextId,
+           let idx = drawings.firstIndex(where: { $0.id == id }) {
+            TextField("Text", text: $editingTextBuffer)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: min(280, image.size.width * 0.4))
+                .position(x: drawings[idx].start.x, y: drawings[idx].start.y)
+                .onSubmit { commitTextEdit() }
+                .onChange(of: editingTextBuffer) { _, newValue in
+                    if let i = drawings.firstIndex(where: { $0.id == id }) {
+                        drawings[i].text = newValue
+                    }
+                }
+        }
+    }
+
+    private var canvasDragGesture: some Gesture {
+        DragGesture(minimumDistance: 0)
+            .onChanged { value in
+                if selectedTool == .text {
+                    if draggingTextId == nil, textGestureStart == nil {
+                        textGestureStart = value.startLocation
+                        if let hit = textHit(at: value.startLocation) {
+                            draggingTextId = hit
+                        }
+                    }
+                    if let id = draggingTextId,
+                       let idx = drawings.firstIndex(where: { $0.id == id }) {
+                        drawings[idx].start = value.location
+                    }
+                    return
+                }
+                if currentStart == nil {
+                    currentStart = value.startLocation
+                }
+                currentEnd = value.location
+            }
+            .onEnded { value in
+                if selectedTool == .text {
+                    defer {
+                        draggingTextId = nil
+                        textGestureStart = nil
+                    }
+                    let dist = hypot(value.translation.width, value.translation.height)
+                    if dist > 6 {
+                        return
+                    }
+                    if let hit = textHit(at: value.startLocation) {
+                        editingTextId = hit
+                        editingTextBuffer = drawings.first(where: { $0.id == hit })?.text ?? ""
+                        return
+                    }
+                    let element = DrawingElement(
+                        tool: .text,
+                        start: value.location,
+                        end: value.location,
+                        color: selectedColor,
+                        lineWidth: lineWidth,
+                        text: "Text",
+                        fontSize: max(18, lineWidth * 5)
+                    )
+                    drawings.append(element)
+                    editingTextId = element.id
+                    editingTextBuffer = "Text"
+                    return
+                }
+                if let start = currentStart {
+                    let element = DrawingElement(
+                        tool: selectedTool,
+                        start: start,
+                        end: value.location,
+                        color: selectedColor,
+                        lineWidth: lineWidth,
+                        zoomLevel: zoomLevel
+                    )
+                    drawings.append(element)
+                }
+                currentStart = nil
+                currentEnd = nil
+            }
+    }
+
+    private func textHit(at point: CGPoint) -> UUID? {
+        for drawing in drawings.reversed() where drawing.tool == .text {
+            let w = CGFloat(max(80, Double(drawing.text.count) * Double(drawing.fontSize) * 0.55))
+            let h = drawing.fontSize * 1.4
+            let rect = CGRect(
+                x: drawing.start.x - w / 2,
+                y: drawing.start.y - h / 2,
+                width: w,
+                height: h
+            )
+            if rect.contains(point) {
+                return drawing.id
+            }
+        }
+        return nil
+    }
+
+    private func commitTextEdit() {
+        guard let id = editingTextId,
+              let idx = drawings.firstIndex(where: { $0.id == id }) else {
+            editingTextId = nil
+            return
+        }
+        let trimmed = editingTextBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            drawings.remove(at: idx)
+        } else {
+            drawings[idx].text = trimmed
+        }
+        editingTextId = nil
+        editingTextBuffer = ""
     }
 
     @MainActor
