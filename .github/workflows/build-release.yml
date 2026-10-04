@@ -218,7 +218,7 @@ jobs:
             electron-app/dist/*.exe
             electron-app/dist/*.deb
             electron-app/dist/*.AppImage
-            electron-app/dist/*.pkg.tar.zst
+            electron-app/dist/*.pacman
             choco-pkg/*.nupkg
 
   # ─── Chrome Extension ──────────────────────────────────────────────
@@ -265,7 +265,7 @@ jobs:
             release-artifacts/**/*.exe
             release-artifacts/**/*.deb
             release-artifacts/**/*.AppImage
-            release-artifacts/**/*.pkg.tar.zst
+            release-artifacts/**/*.pacman
             release-artifacts/**/*.zip
             release-artifacts/**/*.nupkg
 
@@ -375,9 +375,9 @@ jobs:
             exit 0
           fi
           VERSION="${GITHUB_REF_NAME#v}"
-          PKG=$(find release-artifacts -name "FeatherShot-${VERSION}-*(Arch)*.pkg.tar.zst" | head -1)
+          PKG=$(find release-artifacts -name "FeatherShot-${VERSION}-*(Arch)*.pacman" | head -1)
           if [[ -z "$PKG" ]]; then
-            PKG=$(find release-artifacts -name "*.pkg.tar.zst" | head -1)
+            PKG=$(find release-artifacts -name "*.pacman" | head -1)
           fi
           if [[ -z "$PKG" ]]; then
             echo "::warning::pacman artifact not found — skipping Arch publish"

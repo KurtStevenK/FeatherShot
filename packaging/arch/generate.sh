@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Add a .pkg.tar.zst to an Arch repo tree and refresh the pacman database.
+# Add a pacman package (.pacman from electron-builder / FPM) and refresh the database.
 set -euo pipefail
 
 REPO_DIR="${1:?usage: generate.sh <arch-repo-dir>}"
-PKG_FILE="${2:?usage: generate.sh <arch-repo-dir> <path-to.pkg.tar.zst>}"
+PKG_FILE="${2:?usage: generate.sh <arch-repo-dir> <path-to.pacman>}"
 
 if [[ ! -f "$PKG_FILE" ]]; then
   echo "package not found: $PKG_FILE" >&2
@@ -19,7 +19,7 @@ DB="$ARCH_DIR/feathershot.db"
 (
   cd "$ARCH_DIR"
   shopt -s nullglob
-  for old in feathershot-*.pkg.tar.zst; do
+  for old in feathershot-*.pkg.tar.zst FeatherShot-*.pacman; do
     if [[ "$old" != "$NEW_PKG" ]]; then
       if [[ -f "$DB" ]]; then
         repo-remove -q "$DB" "$old" 2>/dev/null || true

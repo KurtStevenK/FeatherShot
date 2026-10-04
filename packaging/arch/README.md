@@ -31,6 +31,6 @@ sudo pacman -Sy feathershot
 ## Maintainer
 
 1. Create an empty public GitHub repo **`KurtStevenK/arch`** (first publish uses the `gh-pages` branch, same pattern as [`KurtStevenK/apt`](https://github.com/KurtStevenK/apt)).
-2. Tagged releases build a `.pkg.tar.zst` via electron-builder and run `packaging/arch/publish.sh` in [`.github/workflows/build-release.yml`](../../.github/workflows/build-release.yml) (Arch Linux container for `repo-add`).
+2. Tagged releases build a `FeatherShot-*-(Arch).pacman` package via electron-builder (FPM) and run `packaging/arch/publish.sh` in [`.github/workflows/build-release.yml`](../../.github/workflows/build-release.yml) (Arch Linux container for `repo-add`).
 
 Uses the same secrets as APT: **`TAP_TOKEN`**, **`APT_GPG_PRIVATE_KEY`**, optional **`APT_GPG_PASSPHRASE`**. See [apt README](../apt/README.md) and `scripts/push-distribution-secrets-to-github.sh`.

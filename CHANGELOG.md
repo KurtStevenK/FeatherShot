@@ -5,6 +5,12 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.19] - 2026-10-04
+
+### Fixed
+
+- **Arch pacman publish** — CI uploads and publishes `*.pacman` artifacts from electron-builder (not `*.pkg.tar.zst`), so `KurtStevenK/arch` gets a signed `feathershot.db` on release.
+
 ## [1.3.18] - 2026-10-04
 
 ### Fixed
@@ -357,6 +363,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.19]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.18...v1.3.19
 [1.3.18]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.17...v1.3.18
 [1.3.17]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.16...v1.3.17
 [1.3.16]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.15...v1.3.16
