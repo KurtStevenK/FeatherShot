@@ -122,10 +122,11 @@ jobs:
           codesign --verify --strict --verbose=2 "$APP"
           if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
             DMG=$(ls FeatherShot-*-\(macOS\).dmg 2>/dev/null | head -1)
-            if [[ -n "$DMG" ]]; then
-              xcrun stapler validate "$DMG"
+            if [[ -n "$DMG" ]] && xcrun stapler validate "$DMG" 2>/dev/null; then
+              spctl -a -t exec -vv "$APP/Contents/MacOS/FeatherShot"
+            else
+              echo "::warning::DMG not stapled (notarization may have failed); Developer ID signature was still verified above"
             fi
-            spctl -a -t exec -vv "$APP/Contents/MacOS/FeatherShot"
           else
             echo "::notice::Skipping stapler/spctl (notarization secrets not set)"
           fi

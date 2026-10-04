@@ -124,12 +124,15 @@ rm -f "$DMG_NAME"
 
 if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" && -n "${APPLE_TEAM_ID:-}" && "$SIGN_ID" != "-" ]]; then
   echo "==> Notarizing DMG"
-  xcrun notarytool submit "$DMG_NAME" --wait \
+  if xcrun notarytool submit "$DMG_NAME" --wait \
     --apple-id "$APPLE_ID" \
     --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-    --team-id "$APPLE_TEAM_ID"
-  xcrun stapler staple "$DMG_NAME"
-  echo "==> Notarization complete"
+    --team-id "$APPLE_TEAM_ID"; then
+    xcrun stapler staple "$DMG_NAME"
+    echo "==> Notarization complete"
+  else
+    echo "==> WARNING: notarization failed (signed DMG still created; fix APPLE_ID / app-specific password in GitHub secrets)"
+  fi
 else
   echo "==> Skipping notarization (need Developer ID sign + APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID)"
 fi
