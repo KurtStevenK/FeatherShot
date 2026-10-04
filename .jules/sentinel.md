@@ -1,6 +1,4 @@
-# Sentinel's Security Journal
-
-## 2025-05-14 - [Renderer Hardening with CSP]
-**Vulnerability:** Lack of Content Security Policy (CSP) in Electron renderer windows.
-**Learning:** Even with `nodeIntegration: true`, adding a CSP provides a vital defense-in-depth layer against XSS. However, restrictive CSPs (`default-src 'none'`) must be carefully tuned to allow necessary resources like `data:` URIs for screenshots and `unsafe-inline` for dynamic styling.
-**Prevention:** Always include a baseline CSP in every HTML entry point, preferring `default-src 'none'` and explicitly whitelisting required sources.
+## 2025-05-15 - [Electron IPC and Permission Hardening]
+**Vulnerability:** The application was missing basic security hardening for the Electron Main process and Renderer windows. Specifically, IPC messages were unvalidated, and no Content Security Policy (CSP) was defined.
+**Learning:** Even simple utilities like FeatherShot can benefit from Electron's security model. Denying all permission requests by default is a safe baseline for apps that don't need access to sensors or geolocation.
+**Prevention:** Always validate data coming from the renderer in the main process. Implement a restrictive CSP to mitigate XSS risks, and explicitly deny unnecessary permissions using `setPermissionRequestHandler`.
