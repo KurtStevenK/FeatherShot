@@ -15,6 +15,7 @@ struct DrawingElement: Identifiable {
 }
 
 // Convert a 1-based step number into a letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
+// JS copies live in shared/letterLabel.js; cases in shared/letterLabel.cases.json.
 func letterLabel(_ n: Int) -> String {
     var num = n - 1
     var result = ""

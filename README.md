@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.2.2-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.0-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.2.2:** Rock-solid **multi-monitor selection** with pointer capture. Improved **Magnifier** centering. Plus configurable zoom.
+> **New in v1.3.0:** **CI** on every PR, shared **ABC label** logic across platforms, **Swift tests**, and updated **Electron 44** with a clean dependency audit.
 
 ---
 
@@ -120,6 +120,7 @@ cd FeatherShot
 
 # Build and run (debug)
 swift build
+swift test
 .build/debug/FeatherShot &
 
 # Build a release DMG
@@ -200,6 +201,10 @@ Sources/
 ├── AppMain.swift          # Menu bar app lifecycle, screen capture, window management
 ├── AnnotationView.swift   # SwiftUI editor with canvas, toolbar, save/export
 └── DrawingShapes.swift    # Tool enum, shape definitions (Arrow, Line, Ellipse, Magnifier, Step variants, Question variants, ABC variants)
+
+shared/
+├── letterLabel.js         # Canonical ABC label helper (Electron + Chrome)
+└── letterLabel.cases.json # Cross-platform test vectors (Swift tests + npm verify)
 ```
 
 ### Windows & Linux (Electron)
@@ -239,6 +244,15 @@ Contributions are welcome! Here's how to get started:
 2. **Create a branch** for your feature: `git checkout -b feature/my-feature`
 3. **Commit** your changes: `git commit -m "Add my feature"`
 4. **Push** and open a **Pull Request**.
+
+### Repo checks
+
+From the repository root (Node.js 20+):
+
+```bash
+npm run verify    # sync shared JS, letterLabel tests, Chrome manifest checks
+swift test        # macOS — includes shared letterLabel fixture
+```
 
 ### Adding a New Tool
 

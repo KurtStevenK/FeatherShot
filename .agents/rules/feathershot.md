@@ -16,7 +16,7 @@ description: Project rules and conventions for FeatherShot
 - Entry point: `AppMain.swift` → `FeatherShotApp` with `@NSApplicationDelegateAdaptor`.
 - `AppDelegate` owns the status bar item, manages screen capture via `/usr/sbin/screencapture`, and presents the annotation window.
 - `AnnotationView` is the SwiftUI editor. It uses `ImageRenderer` for pixel-perfect export.
-- `DrawingShapes.swift` defines the `Tool` enum and all shape/view implementations.
+- `DrawingShapes.swift` defines the `Tool` enum and all shape/view implementations. Swift tests use `@testable import FeatherShot`.
 
 ## Concurrency Rules
 
@@ -34,6 +34,13 @@ When adding a new annotation tool, you must update **all 4 locations**:
 4. `AnnotationView.swift` → `toolbar` — Add a toolbar button with an SF Symbol icon.
 
 See `.agents/workflows/add-tool.md` for the full walkthrough.
+
+## Shared `letterLabel` (ABC tools)
+
+- Canonical JS: `shared/letterLabel.js`
+- Test vectors: `shared/letterLabel.cases.json` (used by Swift tests and `npm run verify:letter-label`)
+- After editing JS, run `npm run sync:shared` from the repo root (copies into `chrome-extension/` and `electron-app/shared/`).
+- Swift implementation stays in `DrawingShapes.swift` and must match the JSON fixture.
 
 ## Version Bumping
 
