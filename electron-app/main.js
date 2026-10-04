@@ -13,18 +13,34 @@ app.whenReady().then(()=>{
 });
 
 function setupSecurity() {
-  // Deny all permission requests (camera, mic, etc.) to minimize attack surface
-  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
-    callback(false);
-  });
-
-  // Restrict navigation and prevent unauthorized window creation
+  // Security Hardening: Deny unauthorized navigation and window creation
   app.on('web-contents-created', (event, contents) => {
     contents.on('will-navigate', (event, navigationUrl) => {
-      event.preventDefault();
+      const parsedUrl = new URL(navigationUrl);
+      if (parsedUrl.protocol !== 'file:') {
+        console.warn(`Blocked unauthorized navigation to: ${navigationUrl}`);
+        event.preventDefault();
+      }
     });
-    contents.setWindowOpenHandler(() => {
+
+    contents.setWindowOpenHandler(({ url }) => {
+      console.warn(`Blocked attempt to open new window: ${url}`);
       return { action: 'deny' };
+    });
+  });
+
+  // Security Hardening: Deny all permission requests (camera, mic, etc.)
+  if (session.defaultSession) {
+    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+      console.warn(`Blocked permission request: ${permission}`);
+      callback(false);
+    });
+  }
+
+  app.on('session-created', (ses) => {
+    ses.setPermissionRequestHandler((webContents, permission, callback) => {
+      console.warn(`Blocked permission request: ${permission}`);
+      callback(false);
     });
   });
 }
