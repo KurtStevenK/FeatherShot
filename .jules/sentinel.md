@@ -1,4 +1,6 @@
-## 2025-05-15 - [Secure Temporary Path Usage]
-**Vulnerability:** Hardcoded temporary file paths in world-writable directories (like `/tmp`) can lead to symlink attacks or race conditions.
-**Learning:** MacOS provides `FileManager.default.temporaryDirectory`, which returns a unique, user-isolated temporary directory that is significantly more secure than `/tmp`.
-**Prevention:** Always use system APIs to resolve temporary directories rather than hardcoding paths.
+# Sentinel's Security Journal
+
+## 2025-05-14 - [Renderer Hardening with CSP]
+**Vulnerability:** Lack of Content Security Policy (CSP) in Electron renderer windows.
+**Learning:** Even with `nodeIntegration: true`, adding a CSP provides a vital defense-in-depth layer against XSS. However, restrictive CSPs (`default-src 'none'`) must be carefully tuned to allow necessary resources like `data:` URIs for screenshots and `unsafe-inline` for dynamic styling.
+**Prevention:** Always include a baseline CSP in every HTML entry point, preferring `default-src 'none'` and explicitly whitelisting required sources.
