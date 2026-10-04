@@ -1,11 +1,19 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{ if(process.platform==='darwin')app.dock.hide(); createTray(); setupIPC(); });
+app.whenReady().then(()=>{
+  // Security: Deny all permission requests
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(false);
+  });
+  if(process.platform==='darwin')app.dock.hide();
+  createTray();
+  setupIPC();
+});
 
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
@@ -28,6 +36,13 @@ function setupIPC() {
   // Selection done — crop from PRE-CAPTURED screenshots (no async capture needed!)
   ipcMain.on('sel-done',(event,crop)=>{
     closeAll();
+    // Security: Validate crop input
+    if (!crop || typeof crop.x !== 'number' || typeof crop.y !== 'number' ||
+        typeof crop.width !== 'number' || typeof crop.height !== 'number') {
+      console.error('Security: Invalid crop data received');
+      return;
+    }
+
     try {
       if(displayCaptures.length===0) return;
       const overlaps = [];

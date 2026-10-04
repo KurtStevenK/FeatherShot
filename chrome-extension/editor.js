@@ -5,16 +5,7 @@ let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0, abcA
 const widthSlider = document.getElementById('width');
 const wLabel = document.getElementById('w-label');
 
-// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
-function letterLabel(n) {
-  let num = n - 1;
-  let result = '';
-  do {
-    result = String.fromCharCode(97 + (num % 26)) + result;
-    num = Math.floor(num / 26) - 1;
-  } while (num >= 0);
-  return result;
-}
+// letterLabel — loaded from letterLabel.js (synced from shared/letterLabel.js)
 
 // Load screenshot and apply crop if available
 chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
