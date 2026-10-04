@@ -13,12 +13,12 @@ app.whenReady().then(()=>{
 });
 
 function setupSecurity() {
-  // Deny all permission requests (camera, microphone, geolocation, etc.)
+  // Deny all permission requests (camera, mic, etc.) to minimize attack surface
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
     callback(false);
   });
 
-  // Limit navigation and window creation to prevent unintended content loading
+  // Restrict navigation and prevent unauthorized window creation
   app.on('web-contents-created', (event, contents) => {
     contents.on('will-navigate', (event, navigationUrl) => {
       event.preventDefault();
@@ -125,11 +125,7 @@ async function startSelection() {
       frame:false,transparent:true,alwaysOnTop:true,skipTaskbar:true,
       resizable:false,movable:false,hasShadow:false,focusable:true,
       fullscreenable:true,backgroundColor:'#00000000',show:false,
-      webPreferences:{
-        nodeIntegration:false,
-        contextIsolation:true,
-        preload: path.join(__dirname, 'preload.js')
-      }
+      webPreferences:{nodeIntegration:true,contextIsolation:false}
     });
     windowData.set(win.id,{displayBounds:display.bounds,globalBounds});
     win.loadFile(path.join(__dirname,'renderer','selection.html'));
@@ -155,11 +151,7 @@ function openEditor(screenshotData) {
   } else { w=Math.min(Math.max(screenshotData.width,700),wa.width-80); h=Math.min(Math.max(screenshotData.height+80,400),wa.height-80); }
 
   editorWindow=new BrowserWindow({width:w,height:h,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
-    webPreferences:{
-      nodeIntegration:false,
-      contextIsolation:true,
-      preload: path.join(__dirname, 'preload.js')
-    },show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
+    webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
   editorWindow.loadFile(path.join(__dirname,'renderer','index.html'));
 
   // Simple, reliable: send data after page loads, then show window
