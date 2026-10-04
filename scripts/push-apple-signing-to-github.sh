@@ -4,6 +4,7 @@
 set -euo pipefail
 
 REPO="KurtStevenK/FeatherShot"
+DEFAULT_P12="${HOME}/private/apple-developer-id/DeveloperIDApplication-for-ci.p12"
 
 if ! security find-identity -v -p codesigning | grep -q "Developer ID Application"; then
   echo "No Developer ID Application certificate in Keychain." >&2
@@ -14,11 +15,16 @@ fi
 security find-identity -v -p codesigning | grep "Developer ID Application" | head -3
 
 echo ""
-echo "Export the certificate from Keychain Access:"
-echo "  My Certificates → Developer ID Application: … → File → Export → .p12"
-echo ""
-
-read -rp "Path to exported .p12 file: " P12_PATH
+if [[ -n "${APPLE_P12_FILE:-}" && -f "$APPLE_P12_FILE" ]]; then
+  P12_PATH="$APPLE_P12_FILE"
+elif [[ -f "$DEFAULT_P12" ]]; then
+  P12_PATH="$DEFAULT_P12"
+  echo "Using $P12_PATH"
+else
+  echo "Export from Keychain Access: My Certificates → Developer ID Application → Export → .p12"
+  echo "Or place DeveloperIDApplication-for-ci.p12 in ~/private/apple-developer-id/"
+  read -rp "Path to .p12 file: " P12_PATH
+fi
 if [[ ! -f "$P12_PATH" ]]; then
   echo "File not found: $P12_PATH" >&2
   exit 1

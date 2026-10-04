@@ -18,6 +18,20 @@ The first pushed version stays **unlisted** until a moderator approves it. While
 
 CI runs [`should-push.sh`](should-push.sh) and skips push with a notice when moderation blocks.
 
+## API key (`CHOCOLATEY_API_KEY`)
+
+Chocolatey has **no separate “tap”** — one API key per account for pushing to the community feed.
+
+| Item | Detail |
+|------|--------|
+| **Get key** | Sign in at [community.chocolatey.org](https://community.chocolatey.org) → **Account** → **API Key** (copy or regenerate) |
+| **GitHub** | Repository secret **`CHOCOLATEY_API_KEY`** on `KurtStevenK/FeatherShot` (same value as `cursor-auto-runner`) |
+| **Local** | `CHOCOLATEY_API_KEY` in FeatherShot **`.env.local`** (gitignored; see [`.env.example`](../../.env.example)) |
+| **Upload** | `bash scripts/push-distribution-secrets-to-github.sh` (sources `.env.local`) |
+| **CI use** | `choco apikey` + `choco push` to `https://push.chocolatey.org/` in [`build-release.yml`](../../.github/workflows/build-release.yml) and [`chocolatey-push.yml`](../../.github/workflows/chocolatey-push.yml) |
+
+Never commit the key. Rotating: generate a new key on Chocolatey, update GitHub + `.env.local`.
+
 ## Manual push after approval
 
 1. Open **Actions → Chocolatey push** in this repository.

@@ -28,7 +28,9 @@ Copy the same values you use for [cursor-auto-runner](https://github.com/KurtSte
 | `APPLE_ID` | Apple ID email |
 | `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for `notarytool` |
 
-Interactive upload:
+**Local files (gitignored):** see `~/private/README.md` — Apple certs under `~/private/apple-developer-id/` and `app-store-connect/`, APT GPG under `~/private/apt-signing/`. Chocolatey + GitHub tap/APT tokens: [chocolatey](../chocolatey/README.md), [homebrew](../homebrew/README.md), [apt](../apt/README.md) and `.env.local` / `scripts/push-distribution-secrets-to-github.sh`.
+
+Interactive upload (uses `~/private/apple-developer-id/DeveloperIDApplication-for-ci.p12` when present):
 
 ```bash
 bash scripts/push-apple-signing-to-github.sh

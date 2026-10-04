@@ -23,4 +23,14 @@ sudo apt-get update && sudo apt-get install --only-upgrade feathershot
 
 FeatherShot tagged releases run `packaging/apt/publish.sh` in [`.github/workflows/build-release.yml`](../../.github/workflows/build-release.yml).
 
-Secrets in **FeatherShot** (same as cursor-auto-runner): `TAP_TOKEN`, `APT_GPG_PRIVATE_KEY`, optional `APT_GPG_PASSPHRASE`.
+## Secrets (FeatherShot Actions)
+
+| Secret | Purpose |
+|--------|---------|
+| **`TAP_TOKEN`** | GitHub PAT — clone/push [`KurtStevenK/apt`](https://github.com/KurtStevenK/apt) (`gh-pages`). Same token as [homebrew-tap](../homebrew/README.md) (`repo` or fine-grained Contents write). |
+| **`APT_GPG_PRIVATE_KEY`** | Full armored **private** GPG key used to sign `InRelease` / `Release.gpg` and publish `gpg.key` |
+| **`APT_GPG_PASSPHRASE`** | Only if the signing key has a passphrase (cursor-auto-runner key has none) |
+
+**Local backup:** `~/private/apt-signing/apt-signing-private.asc` — set `APT_GPG_KEY_FILE` in `.env.local` (see [`.env.example`](../../.env.example)), then `bash scripts/push-distribution-secrets-to-github.sh`.
+
+There is no separate “APT API key” beyond GPG + GitHub push access.
