@@ -1,8 +1,18 @@
+import Foundation
 import Testing
 @testable import FeatherShot
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    // Swift Testing Documentation
-    // https://developer.apple.com/documentation/testing
+private struct LetterLabelCase: Decodable {
+    let n: Int
+    let label: String
+}
+
+@Test func letterLabelMatchesSharedFixture() throws {
+    let url = try #require(Bundle.module.url(forResource: "letterLabel.cases", withExtension: "json"))
+    let data = try Data(contentsOf: url)
+    let cases = try JSONDecoder().decode([LetterLabelCase].self, from: data)
+
+    for entry in cases {
+        #expect(letterLabel(entry.n) == entry.label)
+    }
 }

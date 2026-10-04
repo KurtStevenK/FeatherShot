@@ -17,6 +17,19 @@ let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
 
+// Optimization state
+/**
+ * PERFORMANCE OPTIMIZATION:
+ * 1. Caching layout properties (rect, scale) during mousedown to avoid layout thrashing
+ *    (forced synchronous reflows) during mousemove.
+ * 2. Using requestAnimationFrame to throttle render() calls, preventing "frame piling"
+ *    and ensuring the UI remains responsive even under heavy mouse movement.
+ */
+let cachedRect = null;
+let cachedScaleX = 1;
+let cachedScaleY = 1;
+let renderRequested = false;
+
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
   let num = n - 1;
@@ -117,11 +130,15 @@ function loadScreenshot(dataUrl) {
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
+
+  // Cache layout properties to avoid layout thrashing in mousemove
+  cachedRect = canvas.getBoundingClientRect();
+  cachedScaleX = canvas.width / cachedRect.width;
+  cachedScaleY = canvas.height / cachedRect.height;
+
+  const x = (e.clientX - cachedRect.left) * cachedScaleX;
+  const y = (e.clientY - cachedRect.top) * cachedScaleY;
+
   currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
   // Store zoom level for magnifier
   if (tool === 'magnifier') {
@@ -130,13 +147,20 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  if (!isDragging || !currentDraw) return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  currentDraw.endX = (e.clientX - rect.left) * scaleX;
-  currentDraw.endY = (e.clientY - rect.top) * scaleY;
-  render();
+  if (!isDragging || !currentDraw || !cachedRect) return;
+
+  // Use cached layout properties to avoid synchronous layout/reflow
+  currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
+  currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
+
+  // Throttle render calls with requestAnimationFrame to ensure high frame rate and responsiveness
+  if (!renderRequested) {
+    renderRequested = true;
+    requestAnimationFrame(() => {
+      renderRequested = false;
+      render();
+    });
+  }
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -159,7 +183,7 @@ canvas.addEventListener('mouseup', () => {
   }
   isDragging = false;
   render();
-  updateUndoState();
+  updateActionStates();
 });
 
 // --- Render ---
@@ -431,12 +455,16 @@ function setTool(t) {
     lineWidthSlider.max = '5';
     lineWidthSlider.step = '0.5';
     lineWidthSlider.value = zoomLevel.toString();
+    lineWidthSlider.title = 'Zoom Level';
+    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
     widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     lineWidthSlider.min = '2';
     lineWidthSlider.max = '15';
     lineWidthSlider.step = '1';
     lineWidthSlider.value = lineWidth.toString();
+    lineWidthSlider.title = 'Line Width';
+    lineWidthSlider.setAttribute('aria-label', 'Line Width');
     widthLabel.textContent = lineWidth + 'px';
   }
 }
@@ -449,22 +477,27 @@ function undo() {
     if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
     if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
     render();
-    updateUndoState();
+    updateActionStates();
   }
 }
 
 function clearAll() {
+  if (drawings.length > 0 && !confirm('Are you sure you want to clear all annotations?')) {
+    return;
+  }
   drawings = [];
   stepArrowCount = 0;
   stepRectCount = 0;
   abcArrowCount = 0;
   abcRectCount = 0;
   render();
-  updateUndoState();
+  updateActionStates();
 }
 
-function updateUndoState() {
-  document.getElementById('btn-undo').disabled = drawings.length === 0;
+function updateActionStates() {
+  const isEmpty = drawings.length === 0;
+  document.getElementById('btn-undo').disabled = isEmpty;
+  document.getElementById('btn-clear').disabled = isEmpty;
 }
 
 function saveAndCopy() {
@@ -490,4 +523,4 @@ function saveAndCopy() {
 }
 
 // Initial state
-updateUndoState();
+updateActionStates();
