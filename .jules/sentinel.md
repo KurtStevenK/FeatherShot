@@ -1,4 +1,4 @@
-## 2025-05-15 - Electron Session Hardening Timing
-**Vulnerability:** Potential bypass of permission request handlers if only listening to `session-created`.
-**Learning:** In Electron, `session.defaultSession` is often initialized before the `app.on('session-created')` listener can be attached in `app.whenReady()`. This means the primary session might lack the security restrictions intended for all sessions.
-**Prevention:** Always apply security configurations (like `setPermissionRequestHandler`) directly to `session.defaultSession` in addition to using the `session-created` event for any dynamically created sessions.
+## 2025-05-14 - Electron Session and Renderer Hardening
+**Vulnerability:** The Electron application lacked critical defense-in-depth measures, including restricted permissions, navigation guards, and a Content Security Policy (CSP). This left the application vulnerable to potential XSS and RCE if the renderer process were compromised.
+**Learning:** Default Electron sessions are overly permissive. Security must be explicitly configured both in the main process (via `session` and `web-contents-created` events) and the renderer process (via CSP meta tags).
+**Prevention:** Always implement `setPermissionRequestHandler`, `setWindowOpenHandler`, and restrict `will-navigate` in the main process. Supplement these with a strict CSP in all HTML files.
