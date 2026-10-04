@@ -5,6 +5,29 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-10-04
+
+### Added
+
+- **Swift unit tests** — `FeatherShotTests` target in `Package.swift`; `swift test` runs in CI and before macOS release builds.
+- **CI workflow** (`.github/workflows/ci.yml`) — macOS `swift build` / `swift test`, shared `letterLabel` verification, Electron dependency audit, Chrome extension validation on push and pull requests.
+- **Shared ABC label helper** — `shared/letterLabel.js` and `shared/letterLabel.cases.json`; synced to Chrome and Electron via `npm run sync:shared`.
+- **Repo verification scripts** — `scripts/sync-shared.mjs`, `scripts/verify-letter-label.mjs`, `scripts/validate-chrome-extension.mjs`; root `npm run verify` runs sync, cross-platform label checks, and extension manifest/file validation.
+- **Chrome extension packaging checks** — Release workflow runs sync and validation before zipping the extension.
+
+### Changed
+
+- **Electron** — Upgraded to **44.5.1** and **electron-builder** to **26.15.3** (`npm audit` clean).
+- **Electron / Chrome** — `letterLabel` removed from duplicated inline code; Electron loads `electron-app/shared/letterLabel.js`, Chrome loads `letterLabel.js` before `editor.js`.
+- **Swift tests** — ABC labels validated against `shared/letterLabel.cases.json` (same vectors as JavaScript).
+- **README** — Documents `swift test`, `npm run verify`, and `shared/` layout.
+- **Project rules** — `.agents/rules/feathershot.md` documents shared `letterLabel` workflow.
+
+### Fixed
+
+- **macOS screen capture** — `screencapture` no longer blocks a Swift concurrency thread (`waitUntilExit` replaced with async process completion).
+- **macOS polish** — Removed debug logging from menu bar startup.
+
 ## [1.2.2] - 2026-04-07
 
 ### Fixed
