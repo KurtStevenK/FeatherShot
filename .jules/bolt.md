@@ -1,3 +1,3 @@
-## 2025-05-15 - [Optimization] Eliminate layout thrashing and frame piling in drawing loop
-**Learning:** Calling `canvas.getBoundingClientRect()` inside a `mousemove` handler is a common performance anti-pattern in Electron/Web apps. It forces synchronous layout (reflow) on every mouse event, which can be frequent. Throttling renders with `requestAnimationFrame` further ensures we don't waste cycles rendering faster than the display refresh rate.
-**Action:** Always cache layout-triggering properties (`getBoundingClientRect`, `offsetWidth`, etc.) during `mousedown` or initialization if they are expected to be static during the interaction. Use `requestAnimationFrame` to throttle high-frequency UI updates.
+## 2025-05-14 - [Editor Rendering Optimizations]
+**Learning:** High-frequency events like `mousemove` can cause significant performance degradation in Electron apps if they trigger layout reflows (via `getBoundingClientRect`) or redundant canvas re-renders. Throttling and layout caching are essential for maintaining a responsive UI during interactive tasks like drawing.
+**Action:** Always cache layout-triggering properties outside of high-frequency event handlers and use `requestAnimationFrame` to throttle rendering passes to the display's refresh rate.

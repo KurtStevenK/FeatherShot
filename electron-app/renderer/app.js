@@ -115,13 +115,19 @@ function loadScreenshot(dataUrl) {
 }
 
 // --- Drawing ---
+let cachedRect = null;
+let cachedScaleX = 1;
+let cachedScaleY = 1;
+let renderRequested = false;
+
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
+  // Cache layout values once per drag to avoid layout thrashing in mousemove
+  cachedRect = canvas.getBoundingClientRect();
+  cachedScaleX = canvas.width / cachedRect.width;
+  cachedScaleY = canvas.height / cachedRect.height;
+  const x = (e.clientX - cachedRect.left) * cachedScaleX;
+  const y = (e.clientY - cachedRect.top) * cachedScaleY;
   currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
   // Store zoom level for magnifier
   if (tool === 'magnifier') {
@@ -131,12 +137,18 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (!isDragging || !currentDraw) return;
-  const rect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / rect.width;
-  const scaleY = canvas.height / rect.height;
-  currentDraw.endX = (e.clientX - rect.left) * scaleX;
-  currentDraw.endY = (e.clientY - rect.top) * scaleY;
-  render();
+  // Use cached layout values
+  currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
+  currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
+
+  // Throttle render calls with requestAnimationFrame
+  if (!renderRequested) {
+    renderRequested = true;
+    requestAnimationFrame(() => {
+      render();
+      renderRequested = false;
+    });
+  }
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -169,14 +181,11 @@ function render() {
   ctx.drawImage(screenshotImage, 0, 0);
 
   // Draw completed
-  let stepA = 0, stepR = 0, abcA = 0, abcR = 0;
   drawings.forEach(d => {
     if (d.tool === 'step-arrow') {
-      stepA++;
-      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepA);
+      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
     } else if (d.tool === 'step-rect') {
-      stepR++;
-      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepR);
+      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
     } else if (d.tool === 'arrow') {
       drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'line') {
@@ -186,11 +195,9 @@ function render() {
     } else if (d.tool === 'question-rect') {
       drawQuestionRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'abc-arrow') {
-      abcA++;
-      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcA);
+      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
     } else if (d.tool === 'abc-rect') {
-      abcR++;
-      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
+      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
     } else if (d.tool === 'circle') {
       drawEllipse(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'magnifier') {
