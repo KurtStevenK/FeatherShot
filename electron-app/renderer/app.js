@@ -1,7 +1,4 @@
-const { ipcRenderer, clipboard, nativeImage } = require('electron');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { ipcRenderer, clipboard, nativeImage, fs, path, os } = window.electronAPI;
 
 // --- State ---
 let screenshotImage = null;

@@ -1,4 +1,6 @@
-## 2025-05-15 - [Electron IPC and Permission Hardening]
-**Vulnerability:** The application was missing basic security hardening for the Electron Main process and Renderer windows. Specifically, IPC messages were unvalidated, and no Content Security Policy (CSP) was defined.
-**Learning:** Even simple utilities like FeatherShot can benefit from Electron's security model. Denying all permission requests by default is a safe baseline for apps that don't need access to sensors or geolocation.
-**Prevention:** Always validate data coming from the renderer in the main process. Implement a restrictive CSP to mitigate XSS risks, and explicitly deny unnecessary permissions using `setPermissionRequestHandler`.
+# Sentinel Journal
+
+## 2025-05-14 - initial security assessment
+**Vulnerability:** Found `nodeIntegration: true` and `contextIsolation: false` in Electron `main.js`.
+**Learning:** This is a classic Electron security risk that allows the renderer process to access Node.js APIs directly, making it vulnerable to RCE if any untrusted content is loaded.
+**Prevention:** Always use `contextIsolation: true` and `nodeIntegration: false`, and use a `preload` script to expose specific functionality via `contextBridge`.
