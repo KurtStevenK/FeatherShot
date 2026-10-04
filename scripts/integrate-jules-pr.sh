@@ -4,6 +4,23 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 INTEGRATE_BRANCH="integrate-jules-prs-1-26"
 
+normalize_jules_paths() {
+  if git ls-files --error-unmatch .Jules/palette.md >/dev/null 2>&1; then
+    if ! git ls-files --error-unmatch .jules/palette.md >/dev/null 2>&1; then
+      git mv -f .Jules/palette.md .jules/palette.md 2>/dev/null || true
+    else
+      git rm -f --cached .Jules/palette.md 2>/dev/null || true
+    fi
+  fi
+  for f in palette bolt sentinel; do
+    if [[ -f ".Jules/$f.md" ]] && [[ ! -f ".jules/$f.md" ]]; then
+      mkdir -p .jules
+      git mv -f ".Jules/$f.md" ".jules/$f.md" 2>/dev/null || mv ".Jules/$f.md" ".jules/$f.md"
+    fi
+  done
+  git rm -f --cached .Jules/palette.md .Jules/bolt.md .Jules/sentinel.md 2>/dev/null || true
+}
+
 resolve_conflicts() {
   local prefer=${1:-theirs}
   # Drop pnpm lockfiles per plan
@@ -58,9 +75,10 @@ integrate_pr() {
     resolve_conflicts ours || return 1
     git commit --no-edit || git commit -m "Merge $INTEGRATE_BRANCH into PR $n (resolved conflicts)"
   fi
-  git add -A
+  normalize_jules_paths
+  git add .jules scripts/integrate-jules-pr.sh 2>/dev/null || true
   if ! git diff --cached --quiet; then
-    git commit -m "chore: normalize merge artifacts for PR $n" || true
+    git commit -m "chore: normalize Jules journal paths for PR $n" || true
   fi
 
   git checkout "$INTEGRATE_BRANCH"
@@ -69,10 +87,15 @@ integrate_pr() {
     git commit --no-edit || git commit -m "Merge PR #$n: $title (resolved conflicts)"
   fi
 
+  normalize_jules_paths
   # Ensure no pnpm lock on integration branch
   if [[ -f electron-app/pnpm-lock.yaml ]]; then
     git rm -f electron-app/pnpm-lock.yaml
     git commit -m "Remove pnpm-lock.yaml (npm is canonical)" || true
+  fi
+  if ! git diff --cached --quiet 2>/dev/null || [[ -n $(git status --porcelain) ]]; then
+    git add .jules electron-app/pnpm-lock.yaml 2>/dev/null || true
+    git diff --cached --quiet || git commit -m "chore: post-merge normalization after PR $n" || true
   fi
 
   echo "OK PR $n"
