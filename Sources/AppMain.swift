@@ -99,7 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             CGRequestScreenCaptureAccess()
         }
 
-        let tempPath = "/tmp/feathershot_temp.png"
+        let tempPath = FileManager.default.temporaryDirectory.appendingPathComponent("feathershot_temp.png").path
         
         // Remove old temp file to ensure we don't load a stale image
         try? FileManager.default.removeItem(atPath: tempPath)
