@@ -16,6 +16,8 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
+let cachedRect = null; // Performance: Cache bounding rect during dragging to avoid layout thrashing
+let renderRequested = false; // Performance: Throttle rendering with requestAnimationFrame
 
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
@@ -117,7 +119,8 @@ function loadScreenshot(dataUrl) {
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  const rect = canvas.getBoundingClientRect();
+  cachedRect = canvas.getBoundingClientRect();
+  const rect = cachedRect;
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   const x = (e.clientX - rect.left) * scaleX;
@@ -131,12 +134,20 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (!isDragging || !currentDraw) return;
-  const rect = canvas.getBoundingClientRect();
+  const rect = cachedRect || canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   currentDraw.endX = (e.clientX - rect.left) * scaleX;
   currentDraw.endY = (e.clientY - rect.top) * scaleY;
-  render();
+
+  // Performance: Throttle rendering to once per animation frame
+  if (!renderRequested) {
+    renderRequested = true;
+    requestAnimationFrame(() => {
+      render();
+      renderRequested = false;
+    });
+  }
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -158,6 +169,7 @@ canvas.addEventListener('mouseup', () => {
     currentDraw = null;
   }
   isDragging = false;
+  cachedRect = null;
   render();
   updateUndoState();
 });
@@ -422,8 +434,11 @@ function drawCircleLabel(ctx, x, y, color, lw, label) {
 // --- Actions ---
 function setTool(t) {
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + t).classList.add('active');
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    const isActive = b.id === 'tool-' + t;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive);
+  });
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {
@@ -431,12 +446,16 @@ function setTool(t) {
     lineWidthSlider.max = '5';
     lineWidthSlider.step = '0.5';
     lineWidthSlider.value = zoomLevel.toString();
+    lineWidthSlider.title = 'Zoom Level';
+    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
     widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     lineWidthSlider.min = '2';
     lineWidthSlider.max = '15';
     lineWidthSlider.step = '1';
     lineWidthSlider.value = lineWidth.toString();
+    lineWidthSlider.title = 'Line Width';
+    lineWidthSlider.setAttribute('aria-label', 'Line Width');
     widthLabel.textContent = lineWidth + 'px';
   }
 }
@@ -464,7 +483,9 @@ function clearAll() {
 }
 
 function updateUndoState() {
-  document.getElementById('btn-undo').disabled = drawings.length === 0;
+  const noDrawings = drawings.length === 0;
+  document.getElementById('btn-undo').disabled = noDrawings;
+  document.getElementById('btn-clear').disabled = noDrawings;
 }
 
 function saveAndCopy() {
