@@ -1,11 +1,33 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{ if(process.platform==='darwin')app.dock.hide(); createTray(); setupIPC(); });
+app.whenReady().then(()=>{
+  if(process.platform==='darwin')app.dock.hide();
+  setupSecurity();
+  createTray();
+  setupIPC();
+});
+
+function setupSecurity() {
+  // Deny all permission requests (camera, microphone, geolocation, etc.)
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(false);
+  });
+
+  // Limit navigation and window creation to prevent unintended content loading
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('will-navigate', (event, navigationUrl) => {
+      event.preventDefault();
+    });
+    contents.setWindowOpenHandler(() => {
+      return { action: 'deny' };
+    });
+  });
+}
 
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
@@ -103,7 +125,11 @@ async function startSelection() {
       frame:false,transparent:true,alwaysOnTop:true,skipTaskbar:true,
       resizable:false,movable:false,hasShadow:false,focusable:true,
       fullscreenable:true,backgroundColor:'#00000000',show:false,
-      webPreferences:{nodeIntegration:true,contextIsolation:false}
+      webPreferences:{
+        nodeIntegration:false,
+        contextIsolation:true,
+        preload: path.join(__dirname, 'preload.js')
+      }
     });
     windowData.set(win.id,{displayBounds:display.bounds,globalBounds});
     win.loadFile(path.join(__dirname,'renderer','selection.html'));
@@ -129,7 +155,11 @@ function openEditor(screenshotData) {
   } else { w=Math.min(Math.max(screenshotData.width,700),wa.width-80); h=Math.min(Math.max(screenshotData.height+80,400),wa.height-80); }
 
   editorWindow=new BrowserWindow({width:w,height:h,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
-    webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
+    webPreferences:{
+      nodeIntegration:false,
+      contextIsolation:true,
+      preload: path.join(__dirname, 'preload.js')
+    },show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
   editorWindow.loadFile(path.join(__dirname,'renderer','index.html'));
 
   // Simple, reliable: send data after page loads, then show window

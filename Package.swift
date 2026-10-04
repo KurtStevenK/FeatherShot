@@ -16,6 +16,14 @@ let package = Package(
             linkerSettings: [
                 .unsafeFlags(["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT", "-Xlinker", "__info_plist", "-Xlinker", "Info.plist"])
             ]
-        )
+        ),
+        .testTarget(
+            name: "FeatherShotTests",
+            dependencies: ["FeatherShot"],
+            path: "Tests/FeatherShotTests",
+            resources: [
+                .copy("../../shared/letterLabel.cases.json"),
+            ]
+        ),
     ]
 )
