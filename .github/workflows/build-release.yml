@@ -395,12 +395,15 @@ jobs:
             git rm -rf . 2>/dev/null || true
           fi
           cd "$GITHUB_WORKSPACE"
+          PACMAN_PKG="$(readlink -f "$PKG")"
           docker run --rm \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
             -e APT_GPG_PRIVATE_KEY \
             -e APT_GPG_PASSPHRASE \
+            -e GITHUB_WORKSPACE \
+            -e PACMAN_PKG \
             archlinux:latest \
-            bash -c "pacman -Sy --noconfirm pacman-contrib gnupg && bash $GITHUB_WORKSPACE/packaging/arch/publish.sh $GITHUB_WORKSPACE/arch-repo $GITHUB_WORKSPACE/$PKG"
+            bash -c 'pacman -Sy --noconfirm pacman-contrib gnupg && bash "$GITHUB_WORKSPACE/packaging/arch/publish.sh" "$GITHUB_WORKSPACE/arch-repo" "$PACMAN_PKG"'
           cd arch-repo
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

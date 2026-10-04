@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.19-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.20-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.19:** **Arch pacman** repo publish on release (`pacman -S feathershot`). **v1.3.18** fixes Linux CI artifacts; **v1.3.16** tray **Check for Updates**; **v1.3.13+** Chocolatey, Homebrew, APT.
+> **New in v1.3.20:** **Arch pacman** repo live on release (`pacman -S feathershot`). **v1.3.18+** Linux CI artifacts; **v1.3.16** tray **Check for Updates**; **v1.3.13+** Chocolatey, Homebrew, APT.
 
 ---
 
