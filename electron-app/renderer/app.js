@@ -2,6 +2,7 @@ const { ipcRenderer, clipboard, nativeImage } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { letterLabel } = require('../shared/letterLabel.js');
 
 // --- State ---
 let screenshotImage = null;
@@ -16,17 +17,6 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
-
-// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
-function letterLabel(n) {
-  let num = n - 1;
-  let result = '';
-  do {
-    result = String.fromCharCode(97 + (num % 26)) + result;
-    num = Math.floor(num / 26) - 1;
-  } while (num >= 0);
-  return result;
-}
 
 // --- DOM ---
 const canvas = document.getElementById('canvas');
@@ -422,8 +412,11 @@ function drawCircleLabel(ctx, x, y, color, lw, label) {
 // --- Actions ---
 function setTool(t) {
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tool-' + t).classList.add('active');
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    const isActive = b.id === 'tool-' + t;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive);
+  });
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {

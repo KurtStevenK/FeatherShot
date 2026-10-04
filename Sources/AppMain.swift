@@ -22,22 +22,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var annotationWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        print("FeatherShot starting...")
-        
         // Ensure we are an accessory app (no Dock icon)
         NSApp.setActivationPolicy(.accessory)
-        
+
         // Slightly delay setup to ensure the system is ready for the menu item
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.setupStatusItem()
-            print("Status item setup called.")
         }
-        
-        print("Initial launch steps complete.")
     }
 
     func setupStatusItem() {
-        print("Creating status item...")
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         
         // Prepare the context menu for right-click
@@ -47,16 +41,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         contextMenu?.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
         
         if let button = statusItem?.button {
-            // Using a simple text label for testing visibility
-            button.title = "🪶" 
+            button.title = "🪶"
             button.target = self
             button.action = #selector(statusItemClicked)
-            
+
             // Allow the button to receive both left and right clicks
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
-            print("Button configured with title 🪶")
-        } else {
-            print("Error: Could not find status item button!")
         }
     }
 
@@ -99,7 +89,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             CGRequestScreenCaptureAccess()
         }
 
-        let tempPath = "/tmp/feathershot_temp.png"
+        // Use a secure, user-specific temporary directory instead of a hardcoded /tmp path.
+        // This prevents symlink attacks and ensures isolation between users.
+        let tempPath = FileManager.default.temporaryDirectory.appendingPathComponent("feathershot_temp.png").path
         
         // Remove old temp file to ensure we don't load a stale image
         try? FileManager.default.removeItem(atPath: tempPath)
@@ -112,8 +104,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             process.arguments = ["-i", "-x", tempPath]
 
             do {
-                try process.run()
-                process.waitUntilExit()
+                try await runProcess(process)
 
                 if FileManager.default.fileExists(atPath: tempPath) {
                     // Success!
@@ -178,5 +169,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.writeObjects([image])
+    }
+}
+
+private func runProcess(_ process: Process) async throws {
+    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+        process.terminationHandler = { _ in
+            continuation.resume()
+        }
+        do {
+            try process.run()
+        } catch {
+            process.terminationHandler = nil
+            continuation.resume(throwing: error)
+        }
     }
 }

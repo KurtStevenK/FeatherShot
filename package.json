@@ -1,0 +1,10 @@
+{
+  "name": "feathershot-repo",
+  "private": true,
+  "scripts": {
+    "sync:shared": "node scripts/sync-shared.mjs",
+    "verify:letter-label": "node scripts/verify-letter-label.mjs",
+    "verify:chrome": "node scripts/validate-chrome-extension.mjs",
+    "verify": "npm run sync:shared && npm run verify:letter-label && npm run verify:chrome"
+  }
+}
