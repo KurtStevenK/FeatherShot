@@ -1,5 +1,14 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+
+VERSION="${FEATHERSHOT_VERSION:-1.3.9}"
+ENTITLEMENTS="${ROOT}/packaging/mac/FeatherShot.entitlements"
+DMG_NAME="FeatherShot-${VERSION}-(macOS).dmg"
+
+echo "==> FeatherShot release ${VERSION}"
 
 echo "==> Creating Iconset"
 mkdir -p AppIcon.iconset
@@ -28,7 +37,6 @@ mkdir -p FeatherShot.app/Contents/Resources
 cp .build/release/FeatherShot FeatherShot.app/Contents/MacOS/
 cp AppIcon.icns FeatherShot.app/Contents/Resources/
 
-# Create a final Info.plist inside the bundle
 cat <<EOF > FeatherShot.app/Contents/Info.plist
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -43,9 +51,9 @@ cat <<EOF > FeatherShot.app/Contents/Info.plist
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.3.0</string>
+    <string>${VERSION}</string>
     <key>CFBundleVersion</key>
-    <string>1.3.0</string>
+    <string>${VERSION}</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2026 Kurt Steven Kainzmayer</string>
     <key>LSMinimumSystemVersion</key>
@@ -62,9 +70,37 @@ cat <<EOF > FeatherShot.app/Contents/Info.plist
 </plist>
 EOF
 
-echo "==> Code Signing App Bundle"
-codesign --force --deep --sign - FeatherShot.app
+resolve_sign_identity() {
+  if [[ -n "${CODESIGN_IDENTITY:-}" ]]; then
+    echo "$CODESIGN_IDENTITY"
+    return
+  fi
+  local id
+  id=$(security find-identity -v -p codesigning 2>/dev/null | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -1)
+  if [[ -n "$id" ]]; then
+    echo "$id"
+  else
+    echo "-"
+  fi
+}
 
+SIGN_ID=$(resolve_sign_identity)
+echo "==> Code Signing App Bundle (identity: ${SIGN_ID})"
+
+if [[ "$SIGN_ID" == "-" ]]; then
+  codesign --force --sign - FeatherShot.app
+else
+  codesign --force --options runtime --timestamp \
+    --entitlements "$ENTITLEMENTS" \
+    --sign "$SIGN_ID" \
+    FeatherShot.app/Contents/MacOS/FeatherShot
+  codesign --force --options runtime --timestamp \
+    --entitlements "$ENTITLEMENTS" \
+    --sign "$SIGN_ID" \
+    FeatherShot.app
+fi
+
+codesign --verify --strict FeatherShot.app
 echo "==> App Bundle built at FeatherShot.app"
 
 echo "==> Creating Styled DMG Installer"
@@ -72,7 +108,7 @@ if [ ! -d "create-dmg" ]; then
     git clone https://github.com/create-dmg/create-dmg.git
 fi
 
-rm -f "FeatherShot-1.3.0-(macOS).dmg"
+rm -f "$DMG_NAME"
 
 ./create-dmg/create-dmg \
   --volname "FeatherShot" \
@@ -83,7 +119,19 @@ rm -f "FeatherShot-1.3.0-(macOS).dmg"
   --icon "FeatherShot.app" 150 200 \
   --hide-extension "FeatherShot.app" \
   --app-drop-link 450 200 \
-  "FeatherShot-1.3.0-(macOS).dmg" \
+  "$DMG_NAME" \
   "FeatherShot.app/"
 
-echo "==> Done! Release is ready."
+if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" && -n "${APPLE_TEAM_ID:-}" && "$SIGN_ID" != "-" ]]; then
+  echo "==> Notarizing DMG"
+  xcrun notarytool submit "$DMG_NAME" --wait \
+    --apple-id "$APPLE_ID" \
+    --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+    --team-id "$APPLE_TEAM_ID"
+  xcrun stapler staple "$DMG_NAME"
+  echo "==> Notarization complete"
+else
+  echo "==> Skipping notarization (need Developer ID sign + APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD / APPLE_TEAM_ID)"
+fi
+
+echo "==> Done! Release is ready: ${DMG_NAME}"

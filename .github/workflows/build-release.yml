@@ -15,6 +15,44 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Require Apple signing secrets
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -z "${CSC_LINK:-}" ]] && missing+=(CSC_LINK)
+          [[ -z "${CSC_KEY_PASSWORD:-}" ]] && missing+=(CSC_KEY_PASSWORD)
+          [[ -z "${APPLE_TEAM_ID:-}" ]] && missing+=(APPLE_TEAM_ID)
+          if ((${#missing[@]} > 0)); then
+            echo "::error::Missing GitHub Actions secrets for signed macOS releases: ${missing[*]}. See packaging/mac/README.md"
+            exit 1
+          fi
+          if [[ -z "${APPLE_ID:-}" || -z "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
+            echo "::warning::APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD not set — DMG will be signed but not notarized."
+          fi
+
+      - name: Import Developer ID certificate (keychain)
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.CSC_LINK }}
+          P12_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          CERTIFICATE_PATH="$RUNNER_TEMP/build_certificate.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH" login.keychain-db
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
       - name: Test & Build Release Binary
         run: |
           swift test
@@ -30,10 +68,64 @@ jobs:
             sips -z 400 600 icon_1024.png --out dmg_background.png 2>/dev/null || true
           fi
 
-      - name: Build App Bundle & DMG
+      - name: Preflight notarization credentials
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          set -euo pipefail
+          trim() {
+            local v="$1"
+            v="${v//$'\r'/}"
+            v="${v//$'\n'/}"
+            v="${v#"${v%%[![:space:]]*}"}"
+            v="${v%"${v##*[![:space:]]}"}"
+            printf '%s' "$v"
+          }
+          APPLE_ID="$(trim "${APPLE_ID:-}")"
+          APPLE_APP_SPECIFIC_PASSWORD="$(trim "${APPLE_APP_SPECIFIC_PASSWORD:-}")"
+          APPLE_TEAM_ID="$(trim "${APPLE_TEAM_ID:-}")"
+          if [[ -z "$APPLE_ID" || -z "$APPLE_APP_SPECIFIC_PASSWORD" ]]; then
+            echo "::notice::Skipping notarytool preflight (notarization secrets not set)"
+            exit 0
+          fi
+          export APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+          xcrun notarytool history \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" >/dev/null
+
+      - name: Build App Bundle & DMG
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          FEATHERSHOT_VERSION: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          export FEATHERSHOT_VERSION="${FEATHERSHOT_VERSION#v}"
           chmod +x build_release.sh
+          security find-identity -v -p codesigning
           ./build_release.sh
+
+      - name: Verify macOS code signature
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -euo pipefail
+          APP="FeatherShot.app"
+          codesign --verify --strict --verbose=2 "$APP"
+          if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
+            DMG=$(ls FeatherShot-*-\(macOS\).dmg 2>/dev/null | head -1)
+            if [[ -n "$DMG" ]]; then
+              xcrun stapler validate "$DMG"
+            fi
+            spctl -a -t exec -vv "$APP/Contents/MacOS/FeatherShot"
+          else
+            echo "::notice::Skipping stapler/spctl (notarization secrets not set)"
+          fi
 
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4

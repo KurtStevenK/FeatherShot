@@ -21,16 +21,7 @@ let cachedScaleX = 1;
 let cachedScaleY = 1;
 let renderRequested = false;
 
-// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
-function letterLabel(n) {
-  let num = n - 1;
-  let result = '';
-  do {
-    result = String.fromCharCode(97 + (num % 26)) + result;
-    num = Math.floor(num / 26) - 1;
-  } while (num >= 0);
-  return result;
-}
+// letterLabel from ../shared/letterLabel.js (synced via npm run sync:shared)
 
 // --- DOM ---
 const canvas = document.getElementById('canvas');

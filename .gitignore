@@ -35,6 +35,9 @@ FeatherShot-Chrome-Extension.zip
 # Generated files
 FeatherShot 1.0.1.dmg
 
+# Cursor
+.cursor/plans/
+
 # personal
 .agents/workflows/git-setup.md
 

@@ -5,6 +5,81 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.9] - 2026-10-04
+
+### Added
+
+- **Signed + notarized macOS DMG on GitHub Releases** — Tagged builds use Developer ID Application, hardened runtime, `notarytool`, and stapling so Gatekeeper accepts the download.
+- **`packaging/mac/`** — Entitlements, signing README, and Mac App Store prep doc ([`APP-STORE.md`](packaging/mac/APP-STORE.md)).
+- **`scripts/push-apple-signing-to-github.sh`** — Upload `CSC_*` and Apple notarization secrets to GitHub Actions.
+
+### Changed
+
+- **`build_release.sh`** — Resolves Developer ID from the keychain (ad-hoc `-` fallback for local dev); version from `FEATHERSHOT_VERSION`; notarizes DMG when Apple env vars are set.
+- **Release workflow** — Imports signing certificate, preflights `notarytool`, verifies `codesign` / `stapler` / `spctl` on tag builds.
+
+## [1.3.8] - 2026-10-04
+
+### Changed
+
+- **GitHub Actions** — FeatherShot repo requires the same Apple secrets as cursor-auto-runner (`CSC_LINK`, `CSC_KEY_PASSWORD`, `APPLE_TEAM_ID`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`). See [`packaging/mac/README.md`](packaging/mac/README.md).
+
+## [1.3.7] - 2026-10-04
+
+### Added
+
+- **App Store Connect (manual)** — Create a macOS app record linked to `com.kainzmayer.feathershot.v4` when preparing a future Mac App Store listing (not used for GitHub DMG).
+
+## [1.3.6] - 2026-10-04
+
+### Added
+
+- **Apple Developer (manual)** — Register App ID `com.kainzmayer.feathershot.v4` in [Identifiers](https://developer.apple.com/account/resources/identifiers/list) (no extra capabilities required for screen recording).
+
+## [1.3.5] - 2026-10-04
+
+### Added
+
+- **macOS signing documentation** — [`packaging/mac/README.md`](packaging/mac/README.md) and secret upload script for CI.
+
+## [1.3.4] - 2026-10-04
+
+### Changed
+
+- **`.github/workflows/build-release.yml`** — macOS job imports Developer ID certificate, runs notarization preflight, and verifies signatures before uploading the DMG artifact.
+
+## [1.3.3] - 2026-10-04
+
+### Changed
+
+- **`build_release.sh`** — Developer ID signing with hardened runtime and optional DMG notarization (foundation for 1.3.9).
+
+## [1.3.2] - 2026-10-04
+
+### Added
+
+- **`packaging/mac/FeatherShot.entitlements`** — Minimal entitlements plist for hardened runtime signing.
+
+## [1.3.1] - 2026-10-04
+
+### Added
+
+- **Jules integration** — Merged community PRs #1–#26 (security, performance, accessibility).
+- **`scripts/integrate-jules-pr.sh`** — Helper used to integrate the Jules PR batch.
+- **`electron-app/preload.js`** — Context bridge scaffolding for safer renderer APIs.
+
+### Security
+
+- Safer temporary file handling in capture/save paths.
+- **Electron `setupSecurity()`** — Deny permission requests; block non-`file:` navigation and unauthorized `window.open`.
+- Session hardening across renderer windows.
+
+### Changed
+
+- **Electron renderer** — Canvas hot path uses cached layout and throttled redraws; improved image pipeline during annotation.
+- **Editor accessibility** — Toolbar and action buttons use `aria-label` and `aria-pressed`; keyboard hints in labels; interaction and focus polish in CSS/JS.
+- **Electron editor** — Loads shared `letterLabel` from `electron-app/shared/letterLabel.js`.
+
 ## [1.3.0] - 2026-10-04
 
 ### Added
@@ -207,6 +282,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.9]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.8...v1.3.9
+[1.3.8]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.7...v1.3.8
+[1.3.7]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.6...v1.3.7
+[1.3.6]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.5...v1.3.6
+[1.3.5]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.4...v1.3.5
+[1.3.4]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.3...v1.3.4
+[1.3.3]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.2...v1.3.3
+[1.3.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.1...v1.3.2
+[1.3.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.0...v1.3.1
+[1.3.0]: https://github.com/KurtStevenK/FeatherShot/compare/v1.2.2...v1.3.0
+[1.2.2]: https://github.com/KurtStevenK/FeatherShot/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/KurtStevenK/FeatherShot/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.9...v1.2.0
+[1.1.9]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.8...v1.1.9
+[1.1.8]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.7...v1.1.8
 [1.1.7]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.6...v1.1.7
 [1.1.6]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.5...v1.1.6
 [1.1.5]: https://github.com/KurtStevenK/FeatherShot/compare/v1.1.4...v1.1.5

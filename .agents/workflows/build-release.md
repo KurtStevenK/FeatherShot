@@ -31,17 +31,11 @@ Update the version string in **all 3 locations**:
 
 #### `build_release.sh`
 
-Update the version in the embedded Info.plist **and** the DMG filename:
+Set default `FEATHERSHOT_VERSION` at the top of the script (CI passes `FEATHERSHOT_VERSION` from the git tag, without the `v` prefix). DMG name is derived automatically: `FeatherShot-${VERSION}-(macOS).dmg`.
 
-```bash
-# In the heredoc Info.plist:
-<string>NEW_VERSION</string>   # CFBundleShortVersionString
-<string>NEW_VERSION</string>   # CFBundleVersion
+### macOS signing (GitHub Releases)
 
-# DMG filename (2 occurrences):
-rm -f "FeatherShot NEW_VERSION.dmg"
-"FeatherShot NEW_VERSION.dmg" \
-```
+Tagged releases require Apple secrets on GitHub — see [`packaging/mac/README.md`](../../packaging/mac/README.md). Run `bash scripts/push-apple-signing-to-github.sh` once per repo.
 
 #### `generate_assets.swift`
 
