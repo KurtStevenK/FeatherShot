@@ -1,3 +1,7 @@
-## 2026-06-29 - Throttling Canvas Rendering
-**Learning:** Calling `getBoundingClientRect()` in high-frequency event handlers like `mousemove` causes layout thrashing, significantly impacting performance. Throttling render calls with `requestAnimationFrame` ensures that the UI only updates as fast as the display can refresh.
-**Action:** Always cache layout-triggering properties before a high-frequency interaction loop begins, and use `requestAnimationFrame` to throttle visual updates.
+# Bolt's Performance Journal
+
+This journal tracks critical performance-related learnings for the FeatherShot project.
+
+## 2025-05-15 - Caching Layout and Throttling Renders
+**Learning:** Calling `getBoundingClientRect()` in a `mousemove` handler causes layout thrashing by forcing synchronous reflows. Additionally, frequent mouse events can lead to more render calls than the screen can display, causing "frame piling".
+**Action:** Cache the bounding rect and scale factors during `mousedown` and use `requestAnimationFrame` to throttle `render()` calls during `mousemove`.
