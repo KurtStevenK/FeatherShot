@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.9] - 2026-10-04
 
+### Changed
+
+- **Bundle ID** — Native macOS and Electron use `xyz.kainzmayer.feathershot` (reverse-DNS for **kainzmayer.xyz**), replacing `com.kainzmayer.feathershot.v4` / `com.kainzmayer.feathershot`.
+
 ### Added
 
 - **Signed + notarized macOS DMG on GitHub Releases** — Tagged builds use Developer ID Application, hardened runtime, `notarytool`, and stapling so Gatekeeper accepts the download.
@@ -28,13 +32,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **App Store Connect (manual)** — Create a macOS app record linked to `com.kainzmayer.feathershot.v4` when preparing a future Mac App Store listing (not used for GitHub DMG).
+- **App Store Connect (manual)** — Create a macOS app record linked to `xyz.kainzmayer.feathershot` when preparing a future Mac App Store listing (not used for GitHub DMG).
 
 ## [1.3.6] - 2026-10-04
 
 ### Added
 
-- **Apple Developer (manual)** — Register App ID `com.kainzmayer.feathershot.v4` in [Identifiers](https://developer.apple.com/account/resources/identifiers/list) (no extra capabilities required for screen recording).
+- **Apple Developer (manual)** — Register App ID `xyz.kainzmayer.feathershot` in [Identifiers](https://developer.apple.com/account/resources/identifiers/list) (matches **kainzmayer.xyz**; no extra capabilities required for screen recording).
 
 ## [1.3.5] - 2026-10-04
 

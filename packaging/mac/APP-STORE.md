@@ -11,4 +11,4 @@ The Mac App Store uses:
 
 When you are ready, add a separate CI job and do not replace the Developer ID DMG pipeline — most users will install from GitHub until the Store listing is live.
 
-Bundle ID: `com.kainzmayer.feathershot.v4`
+Bundle ID: `xyz.kainzmayer.feathershot`

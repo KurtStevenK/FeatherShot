@@ -45,7 +45,7 @@ cat <<EOF > FeatherShot.app/Contents/Info.plist
     <key>CFBundleExecutable</key>
     <string>FeatherShot</string>
     <key>CFBundleIdentifier</key>
-    <string>com.kainzmayer.feathershot.v4</string>
+    <string>xyz.kainzmayer.feathershot</string>
     <key>CFBundleName</key>
     <string>FeatherShot</string>
     <key>CFBundlePackageType</key>

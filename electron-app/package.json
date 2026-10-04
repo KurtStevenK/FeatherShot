@@ -20,7 +20,7 @@
     "build:all": "electron-builder --win --linux --publish never"
   },
   "build": {
-    "appId": "com.kainzmayer.feathershot",
+    "appId": "xyz.kainzmayer.feathershot",
     "productName": "FeatherShot",
     "directories": {
       "output": "dist"
