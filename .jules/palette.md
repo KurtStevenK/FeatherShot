@@ -1,7 +1,7 @@
-## 2025-05-15 - [Dynamic Slider Labels and Action State Synchronization]
-**Learning:** In interactive tool-based applications, a single UI element (like a slider) may change purpose. Programmatically updating its accessibility attributes (title, aria-label) is crucial for screen reader users to maintain context. Additionally, global actions that clear state should be synchronized with that state to prevent confusion.
-**Action:** Always check if a shared UI component needs updated metadata when the application mode changes, and ensure "Clear" or "Reset" actions are disabled when there is nothing to clear.
+## 2025-05-14 - [Dynamic A11y Labels and State-Based Action Disabling]
+**Learning:** For multi-purpose UI elements (like a slider that changes from Line Width to Zoom Level), static ARIA labels are insufficient. Dynamically updating `aria-label` and `title` ensures screen reader users maintain context during tool switching. Additionally, synchronizing the 'disabled' state of all canvas-clearing actions (Undo, Clear All) with the state of the 'drawings' array prevents confusing interactions on an empty canvas.
+**Action:** Always verify if a UI element changes its semantic meaning based on application state, and programmatically update its accessibility attributes. Centralize state-based action disabling in a single synchronization function (e.g., `updateActionStates`).
 
-## 2025-05-15 - [Keyboard Accessibility with Focus-Visible]
-**Learning:** Default focus rings are often suppressed for aesthetic reasons, but this breaks keyboard navigation. Using `:focus-visible` allows for a clear focus indicator that only appears for keyboard users, satisfying both design and accessibility requirements.
-**Action:** Implement `:focus-visible` styles using the project's brand colors (e.g., #0a84ff) and a consistent offset to ensure high visibility without cluttering the mouse-driven UI.
+## 2025-05-14 - [Destructive Action Confirmation]
+**Learning:** Users can easily misclick destructive "Clear All" buttons, especially when they are adjacent to frequent actions like "Undo". A simple native `confirm()` dialog provides a low-friction but highly effective safety net that prevents accidental loss of all annotations.
+**Action:** Implement confirmation dialogs for any action that results in significant, irreversible loss of user-generated content, even in lightweight utility apps.

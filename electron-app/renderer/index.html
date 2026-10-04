@@ -20,16 +20,16 @@
         <button id="tool-step-rect" class="tool-btn" title="Step Rectangle (2)" aria-label="Step Rectangle (Shortcut: 2)">
           <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="7" fill="currentColor">1</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
         </button>
-        <button id="tool-arrow" class="tool-btn" title="Arrow (3)" aria-label="Arrow (Shortcut: 3 or A)">
+        <button id="tool-arrow" class="tool-btn" title="Arrow (3)" aria-label="Arrow (Shortcut: 3/A)">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         </button>
-        <button id="tool-rect" class="tool-btn" title="Rectangle (4)" aria-label="Rectangle (Shortcut: 4 or R)">
+        <button id="tool-rect" class="tool-btn" title="Rectangle (4)" aria-label="Rectangle (Shortcut: 4/R)">
           <svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         </button>
         <button id="tool-circle" class="tool-btn" title="Circle / Ellipse (5)" aria-label="Circle / Ellipse (Shortcut: 5)">
           <svg viewBox="0 0 24 24" width="18" height="18"><ellipse cx="12" cy="12" rx="10" ry="8" stroke="currentColor" stroke-width="2" fill="none"/></svg>
         </button>
-        <button id="tool-line" class="tool-btn" title="Line (6)" aria-label="Line (Shortcut: 6 or L)">
+        <button id="tool-line" class="tool-btn" title="Line (6)" aria-label="Line (Shortcut: 6/L)">
           <svg viewBox="0 0 24 24" width="18" height="18"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
         <button id="tool-question-arrow" class="tool-btn" title="Question Arrow (7)" aria-label="Question Arrow (Shortcut: 7)">
@@ -52,19 +52,19 @@
       <div class="separator"></div>
 
       <div class="tool-group">
-        <input type="color" id="color-picker" value="#FF3B30" title="Color">
+        <input type="color" id="color-picker" value="#FF3B30" title="Color" aria-label="Color Picker">
         <div class="width-control">
           <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width" aria-label="Line Width">
-          <span id="width-label">4px</span>
+          <span id="width-label" aria-hidden="true">4px</span>
         </div>
       </div>
 
       <div class="spacer"></div>
 
       <div class="tool-group actions">
-        <button id="btn-undo" class="action-btn" title="Undo (Ctrl+Z)">Undo</button>
-        <button id="btn-clear" class="action-btn danger" title="Clear All">Clear</button>
-        <button id="btn-save" class="action-btn primary" title="Save & Copy (Ctrl+S)">
+        <button id="btn-undo" class="action-btn" title="Undo (Ctrl+Z)" aria-label="Undo (Shortcut: Ctrl+Z)">Undo</button>
+        <button id="btn-clear" class="action-btn danger" title="Clear All" aria-label="Clear All">Clear</button>
+        <button id="btn-save" class="action-btn primary" title="Save & Copy (Ctrl+S)" aria-label="Save & Copy (Shortcut: Ctrl+S)">
           💾 Save & Copy
         </button>
       </div>
