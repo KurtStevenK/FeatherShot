@@ -292,6 +292,120 @@ body {
   background: linear-gradient(180deg, transparent 0%, rgba(0, 102, 255, 0.03) 100%);
 }
 
+.install-commands {
+  max-width: 720px;
+  margin: 0 auto 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.install-command {
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 12px 16px;
+  align-items: start;
+  padding: 14px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.install-command-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-top: 6px;
+}
+
+.install-command-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.install-command-row code {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.85rem;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.install-command-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.install-command-note {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.install-command-note a {
+  color: #6cb4ff;
+  text-decoration: none;
+}
+
+.install-command-note a:hover {
+  text-decoration: underline;
+}
+
+.copy-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(0, 102, 255, 0.08);
+  color: #6cb4ff;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.copy-btn:hover {
+  background: rgba(0, 102, 255, 0.18);
+  border-color: rgba(0, 102, 255, 0.35);
+  color: #9cc8ff;
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.copy-btn .copy-icon-done {
+  display: none;
+}
+
+.copy-btn.copied {
+  color: #5ee0a8;
+  border-color: rgba(94, 224, 168, 0.35);
+  background: rgba(94, 224, 168, 0.1);
+}
+
+.copy-btn.copied .copy-icon {
+  display: none;
+}
+
+.copy-btn.copied .copy-icon-done {
+  display: block;
+}
+
 .download-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -393,6 +507,13 @@ body {
 @media (max-width: 768px) {
   .features-grid {
     grid-template-columns: 1fr;
+  }
+  .install-command {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .install-command-label {
+    padding-top: 0;
   }
   .download-grid {
     grid-template-columns: repeat(2, 1fr);
