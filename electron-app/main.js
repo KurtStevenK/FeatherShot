@@ -1,11 +1,45 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{ if(process.platform==='darwin')app.dock.hide(); createTray(); setupIPC(); });
+app.whenReady().then(()=>{
+  if(process.platform==='darwin')app.dock.hide();
+  setupSecurity();
+  createTray();
+  setupIPC();
+});
+
+function setupSecurity() {
+  // 1. Deny all permission requests (camera, microphone, location, etc.)
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(false);
+  });
+
+  // Also handle sessions created in the future
+  app.on('session-created', (s) => {
+    s.setPermissionRequestHandler((webContents, permission, callback) => {
+      callback(false);
+    });
+  });
+
+  // 2. Restrict navigation to local files only
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('will-navigate', (event, navigationUrl) => {
+      const parsedUrl = new URL(navigationUrl);
+      if (parsedUrl.protocol !== 'file:') {
+        event.preventDefault();
+      }
+    });
+
+    // 3. Disable creation of new windows
+    contents.setWindowOpenHandler(() => {
+      return { action: 'deny' };
+    });
+  });
+}
 
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
