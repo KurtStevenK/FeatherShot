@@ -1,4 +1,4 @@
-## 2025-05-14 - [Insecure Temporary File Usage]
-**Vulnerability:** The macOS application used a hardcoded path in the shared `/tmp` directory (`/tmp/feathershot_temp.png`) to store screenshots before they were loaded into the editor.
-**Learning:** Fixed paths in world-writable directories like `/tmp` are susceptible to symlink attacks where another user could redirect the file write to an arbitrary location or read the screenshot data.
-**Prevention:** Always use user-specific temporary directories provided by the operating system, such as `FileManager.default.temporaryDirectory` on macOS, which ensures isolation between users.
+## 2025-05-15 - [Secure Temporary Path Usage]
+**Vulnerability:** Hardcoded temporary file paths in world-writable directories (like `/tmp`) can lead to symlink attacks or race conditions.
+**Learning:** MacOS provides `FileManager.default.temporaryDirectory`, which returns a unique, user-isolated temporary directory that is significantly more secure than `/tmp`.
+**Prevention:** Always use system APIs to resolve temporary directories rather than hardcoding paths.
