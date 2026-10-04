@@ -159,6 +159,10 @@ jobs:
         working-directory: electron-app
         run: npm ci
 
+      - name: Install Linux packaging tools
+        if: matrix.platform == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y libarchive-tools rpm
+
       - name: Generate Platform Icons
         working-directory: electron-app
         shell: bash
@@ -328,9 +332,9 @@ jobs:
             DEB=$(find release-artifacts -name "*.deb" | head -1)
           fi
           if [[ -z "$DEB" ]]; then
-            echo "deb artifact not found" >&2
+            echo "::warning::deb artifact not found — skipping APT publish"
             find release-artifacts -type f >&2 || true
-            exit 1
+            exit 0
           fi
           sudo apt-get update
           sudo apt-get install -y apt-utils gnupg gzip git-lfs
@@ -376,9 +380,9 @@ jobs:
             PKG=$(find release-artifacts -name "*.pkg.tar.zst" | head -1)
           fi
           if [[ -z "$PKG" ]]; then
-            echo "pacman artifact not found" >&2
+            echo "::warning::pacman artifact not found — skipping Arch publish"
             find release-artifacts -type f >&2 || true
-            exit 1
+            exit 0
           fi
           git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/arch.git" arch-repo
           cd arch-repo

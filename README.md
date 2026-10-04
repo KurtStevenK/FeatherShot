@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.17-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.18-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.17:** **Arch Linux** install via `pacman -S feathershot`. **v1.3.16** adds tray **Check for Updates**; **v1.3.13+** Chocolatey, Homebrew, and APT; **v1.3.14–15** add `!` tools and text annotations.
+> **New in v1.3.18:** Linux CI fix so **deb**, **AppImage**, and **Arch pacman** ship on release. **v1.3.17** adds `pacman -S feathershot`; **v1.3.16** tray **Check for Updates**; **v1.3.13+** Chocolatey, Homebrew, APT.
 
 ---
 
@@ -64,7 +64,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 ### Updates
 
 - **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`).
-- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (Windows uses in-app updater; Linux `.deb` shows `apt upgrade` instructions).
+- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (Windows uses in-app updater; Linux shows `apt` or `pacman` upgrade hints by distro).
 
 ---
 

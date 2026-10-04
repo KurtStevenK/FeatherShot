@@ -1,6 +1,14 @@
+const fs = require('fs');
 const { app, dialog, shell } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { compareVersions, fetchLatestRelease } = require('./github-release');
+
+function linuxUpgradeHint() {
+  if (fs.existsSync('/etc/arch-release')) {
+    return 'sudo pacman -Sy feathershot';
+  }
+  return 'sudo apt-get update && sudo apt-get install --only-upgrade feathershot';
+}
 
 let trayRefresh = null;
 
@@ -65,7 +73,7 @@ async function checkForUpdatesInteractive() {
       return;
     }
     const detail = process.platform === 'linux'
-      ? `Version ${tag} is available.\n\nsudo apt-get update && sudo apt-get install --only-upgrade feathershot\n\nOr open the download page.`
+      ? `Version ${tag} is available.\n\n${linuxUpgradeHint()}\n\nOr open the download page.`
       : `Version ${tag} is available (you have ${current}).`;
     const { response } = await dialog.showMessageBox({
       type: 'info',
