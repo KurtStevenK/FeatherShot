@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sign feathershot.db (+ .files) and export gpg.key at repo root (same key as APT).
+# Sign feathershot.db.tar.zst (+ .files) and export gpg.key at repo root (same key as APT).
 set -euo pipefail
 
 REPO_DIR="${1:?usage: sign.sh <arch-repo-dir>}"
@@ -26,7 +26,8 @@ if [[ -z "$SIGNING_KEY" ]]; then
 fi
 
 ARCH_DIR="$REPO_DIR/x86_64"
-DB="$ARCH_DIR/feathershot.db"
+DB="$ARCH_DIR/feathershot.db.tar.zst"
+FILES="$ARCH_DIR/feathershot.files.tar.zst"
 
 if [[ ! -f "$DB" ]]; then
   echo "database not found: $DB" >&2
@@ -36,7 +37,7 @@ fi
 gpg --batch --yes --local-user "$SIGNING_KEY" --detach-sign --armor \
   -o "$DB.sig" "$DB"
 gpg --batch --yes --local-user "$SIGNING_KEY" --detach-sign --armor \
-  -o "$DB.files.sig" "$DB.files"
+  -o "$FILES.sig" "$FILES"
 
 gpg --batch --yes --export --armor "$SIGNING_KEY" > "$REPO_DIR/gpg.key"
 

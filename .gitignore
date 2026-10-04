@@ -47,6 +47,8 @@ FeatherShot 1.0.1.dmg
 
 # Cursor
 .cursor/plans/
+.cursor/cli.json
+.cursor/rules/subagent-model.mdc
 
 # Personal / agent tooling (local only)
 .agents/
