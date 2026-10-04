@@ -15,8 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Release Binary
-        run: swift build -c release
+      - name: Test & Build Release Binary
+        run: |
+          swift test
+          swift build -c release
 
       - name: Generate DMG Background
         run: |
@@ -106,6 +108,8 @@ jobs:
 
       - name: Package Chrome Extension
         run: |
+          npm run sync:shared
+          npm run verify:chrome
           cd chrome-extension
           zip -r ../FeatherShot-Chrome-Extension.zip . -x ".*"
 
