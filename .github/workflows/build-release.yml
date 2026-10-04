@@ -400,8 +400,8 @@ jobs:
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
             -e APT_GPG_PRIVATE_KEY \
             -e APT_GPG_PASSPHRASE \
-            -e GITHUB_WORKSPACE \
-            -e PACMAN_PKG \
+            -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
+            -e "PACMAN_PKG=$PACMAN_PKG" \
             archlinux:latest \
             bash -c 'pacman -Sy --noconfirm pacman-contrib gnupg && bash "$GITHUB_WORKSPACE/packaging/arch/publish.sh" "$GITHUB_WORKSPACE/arch-repo" "$PACMAN_PKG"'
           cd arch-repo
