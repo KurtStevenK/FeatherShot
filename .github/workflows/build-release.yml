@@ -91,10 +91,13 @@ jobs:
             exit 0
           fi
           export APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
-          xcrun notarytool history \
+          if ! xcrun notarytool history \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID" >/dev/null
+            --team-id "$APPLE_TEAM_ID" >/dev/null; then
+            echo "::warning::notarytool preflight failed (401 = regenerate app-specific password at appleid.apple.com and update GitHub secrets)"
+            exit 0
+          fi
 
       - name: Build App Bundle & DMG
         env:
