@@ -1,3 +1,3 @@
-## 2025-05-14 - [Editor Rendering Optimizations]
-**Learning:** High-frequency events like `mousemove` can cause significant performance degradation in Electron apps if they trigger layout reflows (via `getBoundingClientRect`) or redundant canvas re-renders. Throttling and layout caching are essential for maintaining a responsive UI during interactive tasks like drawing.
-**Action:** Always cache layout-triggering properties outside of high-frequency event handlers and use `requestAnimationFrame` to throttle rendering passes to the display's refresh rate.
+## 2025-05-15 - [Correcting Micro-optimization vs Robustness]
+**Learning:** Prioritizing minor performance gains in a render loop (like removing integer increments) can lead to regressions in dynamic UI behavior (like auto-renumbering). Bolt optimizations should focus on high-impact bottlenecks like layout thrashing and frame rate throttling.
+**Action:** Always verify that performance optimizations do not compromise core features such as dynamic re-calculation of state during rendering.

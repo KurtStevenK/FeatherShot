@@ -17,6 +17,19 @@ let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
 
+// Optimization state
+/**
+ * PERFORMANCE OPTIMIZATION:
+ * 1. Caching layout properties (rect, scale) during mousedown to avoid layout thrashing
+ *    (forced synchronous reflows) during mousemove.
+ * 2. Using requestAnimationFrame to throttle render() calls, preventing "frame piling"
+ *    and ensuring the UI remains responsive even under heavy mouse movement.
+ */
+let cachedRect = null;
+let cachedScaleX = 1;
+let cachedScaleY = 1;
+let renderRequested = false;
+
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
   let num = n - 1;
@@ -115,19 +128,17 @@ function loadScreenshot(dataUrl) {
 }
 
 // --- Drawing ---
-let cachedRect = null;
-let cachedScaleX = 1;
-let cachedScaleY = 1;
-let renderRequested = false;
-
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  // Cache layout values once per drag to avoid layout thrashing in mousemove
+
+  // Cache layout properties to avoid layout thrashing in mousemove
   cachedRect = canvas.getBoundingClientRect();
   cachedScaleX = canvas.width / cachedRect.width;
   cachedScaleY = canvas.height / cachedRect.height;
+
   const x = (e.clientX - cachedRect.left) * cachedScaleX;
   const y = (e.clientY - cachedRect.top) * cachedScaleY;
+
   currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
   // Store zoom level for magnifier
   if (tool === 'magnifier') {
@@ -136,17 +147,18 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  if (!isDragging || !currentDraw) return;
-  // Use cached layout values
+  if (!isDragging || !currentDraw || !cachedRect) return;
+
+  // Use cached layout properties to avoid synchronous layout/reflow
   currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
   currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
 
-  // Throttle render calls with requestAnimationFrame
+  // Throttle render calls with requestAnimationFrame to ensure high frame rate and responsiveness
   if (!renderRequested) {
     renderRequested = true;
     requestAnimationFrame(() => {
-      render();
       renderRequested = false;
+      render();
     });
   }
 });
@@ -171,7 +183,7 @@ canvas.addEventListener('mouseup', () => {
   }
   isDragging = false;
   render();
-  updateActionStates();
+  updateUndoState();
 });
 
 // --- Render ---
@@ -181,11 +193,14 @@ function render() {
   ctx.drawImage(screenshotImage, 0, 0);
 
   // Draw completed
+  let stepA = 0, stepR = 0, abcA = 0, abcR = 0;
   drawings.forEach(d => {
     if (d.tool === 'step-arrow') {
-      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
+      stepA++;
+      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepA);
     } else if (d.tool === 'step-rect') {
-      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
+      stepR++;
+      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepR);
     } else if (d.tool === 'arrow') {
       drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'line') {
@@ -195,9 +210,11 @@ function render() {
     } else if (d.tool === 'question-rect') {
       drawQuestionRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'abc-arrow') {
-      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
+      abcA++;
+      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcA);
     } else if (d.tool === 'abc-rect') {
-      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.stepNumber);
+      abcR++;
+      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
     } else if (d.tool === 'circle') {
       drawEllipse(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'magnifier') {
@@ -438,16 +455,12 @@ function setTool(t) {
     lineWidthSlider.max = '5';
     lineWidthSlider.step = '0.5';
     lineWidthSlider.value = zoomLevel.toString();
-    lineWidthSlider.title = 'Zoom Level';
-    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
     widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     lineWidthSlider.min = '2';
     lineWidthSlider.max = '15';
     lineWidthSlider.step = '1';
     lineWidthSlider.value = lineWidth.toString();
-    lineWidthSlider.title = 'Line Width';
-    lineWidthSlider.setAttribute('aria-label', 'Line Width');
     widthLabel.textContent = lineWidth + 'px';
   }
 }
@@ -460,7 +473,7 @@ function undo() {
     if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
     if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
     render();
-    updateActionStates();
+    updateUndoState();
   }
 }
 
@@ -471,13 +484,11 @@ function clearAll() {
   abcArrowCount = 0;
   abcRectCount = 0;
   render();
-  updateActionStates();
+  updateUndoState();
 }
 
-function updateActionStates() {
-  const hasDrawings = drawings.length > 0;
-  document.getElementById('btn-undo').disabled = !hasDrawings;
-  document.getElementById('btn-clear').disabled = !hasDrawings;
+function updateUndoState() {
+  document.getElementById('btn-undo').disabled = drawings.length === 0;
 }
 
 function saveAndCopy() {
@@ -503,4 +514,4 @@ function saveAndCopy() {
 }
 
 // Initial state
-updateActionStates();
+updateUndoState();
