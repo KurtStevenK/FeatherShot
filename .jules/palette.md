@@ -1,7 +1,7 @@
-## 2025-05-15 - [Dynamic Contextual Accessibility]
-**Learning:** When a single UI control (like a range slider) serves multiple purposes depending on the active tool, its `aria-label` and `title` must be updated programmatically to reflect the current context.
-**Action:** Always update accessibility attributes (`aria-label`, `title`) in the tool selection logic if the control's function changes.
+## 2025-05-15 - [Dynamic Slider Labels and Action State Synchronization]
+**Learning:** In interactive tool-based applications, a single UI element (like a slider) may change purpose. Programmatically updating its accessibility attributes (title, aria-label) is crucial for screen reader users to maintain context. Additionally, global actions that clear state should be synchronized with that state to prevent confusion.
+**Action:** Always check if a shared UI component needs updated metadata when the application mode changes, and ensure "Clear" or "Reset" actions are disabled when there is nothing to clear.
 
-## 2025-05-15 - [Accessible Keyboard Feedback]
-**Learning:** Icon-heavy toolbars often lack focus indicators, making keyboard navigation difficult. Standardized focus styles ensure accessibility without cluttering the mouse-driven UI.
-**Action:** Apply `outline: 2px solid #0a84ff; outline-offset: 2px;` to `:focus-visible` states for interactive elements.
+## 2025-05-15 - [Keyboard Accessibility with Focus-Visible]
+**Learning:** Default focus rings are often suppressed for aesthetic reasons, but this breaks keyboard navigation. Using `:focus-visible` allows for a clear focus indicator that only appears for keyboard users, satisfying both design and accessibility requirements.
+**Action:** Implement `:focus-visible` styles using the project's brand colors (e.g., #0a84ff) and a consistent offset to ensure high visibility without cluttering the mouse-driven UI.

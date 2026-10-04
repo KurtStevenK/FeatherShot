@@ -1,4 +1,7 @@
-const { ipcRenderer, clipboard, nativeImage, fs, path, os } = window.electronAPI;
+const { ipcRenderer, clipboard, nativeImage } = require('electron');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 // --- State ---
 let screenshotImage = null;
@@ -13,10 +16,6 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
-let cachedRect = null;
-let cachedScaleX = 1;
-let cachedScaleY = 1;
-let renderRequested = false;
 
 // Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 function letterLabel(n) {
@@ -118,13 +117,11 @@ function loadScreenshot(dataUrl) {
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  // Performance: Cache layout properties to avoid layout thrashing during mousemove
-  cachedRect = canvas.getBoundingClientRect();
-  cachedScaleX = canvas.width / cachedRect.width;
-  cachedScaleY = canvas.height / cachedRect.height;
-
-  const x = (e.clientX - cachedRect.left) * cachedScaleX;
-  const y = (e.clientY - cachedRect.top) * cachedScaleY;
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
   currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
   // Store zoom level for magnifier
   if (tool === 'magnifier') {
@@ -134,19 +131,12 @@ canvas.addEventListener('mousedown', (e) => {
 
 canvas.addEventListener('mousemove', (e) => {
   if (!isDragging || !currentDraw) return;
-
-  // Performance: Use cached layout properties for better performance
-  currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
-  currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
-
-  // Performance: Throttle render calls with requestAnimationFrame to prevent frame piling
-  if (!renderRequested) {
-    renderRequested = true;
-    requestAnimationFrame(() => {
-      render();
-      renderRequested = false;
-    });
-  }
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  currentDraw.endX = (e.clientX - rect.left) * scaleX;
+  currentDraw.endY = (e.clientY - rect.top) * scaleY;
+  render();
 });
 
 canvas.addEventListener('mouseup', () => {
@@ -169,7 +159,7 @@ canvas.addEventListener('mouseup', () => {
   }
   isDragging = false;
   render();
-  updateUndoState();
+  updateActionStates();
 });
 
 // --- Render ---
@@ -463,7 +453,7 @@ function undo() {
     if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
     if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
     render();
-    updateUndoState();
+    updateActionStates();
   }
 }
 
@@ -474,10 +464,10 @@ function clearAll() {
   abcArrowCount = 0;
   abcRectCount = 0;
   render();
-  updateUndoState();
+  updateActionStates();
 }
 
-function updateUndoState() {
+function updateActionStates() {
   const hasDrawings = drawings.length > 0;
   document.getElementById('btn-undo').disabled = !hasDrawings;
   document.getElementById('btn-clear').disabled = !hasDrawings;
@@ -506,4 +496,4 @@ function saveAndCopy() {
 }
 
 // Initial state
-updateUndoState();
+updateActionStates();
