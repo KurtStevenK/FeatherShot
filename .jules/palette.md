@@ -1,3 +1,7 @@
-## 2025-05-14 - Dynamic ARIA labels for multi-purpose controls
-**Learning:** When a single UI control (like a slider) changes its function based on the active tool, updating only its visual label or title is insufficient for screen readers. The `aria-label` must be dynamically updated in sync with the tool state to maintain accessibility.
-**Action:** Always ensure that any state-driven changes to a control's purpose are reflected by programmatically updating the `aria-label` and `title` attributes.
+## 2025-05-15 - [Dynamic Contextual Accessibility]
+**Learning:** When a single UI control (like a range slider) serves multiple purposes depending on the active tool, its `aria-label` and `title` must be updated programmatically to reflect the current context.
+**Action:** Always update accessibility attributes (`aria-label`, `title`) in the tool selection logic if the control's function changes.
+
+## 2025-05-15 - [Accessible Keyboard Feedback]
+**Learning:** Icon-heavy toolbars often lack focus indicators, making keyboard navigation difficult. Standardized focus styles ensure accessibility without cluttering the mouse-driven UI.
+**Action:** Apply `outline: 2px solid #0a84ff; outline-offset: 2px;` to `:focus-visible` states for interactive elements.

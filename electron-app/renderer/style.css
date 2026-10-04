@@ -70,6 +70,11 @@ body {
   color: #fff;
 }
 
+.tool-btn:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
+}
+
 .tool-btn.active {
   background: #0a84ff;
   color: #fff;
@@ -145,6 +150,11 @@ body {
 
 .action-btn:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
 }
 
 .action-btn:disabled {
