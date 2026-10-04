@@ -16,8 +16,6 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
-
-// Performance caching: avoids layout thrashing and frame piling
 let cachedRect = null;
 let cachedScaleX = 1;
 let cachedScaleY = 1;
@@ -123,7 +121,7 @@ function loadScreenshot(dataUrl) {
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  // Performance optimization: cache rect and scales to avoid layout thrashing in mousemove
+  // Performance: Cache layout properties to avoid layout thrashing during mousemove
   cachedRect = canvas.getBoundingClientRect();
   cachedScaleX = canvas.width / cachedRect.width;
   cachedScaleY = canvas.height / cachedRect.height;
@@ -138,12 +136,13 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  if (!isDragging || !currentDraw || !cachedRect) return;
-  // Performance optimization: use cached rect and scales to avoid layout-triggering getBoundingClientRect
+  if (!isDragging || !currentDraw) return;
+
+  // Performance: Use cached layout properties for better performance
   currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
   currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
 
-  // Throttling: use requestAnimationFrame to prevent frame piling during high-frequency events
+  // Performance: Throttle render calls with requestAnimationFrame to prevent frame piling
   if (!renderRequested) {
     renderRequested = true;
     requestAnimationFrame(() => {
@@ -445,14 +444,12 @@ function setTool(t) {
     lineWidthSlider.max = '5';
     lineWidthSlider.step = '0.5';
     lineWidthSlider.value = zoomLevel.toString();
-    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
     widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     lineWidthSlider.min = '2';
     lineWidthSlider.max = '15';
     lineWidthSlider.step = '1';
     lineWidthSlider.value = lineWidth.toString();
-    lineWidthSlider.setAttribute('aria-label', 'Line Width');
     widthLabel.textContent = lineWidth + 'px';
   }
 }
@@ -481,7 +478,6 @@ function clearAll() {
 
 function updateUndoState() {
   document.getElementById('btn-undo').disabled = drawings.length === 0;
-  document.getElementById('btn-clear').disabled = drawings.length === 0;
 }
 
 function saveAndCopy() {

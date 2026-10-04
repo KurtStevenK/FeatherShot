@@ -1,3 +1,3 @@
-## 2025-06-01 - [Layout Thrashing and Frame Piling in Canvas Renderer]
-**Learning:** Calling `getBoundingClientRect()` inside a `mousemove` handler triggers synchronous layout recalculations (layout thrashing), which is extremely expensive when drawing on a canvas. Additionally, frequent mouse events can queue more `render()` calls than the display refresh rate (frame piling), leading to lag and high CPU usage.
-**Action:** Always cache the canvas bounding rectangle and scale factors during `mousedown` for use in `mousemove`. Throttle rendering calls using `requestAnimationFrame` to ensure drawing happens at most once per display frame.
+## 2025-05-15 - [Optimization] Eliminate layout thrashing and frame piling in drawing loop
+**Learning:** Calling `canvas.getBoundingClientRect()` inside a `mousemove` handler is a common performance anti-pattern in Electron/Web apps. It forces synchronous layout (reflow) on every mouse event, which can be frequent. Throttling renders with `requestAnimationFrame` further ensures we don't waste cycles rendering faster than the display refresh rate.
+**Action:** Always cache layout-triggering properties (`getBoundingClientRect`, `offsetWidth`, etc.) during `mousedown` or initialization if they are expected to be static during the interaction. Use `requestAnimationFrame` to throttle high-frequency UI updates.
