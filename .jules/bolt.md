@@ -1,7 +1,3 @@
-## 2024-05-21 - [Electron Canvas Performance]
-**Learning:** Redundant encoding/decoding cycles (e.g., Canvas -> DataURL -> Image) are extremely costly in Electron renderers, especially for high-resolution images. Extracting the PNG buffer directly from a Base64 string is significantly faster than re-encoding with `toPNG()`.
-**Action:** Always look for intermediate encoding steps in image pipelines and eliminate them by sharing raw canvas or buffer objects.
-
-## 2024-05-21 - [NativeImage createFromBitmap Risk]
-**Learning:** `nativeImage.createFromBitmap` is fast but dangerous for cross-platform apps because it expects native byte order (BGRA on Windows, RGBA on others), while Web Canvas `getImageData` always returns RGBA.
-**Action:** Stick to PNG buffers or Data URLs for `nativeImage` creation unless performance is so critical that platform-specific byte-swapping is justified.
+## 2026-05-25 - Caching Bounding Rect and Throttling Renderer
+**Learning:** Calling `getBoundingClientRect()` inside high-frequency events like `mousemove` triggers synchronous layout recalculations (layout thrashing), which is expensive. Additionally, triggering full canvas re-renders synchronously on every `mousemove` can lead to "frame piling" where the browser falls behind the input rate, causing visible jank.
+**Action:** Always cache layout-triggering properties (like bounding boxes) at the start of a gesture (e.g., `mousedown`) and use `requestAnimationFrame` to throttle rendering to the display's actual refresh rate.

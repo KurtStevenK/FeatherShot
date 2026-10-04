@@ -2,7 +2,6 @@ const { ipcRenderer, clipboard, nativeImage } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { letterLabel } = require('../shared/letterLabel.js');
 
 // --- State ---
 let screenshotImage = null;
@@ -17,6 +16,19 @@ let stepRectCount = 0;
 let abcArrowCount = 0;
 let abcRectCount = 0;
 let isDragging = false;
+let cachedRect = null; // Performance: Cache bounding rect during dragging to avoid layout thrashing
+let renderRequested = false; // Performance: Throttle rendering with requestAnimationFrame
+
+// Convert 1-based number to letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
+function letterLabel(n) {
+  let num = n - 1;
+  let result = '';
+  do {
+    result = String.fromCharCode(97 + (num % 26)) + result;
+    num = Math.floor(num / 26) - 1;
+  } while (num >= 0);
+  return result;
+}
 
 // --- DOM ---
 const canvas = document.getElementById('canvas');
@@ -72,45 +84,43 @@ document.addEventListener('keydown', (e) => {
 });
 
 // --- IPC ---
-// BOLT OPTIMIZATION: Centralized image setter to ensure consistent state and avoid redundant work
-function setScreenshotImage(source) {
-  screenshotImage = source;
-  canvas.width = (source.width || source.naturalWidth);
-  canvas.height = (source.height || source.naturalHeight);
-  render();
-}
-
 ipcRenderer.on('load-screenshot', (event, data) => {
   if (typeof data === 'string') {
-    const img = new Image();
-    img.onload = () => setScreenshotImage(img);
-    img.src = data;
+    loadScreenshot(data);
   } else if (data && data.type === 'composite') {
-    // BOLT OPTIMIZATION: Composite directly onto an offscreen canvas to avoid redundant PNG encoding/decoding cycle
-    const offscreen = document.createElement('canvas');
-    offscreen.width = data.width;
-    offscreen.height = data.height;
-    const oCtx = offscreen.getContext('2d');
-
+    // Cross-monitor: composite multiple pieces onto canvas, then load as single image
+    canvas.width = data.width;
+    canvas.height = data.height;
     let loaded = 0;
     data.pieces.forEach(p => {
       const img = new Image();
       img.onload = () => {
-        oCtx.drawImage(img, 0, 0, img.width, img.height, p.destX, p.destY, p.destW, p.destH);
+        const ctx2 = canvas.getContext('2d');
+        ctx2.drawImage(img, 0, 0, img.width, img.height, p.destX, p.destY, p.destW, p.destH);
         loaded++;
-        if (loaded === data.pieces.length) {
-          setScreenshotImage(offscreen);
-        }
+        if (loaded === data.pieces.length) loadScreenshot(canvas.toDataURL('image/png'));
       };
       img.src = p.dataUrl;
     });
   }
 });
 
+function loadScreenshot(dataUrl) {
+  const img = new Image();
+  img.onload = () => {
+    screenshotImage = img;
+    canvas.width = img.width;
+    canvas.height = img.height;
+    render();
+  };
+  img.src = dataUrl;
+}
+
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   isDragging = true;
-  const rect = canvas.getBoundingClientRect();
+  cachedRect = canvas.getBoundingClientRect();
+  const rect = cachedRect;
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   const x = (e.clientX - rect.left) * scaleX;
@@ -122,21 +132,20 @@ canvas.addEventListener('mousedown', (e) => {
   }
 });
 
-let renderPending = false;
 canvas.addEventListener('mousemove', (e) => {
   if (!isDragging || !currentDraw) return;
-  const rect = canvas.getBoundingClientRect();
+  const rect = cachedRect || canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
   currentDraw.endX = (e.clientX - rect.left) * scaleX;
   currentDraw.endY = (e.clientY - rect.top) * scaleY;
 
-  // BOLT OPTIMIZATION: Throttle rendering with requestAnimationFrame to prevent frame piling
-  if (!renderPending) {
-    renderPending = true;
+  // Performance: Throttle rendering to once per animation frame
+  if (!renderRequested) {
+    renderRequested = true;
     requestAnimationFrame(() => {
       render();
-      renderPending = false;
+      renderRequested = false;
     });
   }
 });
@@ -160,6 +169,7 @@ canvas.addEventListener('mouseup', () => {
     currentDraw = null;
   }
   isDragging = false;
+  cachedRect = null;
   render();
   updateUndoState();
 });
@@ -424,11 +434,8 @@ function drawCircleLabel(ctx, x, y, color, lw, label) {
 // --- Actions ---
 function setTool(t) {
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => {
-    const isActive = b.id === 'tool-' + t;
-    b.classList.toggle('active', isActive);
-    b.setAttribute('aria-pressed', isActive);
-  });
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tool-' + t).classList.add('active');
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {
@@ -469,15 +476,10 @@ function clearAll() {
 }
 
 function updateUndoState() {
-  const hasNoDrawings = drawings.length === 0;
-  document.getElementById('btn-undo').disabled = hasNoDrawings;
-  document.getElementById('btn-clear').disabled = hasNoDrawings;
+  document.getElementById('btn-undo').disabled = drawings.length === 0;
 }
 
 function saveAndCopy() {
-  // BOLT OPTIMIZATION: Streamline the conversion from canvas to PNG to minimize redundant encoding overhead.
-  // Using toDataURL and then createFromDataURL avoids the complex channel-swapping issues of createFromBitmap (RGBA vs BGRA)
-  // while still being reasonably fast.
   const dataUrl = canvas.toDataURL('image/png');
   const img = nativeImage.createFromDataURL(dataUrl);
   clipboard.writeImage(img);
@@ -487,8 +489,7 @@ function saveAndCopy() {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const filePath = path.join(downloadsDir, `FeatherShot_${timestamp}.png`);
 
-  // Extract the PNG buffer directly from the data URL to avoid a second expensive toPNG() encoding cycle.
-  const buffer = Buffer.from(dataUrl.split(',')[1], 'base64');
+  const buffer = img.toPNG();
   fs.writeFileSync(filePath, buffer);
 
   // Flash the save button briefly then close on Windows/Linux
