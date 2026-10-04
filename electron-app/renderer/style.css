@@ -70,10 +70,26 @@ body {
   color: #fff;
 }
 
+.tool-btn:focus-visible,
+.action-btn:focus-visible,
+#color-picker:focus-visible,
+#line-width:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
+}
+
 .tool-btn.active {
   background: #0a84ff;
   color: #fff;
   border-color: #0a84ff;
+}
+
+.tool-btn:focus-visible,
+.action-btn:focus-visible,
+input[type="range"]:focus-visible,
+input[type="color"]:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
 }
 
 .separator {

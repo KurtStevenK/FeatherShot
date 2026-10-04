@@ -12,6 +12,7 @@ struct AnnotationView: View {
     @State private var selectedColor: Color = .red
     @State private var lineWidth: CGFloat = 4.0
     @State private var zoomLevel: CGFloat = 2.0
+    @State private var isSaved = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -328,13 +329,13 @@ struct AnnotationView: View {
 
                 Button(action: finish) {
                     HStack(spacing: 6) {
-                        Image(systemName: "square.and.arrow.down.on.square")
-                        Text("Save & Copy")
+                        Image(systemName: isSaved ? "checkmark" : "square.and.arrow.down.on.square")
+                        Text(isSaved ? "Saved & Copied!" : "Save & Copy")
                             .fontWeight(.bold)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color.blue)
+                    .background(isSaved ? Color.green : Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
                 }
@@ -360,8 +361,15 @@ struct AnnotationView: View {
         renderer.scale = scale
         
         if let nsImage = renderer.nsImage {
+            // Provide visual feedback before closing
+            isSaved = true
+
+            // Execute completion and saving
             onComplete(nsImage)
             saveToDownloads(image: nsImage)
+
+            // The window will be closed by the onComplete callback in AppDelegate
+            // but we have a brief moment to show the success state
         }
     }
 
