@@ -22,6 +22,16 @@ create-dmg/
 # Credentials
 .netrc
 
+# Apple signing material (never commit)
+*.p12
+*.cer
+*.mobileprovision
+AuthKey_*.p8
+
+# Local env
+.env
+.env.*
+
 # Node.js / Electron
 node_modules/
 electron-app/node_modules/
@@ -38,8 +48,11 @@ FeatherShot 1.0.1.dmg
 # Cursor
 .cursor/plans/
 
-# personal
-.agents/workflows/git-setup.md
+# Personal / agent tooling (local only)
+.agents/
+.jules/
+skills-lock.json
+scripts/integrate-jules-pr.sh
 
 # Chat history
 .privatehistory/

@@ -1,7 +1,3 @@
----
-description: How to add a new drawing/annotation tool to FeatherShot
----
-
 # Add a New Drawing Tool
 
 This workflow walks through adding a new annotation tool to FeatherShot. Every tool requires changes in exactly **2 files** across **4 locations**.

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Requires `gh auth login`. Lists GitHub Actions secret *names* only (never values).
 # Copy Apple signing secret *names* from cursor-auto-runner — values must be set manually.
 # GitHub does not expose secret values. Use the same .p12 + passwords as cursor-auto-runner:
 #   bash scripts/push-apple-signing-to-github.sh

@@ -1,8 +1,4 @@
----
-description: Project rules and conventions for FeatherShot
----
-
-# FeatherShot — Project Rules
+# FeatherShot — Project Conventions
 
 ## Language & Platform
 
@@ -33,7 +29,7 @@ When adding a new annotation tool, you must update **all 4 locations**:
 3. `AnnotationView.swift` → `drawingContent` — Add rendering for both completed and active drawings.
 4. `AnnotationView.swift` → `toolbar` — Add a toolbar button with an SF Symbol icon.
 
-See `.agents/workflows/add-tool.md` for the full walkthrough.
+See [adding-a-tool.md](adding-a-tool.md) for the full walkthrough.
 
 ## Shared `letterLabel` (ABC tools)
 
@@ -87,3 +83,4 @@ Always update `CHANGELOG.md` when bumping the version.
 - `create-dmg/` — external cloned tool
 - `AppIcon.iconset/` — intermediate build artifact
 - `.DS_Store` — macOS metadata
+- `*.p12`, `*.cer`, `.env` — signing material and local secrets (see root `.gitignore`)

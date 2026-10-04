@@ -128,7 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Electron / Chrome** — `letterLabel` removed from duplicated inline code; Electron loads `electron-app/shared/letterLabel.js`, Chrome loads `letterLabel.js` before `editor.js`.
 - **Swift tests** — ABC labels validated against `shared/letterLabel.cases.json` (same vectors as JavaScript).
 - **README** — Documents `swift test`, `npm run verify`, and `shared/` layout.
-- **Project rules** — `.agents/rules/feathershot.md` documents shared `letterLabel` workflow.
+- **Project rules** — `docs/project-conventions.md` documents shared `letterLabel` workflow.
 
 ### Fixed
 

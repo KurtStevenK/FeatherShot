@@ -24,7 +24,7 @@ Copy the same values you use for [cursor-auto-runner](https://github.com/KurtSte
 |--------|---------|
 | `CSC_LINK` | Base64 `.p12` (Developer ID Application) |
 | `CSC_KEY_PASSWORD` | `.p12` password |
-| `APPLE_TEAM_ID` | `XPPUZJDN56` |
+| `APPLE_TEAM_ID` | Team ID from [Apple Developer → Membership](https://developer.apple.com/account) |
 | `APPLE_ID` | Apple ID email |
 | `APPLE_APP_SPECIFIC_PASSWORD` | App-specific password for `notarytool` |
 
@@ -54,7 +54,7 @@ CI builds `FeatherShot-<version>-(macOS).dmg` with Developer ID signing + notari
 ```bash
 export APPLE_ID=...
 export APPLE_APP_SPECIFIC_PASSWORD=...
-export APPLE_TEAM_ID=XPPUZJDN56
+export APPLE_TEAM_ID=YOUR_APPLE_TEAM_ID
 export FEATHERSHOT_VERSION=1.3.12
 ./build_release.sh
 ```

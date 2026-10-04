@@ -4,7 +4,6 @@
 set -euo pipefail
 
 REPO="KurtStevenK/FeatherShot"
-TEAM_ID="XPPUZJDN56"
 
 if ! security find-identity -v -p codesigning | grep -q "Developer ID Application"; then
   echo "No Developer ID Application certificate in Keychain." >&2
@@ -30,6 +29,15 @@ echo ""
 read -rp "Apple ID email (notarization): " APPLE_ID
 read -rsp "App-specific password (appleid.apple.com): " APPLE_ASP
 echo ""
+if [[ -n "${APPLE_TEAM_ID:-}" ]]; then
+  TEAM_ID="$APPLE_TEAM_ID"
+else
+  read -rp "Apple Team ID (developer.apple.com → Membership): " TEAM_ID
+fi
+if [[ -z "${TEAM_ID:-}" ]]; then
+  echo "APPLE_TEAM_ID is required." >&2
+  exit 1
+fi
 
 B64=$(mktemp)
 base64 < "$P12_PATH" | tr -d '\n' > "$B64"

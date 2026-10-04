@@ -256,7 +256,7 @@ swift test        # macOS — includes shared letterLabel fixture
 
 ### Adding a New Tool
 
-See the workflow guide at [`.agents/workflows/add-tool.md`](.agents/workflows/add-tool.md) for a step-by-step walkthrough.
+See [docs/adding-a-tool.md](docs/adding-a-tool.md) for a step-by-step walkthrough. Broader conventions: [docs/project-conventions.md](docs/project-conventions.md).
 
 ---
 
