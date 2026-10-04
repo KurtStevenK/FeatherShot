@@ -15,4 +15,4 @@ read -rsp "App-specific password (appleid.apple.com): " APPLE_ASP
 echo ""
 printf '%s' "$APPLE_ID" | gh secret set APPLE_ID --repo "$REPO"
 printf '%s' "$APPLE_ASP" | gh secret set APPLE_APP_SPECIFIC_PASSWORD --repo "$REPO"
-echo "Done. Re-run the v1.3.9 release workflow or: gh workflow run build-release.yml --ref v1.3.9"
+echo "Done. Re-run the latest release tag workflow or: gh workflow run build-release.yml --ref v1.3.12"

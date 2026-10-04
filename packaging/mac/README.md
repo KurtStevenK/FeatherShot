@@ -43,8 +43,8 @@ If `notarytool` returns **HTTP 401**, regenerate the app-specific password and u
 ## Release
 
 ```bash
-git tag v1.3.9
-git push origin v1.3.9
+git tag v1.3.12
+git push origin v1.3.12
 ```
 
 CI builds `FeatherShot-<version>-(macOS).dmg` with Developer ID signing + notarization.
@@ -55,7 +55,7 @@ CI builds `FeatherShot-<version>-(macOS).dmg` with Developer ID signing + notari
 export APPLE_ID=...
 export APPLE_APP_SPECIFIC_PASSWORD=...
 export APPLE_TEAM_ID=XPPUZJDN56
-export FEATHERSHOT_VERSION=1.3.9
+export FEATHERSHOT_VERSION=1.3.12
 ./build_release.sh
 ```
 
@@ -63,7 +63,7 @@ export FEATHERSHOT_VERSION=1.3.9
 
 ```bash
 codesign --verify --strict --verbose=2 FeatherShot.app
-xcrun stapler validate "FeatherShot-1.3.9-(macOS).dmg"
+xcrun stapler validate "FeatherShot-1.3.12-(macOS).dmg"
 spctl -a -t exec -vv FeatherShot.app/Contents/MacOS/FeatherShot
 ```
 

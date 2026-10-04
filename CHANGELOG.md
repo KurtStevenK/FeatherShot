@@ -5,6 +5,34 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.12] - 2026-10-04
+
+### Fixed
+
+- **macOS notarization on GitHub Releases** — Correct `APPLE_ID` email in GitHub Actions; **`v1.3.12`** DMG is notarized (`status: Accepted`), stapled, and opens without Gatekeeper “unidentified developer” workarounds. Prefer this release over **v1.3.9–v1.3.11** for macOS downloads.
+
+### Changed
+
+- Version strings in manifests, extension, Electron, and docs aligned with **1.3.12**.
+
+## [1.3.11] - 2026-10-04
+
+### Changed
+
+- **Release retry** — Re-synced `APPLE_ID` / `APPLE_APP_SPECIFIC_PASSWORD` via [`scripts/resync-apple-notarization-secrets.sh`](scripts/resync-apple-notarization-secrets.sh) while fixing notarization (`notarytool` 401 / wrong Apple ID).
+
+## [1.3.10] - 2026-10-04
+
+### Changed
+
+- **Release retry** — Refreshed `CSC_LINK` / `CSC_KEY_PASSWORD` (matching cursor-auto-runner); tagged build still shipped a Developer ID–signed DMG when notarization failed.
+
+### Fixed
+
+- **`scripts/push-apple-signing-to-github.sh`** — Write secrets without trailing newlines.
+- **`build_release.sh`** — Do not abort the release when notarization fails; signed DMG still uploads.
+- **Release workflow** — `notarytool` preflight warns on bad credentials instead of failing the macOS job.
+
 ## [1.3.9] - 2026-10-04
 
 ### Changed
@@ -13,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Signed + notarized macOS DMG on GitHub Releases** — Tagged builds use Developer ID Application, hardened runtime, `notarytool`, and stapling so Gatekeeper accepts the download.
+- **Signed macOS DMG on GitHub Releases** — Tagged builds use Developer ID Application, hardened runtime, `notarytool`, and stapling. First **notarized** public DMG: **[v1.3.12](https://github.com/KurtStevenK/FeatherShot/releases/tag/v1.3.12)** (earlier tags **v1.3.9–v1.3.11** were signed only).
 - **`packaging/mac/`** — Entitlements, signing README, and Mac App Store prep doc ([`APP-STORE.md`](packaging/mac/APP-STORE.md)).
 - **`scripts/push-apple-signing-to-github.sh`** — Upload `CSC_*` and Apple notarization secrets to GitHub Actions.
 
@@ -286,6 +314,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.12]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.11...v1.3.12
+[1.3.11]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.10...v1.3.11
+[1.3.10]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.8...v1.3.9
 [1.3.8]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.6...v1.3.7

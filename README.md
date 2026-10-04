@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.9-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.12-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.9:** **Signed + notarized macOS DMG** on GitHub Releases. **v1.3.1** added Jules security/performance/a11y work; **v1.3.0** brought CI, shared ABC labels, and Swift tests.
+> **New in v1.3.12:** **Signed + notarized macOS DMG** on GitHub Releases (use [v1.3.12](https://github.com/KurtStevenK/FeatherShot/releases/tag/v1.3.12) for Gatekeeper-friendly download). **v1.3.1** added Jules security/performance/a11y work; **v1.3.0** brought CI, shared ABC labels, and Swift tests.
 
 ---
 

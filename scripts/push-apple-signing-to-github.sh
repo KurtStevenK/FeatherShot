@@ -42,4 +42,4 @@ printf '%s' "$APPLE_ASP" | gh secret set APPLE_APP_SPECIFIC_PASSWORD --repo "$RE
 printf '%s' "$TEAM_ID" | gh secret set APPLE_TEAM_ID --repo "$REPO"
 
 rm -f "$B64"
-echo "Done. Tag a release (git tag v1.3.9 && git push origin v1.3.9) to publish a signed macOS DMG."
+echo "Done. Tag a release (e.g. git tag v1.3.12 && git push origin v1.3.12) to publish a signed macOS DMG."
