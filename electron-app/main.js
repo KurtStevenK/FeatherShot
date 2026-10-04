@@ -1,11 +1,16 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
 const path = require('path');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{ if(process.platform==='darwin')app.dock.hide(); createTray(); setupIPC(); });
+app.whenReady().then(()=>{
+  if(process.platform==='darwin')app.dock.hide();
+  setupSecurity();
+  createTray();
+  setupIPC();
+});
 
 function createTray() {
   tray = new Tray(path.join(__dirname,'assets','tray-icon.png'));
@@ -140,6 +145,30 @@ function openEditor(screenshotData) {
     editorWindow.focus();
   });
   editorWindow.on('closed',()=>{editorWindow=null;});
+}
+
+function setupSecurity() {
+  // Deny all permission requests (camera, microphone, etc.)
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => callback(false));
+  app.on('session-created', (session) => {
+    session.setPermissionRequestHandler((webContents, permission, callback) => callback(false));
+  });
+
+  // Harden webContents (block unauthorized navigation and window creation)
+  app.on('web-contents-created', (event, contents) => {
+    contents.on('will-navigate', (event, navigationUrl) => {
+      const parsedUrl = new URL(navigationUrl);
+      if (parsedUrl.protocol !== 'file:') {
+        console.warn('Blocked unauthorized navigation to:', navigationUrl);
+        event.preventDefault();
+      }
+    });
+
+    contents.setWindowOpenHandler(() => {
+      console.warn('Blocked unauthorized window creation');
+      return { action: 'deny' };
+    });
+  });
 }
 
 app.on('window-all-closed',(e)=>e.preventDefault());
