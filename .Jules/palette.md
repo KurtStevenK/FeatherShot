@@ -1,9 +1,3 @@
-# Palette's Journal - FeatherShot UX & Accessibility Learnings
-
-## 2025-05-14 - [Initial Assessment] Toolbar Accessibility Gaps
-**Learning:** Icon-only buttons in the Electron app lack ARIA labels and focus visibility, making them difficult for screen reader and keyboard users.
-**Action:** Always include ARIA labels for icon-only buttons and explicit focus-visible states in CSS.
-
-## 2025-01-24 - [Success States & Accessibility]
-**Learning:** Providing consistent visual feedback for destructive and final actions (like saving) across different platforms (macOS/Electron) makes the app feel more polished. ARIA labels on icon-only buttons are crucial for screen reader users to navigate complex toolbars.
-**Action:** Always check if icon-only buttons have descriptive ARIA labels and ensure 'focus-visible' styles are defined for keyboard accessibility.
+## 2025-05-14 - Dynamic ARIA labels for multi-purpose controls
+**Learning:** When a single UI control (like a slider) changes its function based on the active tool, updating only its visual label or title is insufficient for screen readers. The `aria-label` must be dynamically updated in sync with the tool state to maintain accessibility.
+**Action:** Always ensure that any state-driven changes to a control's purpose are reflected by programmatically updating the `aria-label` and `title` attributes.
