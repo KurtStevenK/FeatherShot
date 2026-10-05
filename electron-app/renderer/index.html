@@ -10,7 +10,7 @@
   <div id="editor">
     <div id="canvas-container">
       <canvas id="canvas"></canvas>
-      <textarea id="text-editor" class="text-editor-hidden" rows="1"></textarea>
+      <textarea id="text-editor" class="text-editor-hidden" rows="1" aria-label="Text annotation input"></textarea>
     </div>
 
     <div id="toolbar">
@@ -62,10 +62,10 @@
       <div class="separator"></div>
 
       <div class="tool-group">
-        <input type="color" id="color-picker" value="#FF3B30" title="Color">
+        <input type="color" id="color-picker" value="#FF3B30" title="Color" aria-label="Color">
         <div class="width-control">
-          <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width">
-          <span id="width-label">4px</span>
+          <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width" aria-label="Line Width">
+          <span id="width-label" aria-hidden="true">4px</span>
         </div>
       </div>
 
