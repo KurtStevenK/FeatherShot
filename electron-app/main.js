@@ -182,6 +182,12 @@ function setupSecurity() {
       console.warn('Blocked unauthorized window creation');
       return { action: 'deny' };
     });
+
+    // Block attachment of <webview> tags to prevent renderer privilege escalation
+    contents.on('will-attach-webview', (event) => {
+      console.warn('Blocked unauthorized webview attachment');
+      event.preventDefault();
+    });
   });
 }
 
