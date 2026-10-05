@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 let img = null, tool = 'step', color = '#FF3B30', lw = 4, zoomLevel = 2.0;
 let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0, abcAN = 0, abcRN = 0;
 let editingTextId = null, draggingTextId = null, textPlaceStart = null, cachedRect = null, scaleX = 1, scaleY = 1;
+let renderRequested = false;
 const widthSlider = document.getElementById('width');
 const wLabel = document.getElementById('w-label');
 const textEditor = document.getElementById('text-editor');
@@ -150,14 +151,32 @@ canvas.onmousemove = (e) => {
     const r = cachedRect || canvas.getBoundingClientRect();
     const x = (e.clientX - r.left) * scaleX, y = (e.clientY - r.top) * scaleY;
     const d = drawings.find(item => item.id === draggingTextId);
-    if (d) { d.x1 = x; d.y1 = y; if (editingTextId === d.id) positionTextEditor(d); render(); }
+    if (d) {
+      d.x1 = x; d.y1 = y;
+      if (editingTextId === d.id) positionTextEditor(d);
+      if (!renderRequested) {
+        renderRequested = true;
+        requestAnimationFrame(() => {
+          render();
+          renderRequested = false;
+        });
+      }
+    }
     return;
   }
   if (!dragging || !current) return;
   const r = canvas.getBoundingClientRect();
   current.x2 = (e.clientX-r.left)*(canvas.width/r.width);
   current.y2 = (e.clientY-r.top)*(canvas.height/r.height);
-  render();
+
+  // Performance: Throttle render calls to requestAnimationFrame to prevent "frame piling"
+  if (!renderRequested) {
+    renderRequested = true;
+    requestAnimationFrame(() => {
+      render();
+      renderRequested = false;
+    });
+  }
 };
 canvas.onmouseup = (e) => {
   if (tool === 'text') {
