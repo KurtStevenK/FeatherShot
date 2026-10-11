@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.23-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.24-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.23:** **Windows/Linux Electron** selection overlay fixed (drag, Escape, single instance). **v1.3.22** Arch pacman; **v1.3.16** tray updates; **v1.3.13+** Chocolatey, Homebrew, APT.
+> **New in v1.3.24:** **Windows multi-monitor** 1:1 capture per display; faster post-selection capture. **v1.3.23** selection overlay fix; **v1.3.22** Arch pacman; **v1.3.13+** package managers.
 
 ---
 
