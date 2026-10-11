@@ -302,8 +302,9 @@ jobs:
             exit 1
           fi
           SHA=$(shasum -a 256 "$DMG" | cut -d' ' -f1)
+          DMG_FILENAME=$(basename "$DMG" | sed 's/(/./g' | tr -d ')')
           mkdir -p Casks
-          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" packaging/homebrew/feathershot.rb > Casks/feathershot.rb
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" -e "s/__DMG_FILENAME__/$DMG_FILENAME/g" packaging/homebrew/feathershot.rb > Casks/feathershot.rb
           git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/homebrew-tap.git" tap
           mkdir -p tap/Casks
           cp Casks/feathershot.rb tap/Casks/feathershot.rb
