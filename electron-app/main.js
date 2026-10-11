@@ -1,13 +1,32 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session, globalShortcut } = require('electron');
 const path = require('path');
 const { initUpdater, checkForUpdatesInteractive } = require('./updater');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 let displayCaptures = []; // Pre-captured per-display screenshots
 const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) app.quit();
-app.whenReady().then(()=>{
-  if(process.platform==='darwin')app.dock.hide();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (selectionWindows.length > 0) {
+      const win = selectionWindows.find((w) => w && !w.isDestroyed());
+      if (win) {
+        win.show();
+        win.focus();
+      }
+      return;
+    }
+    if (editorWindow && !editorWindow.isDestroyed()) {
+      editorWindow.show();
+      editorWindow.focus();
+    }
+  });
+}
+
+app.whenReady().then(() => {
+  if (!gotTheLock) return;
+  if (process.platform === 'darwin') app.dock.hide();
   setupSecurity();
   initUpdater(refreshTrayMenu);
   createTray();
@@ -87,13 +106,38 @@ function setupIPC() {
     } catch(e){ console.error('Crop failed:',e); }
     displayCaptures=[];
   });
-  ipcMain.on('sel-cancel',()=>{closeAll();displayCaptures=[];});
+  ipcMain.on('sel-cancel', () => cancelSelection());
 }
 
-function closeAll(){
+function cancelSelection() {
+  closeAll();
+  displayCaptures = [];
+}
+
+function registerSelectionEscapeShortcut() {
+  if (globalShortcut.isRegistered('Escape')) return;
+  globalShortcut.register('Escape', () => cancelSelection());
+}
+
+function unregisterSelectionEscapeShortcut() {
+  if (globalShortcut.isRegistered('Escape')) {
+    globalShortcut.unregister('Escape');
+  }
+}
+
+function closeAll() {
+  unregisterSelectionEscapeShortcut();
   windowData.clear();
-  const w=selectionWindows; selectionWindows=[];
-  for(const x of w){try{if(x&&!x.isDestroyed()){if(x.isFullScreen())x.setFullScreen(false);x.close();}}catch(e){}}
+  const w = selectionWindows;
+  selectionWindows = [];
+  for (const x of w) {
+    try {
+      if (x && !x.isDestroyed()) {
+        if (x.isFullScreen()) x.setFullScreen(false);
+        x.close();
+      }
+    } catch (e) {}
+  }
 }
 
 async function startSelection() {
@@ -133,9 +177,14 @@ async function startSelection() {
       win.setAlwaysOnTop(true,'screen-saver');
       win.show(); win.focus();
     });
-    win.on('closed',()=>{selectionWindows.splice(selectionWindows.indexOf(win),1);windowData.delete(win.id);});
+    win.on('closed', () => {
+      selectionWindows.splice(selectionWindows.indexOf(win), 1);
+      windowData.delete(win.id);
+      if (selectionWindows.length === 0) unregisterSelectionEscapeShortcut();
+    });
     selectionWindows.push(win);
   }
+  registerSelectionEscapeShortcut();
 }
 
 function openEditor(screenshotData) {
@@ -185,4 +234,5 @@ function setupSecurity() {
   });
 }
 
-app.on('window-all-closed',(e)=>e.preventDefault());
+app.on('window-all-closed', (e) => e.preventDefault());
+app.on('will-quit', () => globalShortcut.unregisterAll());

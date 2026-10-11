@@ -5,6 +5,7 @@
     "sync:shared": "node scripts/sync-shared.mjs",
     "verify:letter-label": "node scripts/verify-letter-label.mjs",
     "verify:chrome": "node scripts/validate-chrome-extension.mjs",
-    "verify": "npm run sync:shared && npm run verify:letter-label && npm run verify:chrome"
+    "verify:electron-ipc": "node scripts/verify-electron-ipc.mjs",
+    "verify": "npm run sync:shared && npm run verify:letter-label && npm run verify:chrome && npm run verify:electron-ipc"
   }
 }

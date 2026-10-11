@@ -1,4 +1,4 @@
-const { ipcRenderer } = window.electronAPI;
+const { ipcRenderer } = require('electron');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const dimLabel = document.getElementById('dimensions');

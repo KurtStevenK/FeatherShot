@@ -5,6 +5,18 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.23] - 2026-10-11
+
+### Fixed
+
+- **Windows / Linux Electron selection overlay** — Restored `require('electron')` IPC in the selection renderer (broken since v1.3.9 when `window.electronAPI` was used without a preload). Area drag, Escape, and tray Quit work again.
+- **Windows multiple processes** — Second launch no longer starts another tray instance; `second-instance` focuses the existing app.
+- **Selection escape hatch** — Global Escape in the main process cancels the overlay if the renderer fails.
+
+### Added
+
+- **`scripts/verify-electron-ipc.mjs`** — Fails CI when selection overlay expects `electronAPI` without a wired preload.
+
 ## [1.3.22] - 2026-10-04
 
 ### Fixed
@@ -381,6 +393,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.23]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.22...v1.3.23
 [1.3.22]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.21...v1.3.22
 [1.3.21]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.20...v1.3.21
 [1.3.20]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.19...v1.3.20
