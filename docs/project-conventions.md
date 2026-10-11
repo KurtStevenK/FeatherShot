@@ -59,7 +59,7 @@ The version string exists in **7 places** across all platforms — all must be u
 
 ### Documentation
 
-- `docs/index.html` — version badge in hero section
+- `hosting/public/index.html` — version badge in hero section (Firebase site; `docs/index.html` redirects)
 
 Always update `CHANGELOG.md` when bumping the version.
 

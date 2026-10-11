@@ -7,10 +7,16 @@ struct FeatherShotApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        // We still need a scene, but we don't want a window.
-        // In macOS 13+, we can use Settings or a hidden window.
-        Settings {
-            EmptyView()
+        // SwiftUI requires a Scene. Do not use `Settings { EmptyView() }` — macOS opens that
+        // window on every Finder / TestFlight launch. Menu bar UI lives in AppDelegate.
+        WindowGroup {
+            Color.clear
+                .frame(width: 0, height: 0)
+                .accessibilityHidden(true)
+        }
+        .windowResizability(.contentSize)
+        .commands {
+            CommandGroup(replacing: .appSettings) { }
         }
     }
 }
@@ -26,6 +32,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Ensure we are an accessory app (no Dock icon)
         NSApp.setActivationPolicy(.accessory)
+
+        // Dismiss SwiftUI's placeholder window if the system presents it on launch.
+        DispatchQueue.main.async {
+            self.closePlaceholderLaunchWindows()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            self.closePlaceholderLaunchWindows()
+        }
         
         // Slightly delay setup to ensure the system is ready for the menu item
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -34,6 +48,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
         
         print("Initial launch steps complete.")
+    }
+
+    /// Closes zero-size placeholder windows from `WindowGroup`; keeps editor and other real windows.
+    func closePlaceholderLaunchWindows() {
+        for window in NSApp.windows where window !== annotationWindow {
+            let isPlaceholder = window.title.isEmpty
+                || window.title == "FeatherShot"
+                || window.title == "FeatherShot Settings"
+            if isPlaceholder {
+                window.close()
+            }
+        }
     }
 
     func setupStatusItem() {

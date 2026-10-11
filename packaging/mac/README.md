@@ -14,7 +14,7 @@ Never commit `.p12` or private `.key` files.
 | Site | FeatherShot |
 |------|-------------|
 | [developer.apple.com/account](https://developer.apple.com/account) | Register App ID **`xyz.kainzmayer.feathershot`** (matches **kainzmayer.xyz**) |
-| [appstoreconnect.apple.com](https://appstoreconnect.apple.com) | Optional macOS app record for future Mac App Store |
+| [appstoreconnect.apple.com](https://appstoreconnect.apple.com) | FeatherShot macOS TestFlight — see [APP-STORE.md](APP-STORE.md) |
 
 ## GitHub Actions secrets
 

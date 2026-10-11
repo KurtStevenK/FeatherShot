@@ -1,26 +1,73 @@
-# Mac App Store (planned)
+# Mac App Store / TestFlight
 
 Direct download (GitHub DMG) uses **Developer ID Application** + notarization (see [README.md](README.md)).
 
-The Mac App Store uses:
+The Mac App Store uses a **separate** pipeline:
 
-- **Apple Distribution** certificate
-- App Store Connect app record + sandbox entitlements
-- A separate build/archive pipeline (not the Swift `build_release.sh` DMG)
-- Review guidelines (screen recording usage must be justified in App Review notes)
+- **Apple Distribution** + **App Sandbox** ([`FeatherShot-AppStore.entitlements`](FeatherShot-AppStore.entitlements))
+- Mac App Store **`.pkg`** (not the Developer ID DMG from [`build_release.sh`](../../build_release.sh))
+- App Store Connect app **FeatherShot** — bundle `xyz.kainzmayer.feathershot`
 
-When you are ready, add a separate CI job and do not replace the Developer ID DMG pipeline — most users will install from GitHub until the Store listing is live.
+Do not replace the Developer ID DMG CI job; most users install from GitHub until the Store listing is live.
 
-Bundle ID: `xyz.kainzmayer.feathershot`
+## Local build (TestFlight / App Store upload)
 
-## App Store Connect API key (`.p8`)
+```bash
+cd /path/to/FeatherShot
+FEATHERSHOT_VERSION=1.3.25 FEATHERSHOT_BUILD=1326 bash packaging/mac/build_appstore.sh
+```
 
-Apple issues **API keys** (filename like `AuthKey_WVB97T8LBH.p8`) from [App Store Connect → Users and Access → Integrations → App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api). This is **not** a `.p6` file and is **not** the same as:
+Output: `FeatherShot-<version>-AppStore.pkg` in the repo root.
+
+The script compiles the Swift app, assembles `FeatherShot.app`, signs with **Apple Distribution**, then runs `xcodebuild -exportArchive` (managed **Mac Installer** signing). Xcode creates a **Mac Team Store** provisioning profile on first export if needed.
+
+### Info.plist requirements (App Store)
+
+Included in the App Store build template:
+
+- `ITSAppUsesNonExemptEncryption` = false (HTTPS only)
+- `LSApplicationCategoryType` = `public.app-category.graphics-design`
+- `NSScreenCaptureUsageDescription`
+
+## Upload
+
+**Transporter (GUI):** drag `FeatherShot-*-AppStore.pkg` into [Transporter](https://apps.apple.com/app/transporter/id1450874784).
+
+**CLI (same as Transporter):** API key in `~/.private_keys/AuthKey_WVB97T8LBH.p8` (copy from `~/private/app-store-connect/`). Use system `PATH` so GNU `mktemp` does not break Java:
+
+```bash
+PATH="/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Xcode.app/Contents/Developer/usr/bin" \
+  TMPDIR=/tmp \
+  xcrun iTMSTransporter -m upload \
+  -assetFile "FeatherShot-1.3.25-AppStore.pkg" \
+  -apiKey WVB97T8LBH \
+  -apiIssuer "<issuer-id-from-app-store-connect-integrations>"
+```
+
+Issuer ID: [App Store Connect → Users and Access → Integrations → App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api).
+
+## App Store listing URLs
+
+| Field | URL |
+|-------|-----|
+| Privacy Policy | https://feathershot.web.app/privacy |
+| Marketing / support site | https://feathershot.web.app/ |
+
+Set **Privacy Policy URL** under App Information in App Store Connect before submitting for review. Align **App Privacy** answers with [`hosting/public/privacy/index.html`](../../hosting/public/privacy/index.html).
+
+## After upload
+
+1. Wait for **Processing** on [TestFlight → macOS](https://appstoreconnect.apple.com/apps/6821684358/testflight/macos).
+2. Answer **export compliance** (no non-exempt encryption if `ITSAppUsesNonExemptEncryption` is false).
+3. Enable the build for **internal testing** (create a group if needed).
+4. Match **marketing version** on the macOS App Store version page to `CFBundleShortVersionString` (e.g. 1.3.25). Use **manual release** until the listing is ready.
+
+## Credentials (not in git)
 
 | Credential | Used for |
 |------------|----------|
-| `AuthKey_*.p8` + Key ID + Issuer ID | App Store Connect API (upload builds, metadata, TestFlight) |
-| App-specific password | `notarytool` / `altool` notarization for **Developer ID** DMGs (`APPLE_APP_SPECIFIC_PASSWORD` in GitHub) |
-| `DeveloperIDApplication-for-ci.p12` | Code signing DMGs in CI (`CSC_LINK`) |
+| `AuthKey_*.p8` + Key ID + Issuer ID | Upload / App Store Connect API |
+| App-specific password | `notarytool` for **Developer ID** DMGs only |
+| `DeveloperIDApplication-for-ci.p12` | GitHub DMG CI (`CSC_LINK`) |
 
-Keep `.p8` files out of git (see root `.gitignore`). Local backup: `~/private/app-store-connect/`.
+Local backup: `~/private/app-store-connect/` and `~/private/apple-developer-id/`.

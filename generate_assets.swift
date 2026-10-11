@@ -11,60 +11,63 @@ func drawLinearGradient(context: CGContext, rect: CGRect, startColor: CGColor, e
     context.drawLinearGradient(gradient, start: startPoint, end: endPoint, options: [])
 }
 
-func drawIcon() {
+func drawIcon(whiteBackground: Bool, outputPath: String) {
     let size = CGSize(width: 1024, height: 1024)
     let colorSpace = CGColorSpaceCreateDeviceRGB()
     let bitmapInfo = CGImageAlphaInfo.premultipliedLast.rawValue
     guard let context = CGContext(data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmapInfo) else { return }
 
     let rect = CGRect(origin: .zero, size: size)
-
-    // Deep modern blue to cyan gradient
-    let startColor = CGColor(red: 0.05, green: 0.3, blue: 0.8, alpha: 1.0)
-    let endColor = CGColor(red: 0.1, green: 0.8, blue: 0.8, alpha: 1.0)
-    
-    // Draw rounded rect background
     let roundedPath = CGPath(roundedRect: rect, cornerWidth: 225, cornerHeight: 225, transform: nil)
     context.addPath(roundedPath)
     context.clip()
-    drawLinearGradient(context: context, rect: rect, startColor: startColor, endColor: endColor)
+
+    if whiteBackground {
+        context.setFillColor(CGColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0))
+        context.fill(rect)
+    } else {
+        let startColor = CGColor(red: 0.05, green: 0.3, blue: 0.8, alpha: 1.0)
+        let endColor = CGColor(red: 0.1, green: 0.8, blue: 0.8, alpha: 1.0)
+        drawLinearGradient(context: context, rect: rect, startColor: startColor, endColor: endColor)
+    }
 
     let nsContext = NSGraphicsContext(cgContext: context, flipped: false)
     NSGraphicsContext.current = nsContext
-    
-    // Draw Feather ONLY
+
     let text = "🪶"
     let font = NSFont.systemFont(ofSize: 550)
-    let attributes: [NSAttributedString.Key: Any] = [
-        .font: font
-    ]
+    let attributes: [NSAttributedString.Key: Any] = [.font: font]
     let string = NSAttributedString(string: text, attributes: attributes)
     let stringSize = string.size()
     let stringRect = CGRect(
         x: (size.width - stringSize.width) / 2,
-        y: (size.height - stringSize.height) / 2 - 20, // Center it nicely
+        y: (size.height - stringSize.height) / 2 - 20,
         width: stringSize.width,
         height: stringSize.height
     )
-    
-    // Add shadow to the feather
-    let shadow = NSShadow()
-    shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
-    shadow.shadowBlurRadius = 30
-    shadow.shadowOffset = NSSize(width: 0, height: -20)
-    shadow.set()
-    
-    string.draw(in: stringRect)
 
+    let shadow = NSShadow()
+    if whiteBackground {
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.12)
+        shadow.shadowBlurRadius = 24
+        shadow.shadowOffset = NSSize(width: 0, height: -8)
+    } else {
+        shadow.shadowColor = NSColor.black.withAlphaComponent(0.4)
+        shadow.shadowBlurRadius = 30
+        shadow.shadowOffset = NSSize(width: 0, height: -20)
+    }
+    shadow.set()
+
+    string.draw(in: stringRect)
     NSGraphicsContext.current = nil
 
     guard let cgImage = context.makeImage() else { return }
     let nsImage = NSImage(cgImage: cgImage, size: size)
-    
+
     if let tiffData = nsImage.tiffRepresentation,
        let bitmapImage = NSBitmapImageRep(data: tiffData),
        let pngData = bitmapImage.representation(using: .png, properties: [:]) {
-        let url = URL(fileURLWithPath: "icon_1024.png")
+        let url = URL(fileURLWithPath: outputPath)
         try? pngData.write(to: url)
     }
 }
@@ -77,43 +80,31 @@ func drawDmgBackground() {
 
     let rect = CGRect(origin: .zero, size: size)
 
-    // Very light grey/white gradient for a bright, clean, modern macOS look
-    // This ensures dark text is always legible and it looks native
     let startColor = CGColor(red: 0.95, green: 0.96, blue: 0.98, alpha: 1.0)
     let endColor = CGColor(red: 0.88, green: 0.90, blue: 0.94, alpha: 1.0)
     drawLinearGradient(context: context, rect: rect, startColor: startColor, endColor: endColor)
-    
+
     let nsContext = NSGraphicsContext(cgContext: context, flipped: false)
     NSGraphicsContext.current = nsContext
-    
+
     let pstyleCenter = NSMutableParagraphStyle()
     pstyleCenter.alignment = .center
 
-    // Draw Title (Top Center)
     let title = "FeatherShot"
     let titleFont = NSFont.systemFont(ofSize: 42, weight: .heavy)
     let titleAttr: [NSAttributedString.Key: Any] = [.font: titleFont, .foregroundColor: NSColor(white: 0.1, alpha: 1.0), .paragraphStyle: pstyleCenter]
-    let titleString = NSAttributedString(string: title, attributes: titleAttr)
-    let titleRect = CGRect(x: 0, y: 310, width: 600, height: 60)
-    titleString.draw(in: titleRect)
-    
-    // Draw Version
-    let subtitle = "Version 1.3.25"
+    NSAttributedString(string: title, attributes: titleAttr).draw(in: CGRect(x: 0, y: 310, width: 600, height: 60))
+
+    let subtitle = "Version 1.3.26"
     let subFont = NSFont.systemFont(ofSize: 18, weight: .medium)
     let subAttr: [NSAttributedString.Key: Any] = [.font: subFont, .foregroundColor: NSColor(white: 0.4, alpha: 1.0), .paragraphStyle: pstyleCenter]
-    let subString = NSAttributedString(string: subtitle, attributes: subAttr)
-    let subRect = CGRect(x: 0, y: 280, width: 600, height: 30)
-    subString.draw(in: subRect)
+    NSAttributedString(string: subtitle, attributes: subAttr).draw(in: CGRect(x: 0, y: 280, width: 600, height: 30))
 
-    // Draw Arrow Instruction (Below the icons)
     let instruct = "Drag to install"
     let instFont = NSFont.systemFont(ofSize: 16, weight: .bold)
     let instAttr: [NSAttributedString.Key: Any] = [.font: instFont, .foregroundColor: NSColor(white: 0.4, alpha: 1.0), .paragraphStyle: pstyleCenter]
-    let instString = NSAttributedString(string: instruct, attributes: instAttr)
-    let instRect = CGRect(x: 0, y: 150, width: 600, height: 30)
-    instString.draw(in: instRect)
-    
-    // Draw a decorative arrow exactly between the left icon and the right folder
+    NSAttributedString(string: instruct, attributes: instAttr).draw(in: CGRect(x: 0, y: 150, width: 600, height: 30))
+
     let path = NSBezierPath()
     path.move(to: NSPoint(x: 250, y: 200))
     path.line(to: NSPoint(x: 350, y: 200))
@@ -126,27 +117,24 @@ func drawDmgBackground() {
     NSColor(white: 0.7, alpha: 1.0).setStroke()
     path.stroke()
 
-    // Draw Author (Bottom Center)
     let authorText = "Crafted by Kurt Steven Kainzmayer"
     let authorFont = NSFont.systemFont(ofSize: 14, weight: .regular)
     let authorAttr: [NSAttributedString.Key: Any] = [.font: authorFont, .foregroundColor: NSColor(white: 0.5, alpha: 1.0), .paragraphStyle: pstyleCenter]
-    let authorString = NSAttributedString(string: authorText, attributes: authorAttr)
-    let authorRect = CGRect(x: 0, y: 30, width: 600, height: 20)
-    authorString.draw(in: authorRect)
-    
+    NSAttributedString(string: authorText, attributes: authorAttr).draw(in: CGRect(x: 0, y: 30, width: 600, height: 20))
+
     NSGraphicsContext.current = nil
 
     guard let cgImage = context.makeImage() else { return }
     let nsImage = NSImage(cgImage: cgImage, size: size)
-    
+
     if let tiffData = nsImage.tiffRepresentation,
        let bitmapImage = NSBitmapImageRep(data: tiffData),
        let pngData = bitmapImage.representation(using: .png, properties: [:]) {
-        let url = URL(fileURLWithPath: "dmg_background.png")
-        try? pngData.write(to: url)
+        try? pngData.write(to: URL(fileURLWithPath: "dmg_background.png"))
     }
 }
 
-drawIcon()
+drawIcon(whiteBackground: false, outputPath: "icon_1024.png")
+drawIcon(whiteBackground: true, outputPath: "icon_1024_white.png")
 drawDmgBackground()
 print("Images generated successfully.")

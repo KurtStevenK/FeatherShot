@@ -5,6 +5,20 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.3.26] - 2026-10-11
+
+### Added
+
+- **Firebase website** — Project `feathershot` on [Firebase Hosting](https://feathershot.web.app/) with landing page, [privacy policy](https://feathershot.web.app/privacy), and [press / marketing kit](https://feathershot.web.app/marketing); source in [`hosting/public`](hosting/public/).
+- **Release mirror** — Tag builds upload binaries to Firebase Storage and refresh [`releases/latest.json`](hosting/public/releases/latest.json) via [`packaging/firebase/upload-releases.sh`](packaging/firebase/upload-releases.sh) (GitHub Releases and package managers unchanged).
+- **Mac App Store / TestFlight** — [`packaging/mac/build_appstore.sh`](packaging/mac/build_appstore.sh) builds a sandboxed App Store `.pkg`; [`FeatherShot-AppStore.entitlements`](packaging/mac/FeatherShot-AppStore.entitlements) and upload steps in [`packaging/mac/APP-STORE.md`](packaging/mac/APP-STORE.md).
+
+### Changed
+
+- **Canonical website** — README and GitHub Pages [`docs/`](docs/) redirect to `https://feathershot.web.app/`; legacy `kurtstevenk.github.io/FeatherShot/` redirects.
+
 ## [1.3.25] - 2026-10-11
 
 ### Security
@@ -423,6 +437,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.26]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.25...v1.3.26
 [1.3.25]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.24...v1.3.25
 [1.3.24]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.23...v1.3.24
 [1.3.23]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.22...v1.3.23

@@ -15,6 +15,8 @@ DerivedData/
 FeatherShot.app/
 AppIcon.iconset/
 *.dmg
+*AppStore.pkg
+/build/appstore/
 
 # External build tools (cloned at build time)
 create-dmg/
@@ -41,6 +43,9 @@ electron-app/out/
 # Chrome Extension build
 *.crx
 FeatherShot-Chrome-Extension.zip
+
+# Firebase local cache
+.firebase/
 
 # Generated files
 FeatherShot 1.0.1.dmg
