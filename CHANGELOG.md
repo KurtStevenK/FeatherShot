@@ -5,6 +5,20 @@ All notable changes to FeatherShot will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.25] - 2026-10-11
+
+### Security
+
+- **Electron** — Block `<webview>` attachment in the main process (`will-attach-webview`) to prevent renderer privilege escalation.
+
+### Changed
+
+- **Chrome extension editor** — Throttle canvas `render()` during pointer move with `requestAnimationFrame` to cut redundant redraws on high-polling mice.
+
+### Fixed
+
+- **Editor accessibility** — Explicit `aria-label` on color picker, line-width slider, and text input; `aria-hidden` on the redundant width readout; slider `title` / `aria-label` switch between Line Width and Zoom Level when toggling the magnifier (Electron and shared editor markup).
+
 ## [1.3.24] - 2026-10-11
 
 ### Fixed
@@ -409,6 +423,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.25]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.24...v1.3.25
 [1.3.24]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.23...v1.3.24
 [1.3.23]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.22...v1.3.23
 [1.3.22]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.21...v1.3.22
