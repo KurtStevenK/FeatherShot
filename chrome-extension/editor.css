@@ -63,6 +63,10 @@ body {
 }
 .tool-btn:hover { background: #333; color: #fff; }
 .tool-btn.active { background: #0a84ff; color: #fff; border-color: #0a84ff; }
+.tool-btn:focus-visible, #color:focus-visible, #width:focus-visible, .act:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
+}
 
 .sep { width: 1px; height: 24px; background: #333; }
 

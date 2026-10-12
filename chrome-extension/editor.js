@@ -98,7 +98,10 @@ document.getElementById('save').onclick = saveAndDownload;
 function setTool(t) {
   if (tool === 'text' && t !== 'text') commitTextEdit();
   tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
   const idMap = {
     'step': 'tool-step', 'step-rect': 'tool-step-rect',
     'arrow': 'tool-arrow', 'rect': 'tool-rect', 'circle': 'tool-circle',
@@ -109,7 +112,11 @@ function setTool(t) {
     'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect',
     'magnifier': 'tool-magnifier'
   };
-  document.getElementById(idMap[t]).classList.add('active');
+  const activeBtn = document.getElementById(idMap[t]);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-pressed', 'true');
+  }
 
   // Switch slider between line-width mode and zoom mode
   if (t === 'magnifier') {
@@ -117,12 +124,16 @@ function setTool(t) {
     widthSlider.max = '5';
     widthSlider.step = '0.5';
     widthSlider.value = zoomLevel.toString();
+    widthSlider.title = 'Zoom Level';
+    widthSlider.setAttribute('aria-label', 'Zoom Level');
     wLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
     widthSlider.min = '2';
     widthSlider.max = '15';
     widthSlider.step = '1';
     widthSlider.value = lw.toString();
+    widthSlider.title = 'Line Width';
+    widthSlider.setAttribute('aria-label', 'Line Width');
     wLabel.textContent = lw + 'px';
   }
 }
