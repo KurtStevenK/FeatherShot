@@ -141,9 +141,11 @@ canvas.onmousedown = (e) => {
     return;
   }
   dragging = true;
-  const r = canvas.getBoundingClientRect();
-  const sx = canvas.width / r.width, sy = canvas.height / r.height;
-  current = { tool, color, lw, x1: (e.clientX-r.left)*sx, y1: (e.clientY-r.top)*sy, x2: 0, y2: 0 };
+  // Performance: Cache bounding rectangle and scale factors on mousedown to prevent layout thrashing during mousemove
+  cachedRect = canvas.getBoundingClientRect();
+  scaleX = canvas.width / cachedRect.width;
+  scaleY = canvas.height / cachedRect.height;
+  current = { tool, color, lw, x1: (e.clientX - cachedRect.left) * scaleX, y1: (e.clientY - cachedRect.top) * scaleY, x2: 0, y2: 0 };
   if (tool === 'magnifier') current.zoom = zoomLevel;
 };
 canvas.onmousemove = (e) => {
@@ -165,9 +167,9 @@ canvas.onmousemove = (e) => {
     return;
   }
   if (!dragging || !current) return;
-  const r = canvas.getBoundingClientRect();
-  current.x2 = (e.clientX-r.left)*(canvas.width/r.width);
-  current.y2 = (e.clientY-r.top)*(canvas.height/r.height);
+  // Performance: Use cachedRect, scaleX, scaleY to avoid layout thrashing (forced reflow) on every mouse movement
+  current.x2 = (e.clientX - cachedRect.left) * scaleX;
+  current.y2 = (e.clientY - cachedRect.top) * scaleY;
 
   // Performance: Throttle render calls to requestAnimationFrame to prevent "frame piling"
   if (!renderRequested) {
