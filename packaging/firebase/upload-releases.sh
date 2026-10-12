@@ -26,8 +26,10 @@ sha256_file() {
 upload_one() {
   local file="$1"
   local dest="releases/v${VERSION}/$(basename "$file")"
-  echo "Uploading $(basename "$file") -> gs://${BUCKET}/${dest}"
-  gcloud storage cp --cache-control="public, max-age=31536000" "$file" "gs://${BUCKET}/${dest}"
+  echo "Uploading $(basename "$file") -> gs://${BUCKET}/${dest}" >&2
+  if ! gcloud storage cp --cache-control="public, max-age=31536000" "$file" "gs://${BUCKET}/${dest}" 2>/dev/null; then
+    python3 "$REPO_ROOT/packaging/firebase/upload_object.py" "$file" "$dest" "$BUCKET" || return 1
+  fi
   local url sha
   url=$(storage_public_url "$dest")
   sha=$(sha256_file "$file")

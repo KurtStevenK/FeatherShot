@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.27] - 2026-10-12
+
+### Fixed
+
+- **macOS launch** — Drop the SwiftUI `WindowGroup` / Settings placeholder; `@main` `AppDelegate` starts via AppKit only so no empty FeatherShot window appears at launch.
+- **Windows & Linux Save & Copy** — Export runs in the main process with Electron 44 `clipboard.write` and `app.getPath('downloads')`; errors show a dialog instead of failing silently in the renderer.
+
+### Changed
+
+- **Firebase release upload** — `upload-releases.sh` falls back to `upload_object.py` when `gcloud storage cp` fails.
+
 ## [1.3.26] - 2026-10-11
 
 ### Added
@@ -437,6 +448,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.27]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.26...v1.3.27
 [1.3.26]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.25...v1.3.26
 [1.3.25]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.24...v1.3.25
 [1.3.24]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.23...v1.3.24

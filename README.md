@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.26-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.27-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.26:** Firebase website (feathershot.web.app), privacy policy, press kit, and release mirror CI. **v1.3.25** webview hardening & editor a11y; **v1.3.24** Windows 1:1 capture.
+> **New in v1.3.27:** No empty window on macOS launch; Windows/Linux **Save & Copy** works again on Electron 44. **v1.3.26** Firebase site & release mirror; **v1.3.24** Windows 1:1 capture.
 
 ---
 

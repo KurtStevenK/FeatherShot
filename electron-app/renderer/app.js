@@ -1,7 +1,4 @@
-const { ipcRenderer, clipboard, nativeImage } = require('electron');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { ipcRenderer } = require('electron');
 
 // --- State ---
 let screenshotImage = null;
@@ -650,25 +647,35 @@ function updateActionStates() {
 }
 
 function saveAndCopy() {
-  const dataUrl = canvas.toDataURL('image/png');
-  const img = nativeImage.createFromDataURL(dataUrl);
-  clipboard.writeImage(img);
-
-  // Save to Downloads
-  const downloadsDir = path.join(os.homedir(), 'Downloads');
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const filePath = path.join(downloadsDir, `FeatherShot_${timestamp}.png`);
-
-  const buffer = img.toPNG();
-  fs.writeFileSync(filePath, buffer);
-
-  // Flash the save button briefly then close on Windows/Linux
   const btn = document.getElementById('btn-save');
-  btn.textContent = '✓ Saved & Copied!';
-  btn.style.background = '#30d158';
-  setTimeout(() => {
-    window.close();
-  }, 800);
+  const originalText = btn.textContent;
+  const originalBackground = btn.style.background;
+
+  commitTextEdit();
+  render();
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  canvas.toBlob(async (blob) => {
+    try {
+      if (!blob) {
+        throw new Error('Failed to export screenshot');
+      }
+      const arrayBuffer = await blob.arrayBuffer();
+      await ipcRenderer.invoke('save-and-copy', arrayBuffer);
+      btn.textContent = '✓ Saved & Copied!';
+      btn.style.background = '#30d158';
+      setTimeout(() => {
+        window.close();
+      }, 800);
+    } catch (err) {
+      console.error('Save & Copy failed:', err);
+      btn.disabled = false;
+      btn.textContent = originalText;
+      btn.style.background = originalBackground;
+    }
+  }, 'image/png');
 }
 
 // Initial state

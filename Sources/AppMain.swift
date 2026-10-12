@@ -3,24 +3,6 @@ import AppKit
 import CoreGraphics
 
 @main
-struct FeatherShotApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
-    var body: some Scene {
-        // SwiftUI requires a Scene. Do not use `Settings { EmptyView() }` — macOS opens that
-        // window on every Finder / TestFlight launch. Menu bar UI lives in AppDelegate.
-        WindowGroup {
-            Color.clear
-                .frame(width: 0, height: 0)
-                .accessibilityHidden(true)
-        }
-        .windowResizability(.contentSize)
-        .commands {
-            CommandGroup(replacing: .appSettings) { }
-        }
-    }
-}
-
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
@@ -29,43 +11,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("FeatherShot starting...")
-        
+
         // Ensure we are an accessory app (no Dock icon)
         NSApp.setActivationPolicy(.accessory)
 
-        // Dismiss SwiftUI's placeholder window if the system presents it on launch.
-        DispatchQueue.main.async {
-            self.closePlaceholderLaunchWindows()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            self.closePlaceholderLaunchWindows()
-        }
-        
         // Slightly delay setup to ensure the system is ready for the menu item
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.setupStatusItem()
             print("Status item setup called.")
         }
-        
-        print("Initial launch steps complete.")
-    }
 
-    /// Closes zero-size placeholder windows from `WindowGroup`; keeps editor and other real windows.
-    func closePlaceholderLaunchWindows() {
-        for window in NSApp.windows where window !== annotationWindow {
-            let isPlaceholder = window.title.isEmpty
-                || window.title == "FeatherShot"
-                || window.title == "FeatherShot Settings"
-            if isPlaceholder {
-                window.close()
-            }
-        }
+        print("Initial launch steps complete.")
     }
 
     func setupStatusItem() {
         print("Creating status item...")
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        
+
         // Prepare the context menu for right-click
         contextMenu = NSMenu()
         contextMenu?.addItem(NSMenuItem(title: "Take Screenshot", action: #selector(captureScreen), keyEquivalent: "s"))
@@ -76,13 +38,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         contextMenu?.addItem(versionItem)
         contextMenu?.addItem(NSMenuItem.separator())
         contextMenu?.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
-        
+
         if let button = statusItem?.button {
             // Using a simple text label for testing visibility
-            button.title = "🪶" 
+            button.title = "🪶"
             button.target = self
             button.action = #selector(statusItemClicked)
-            
+
             // Allow the button to receive both left and right clicks
             button.sendAction(on: [.leftMouseUp, .rightMouseUp])
             print("Button configured with title 🪶")
@@ -93,7 +55,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func statusItemClicked() {
         let event = NSApp.currentEvent
-        
+
         // Check if it's a right click or a control-left click
         if event?.type == .rightMouseUp || (event?.modifierFlags.contains(.control) ?? false) {
             if let menu = contextMenu {
@@ -115,14 +77,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func checkForUpdates() {
         UpdateChecker.checkForUpdates()
     }
-    
+
     func showPermissionAlert() {
         let alert = NSAlert()
         alert.messageText = "Screen Recording Permission Required"
         alert.informativeText = "macOS requires you to grant FeatherShot permission to record the screen before taking screenshots.\n\n1. Open System Settings > Privacy & Security > Screen Recording.\n2. Remove any existing FeatherShot entries using the '-' button.\n3. Add or enable FeatherShot.\n4. Quit and reopen the app."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
-        
+
         NSApp.activate(ignoringOtherApps: true)
         alert.runModal()
     }
@@ -135,10 +97,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let tempPath = FileManager.default.temporaryDirectory.appendingPathComponent("feathershot_temp.png").path
-        
+
         // Remove old temp file to ensure we don't load a stale image
         try? FileManager.default.removeItem(atPath: tempPath)
-        
+
         Task {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")

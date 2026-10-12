@@ -1,4 +1,19 @@
-const { app, BrowserWindow, Tray, Menu, screen, desktopCapturer, nativeImage, ipcMain, session, globalShortcut } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  Tray,
+  Menu,
+  screen,
+  desktopCapturer,
+  nativeImage,
+  ipcMain,
+  session,
+  globalShortcut,
+  clipboard,
+  ClipboardItem,
+  dialog,
+} = require('electron');
+const fs = require('fs');
 const path = require('path');
 const { initUpdater, checkForUpdatesInteractive } = require('./updater');
 const { buildScreenshotFromCrop } = require('./capture');
@@ -74,6 +89,32 @@ function setupIPC() {
     }
   });
   ipcMain.on('sel-cancel', () => cancelSelection());
+
+  ipcMain.handle('save-and-copy', async (_event, pngBytes) => {
+    try {
+      const buffer = Buffer.from(pngBytes);
+      const img = nativeImage.createFromBuffer(buffer);
+      if (img.isEmpty()) {
+        throw new Error('Failed to create image from screenshot data');
+      }
+      await clipboard.write([
+        new ClipboardItem({
+          'image/png': new Blob([buffer], { type: 'image/png' }),
+        }),
+      ]);
+      const downloadsDir = app.getPath('downloads');
+      fs.mkdirSync(downloadsDir, { recursive: true });
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const filePath = path.join(downloadsDir, `FeatherShot_${timestamp}.png`);
+      fs.writeFileSync(filePath, buffer);
+      return { filePath };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error('Save & Copy failed:', e);
+      dialog.showErrorBox('Save & Copy failed', message);
+      throw e;
+    }
+  });
 }
 
 function cancelSelection() {
