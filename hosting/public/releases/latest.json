@@ -1,6 +1,37 @@
 {
   "version": "1.3.28",
-  "published_at": "2026-03-22T00:00:00Z",
+  "published_at": "2026-10-12T23:35:37Z",
   "bucket": "feathershot.firebasestorage.app",
-  "assets": {}
+  "assets": {
+    "macos_dmg": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.macOS.dmg?alt=media",
+      "sha256": "e5f7d2905a40814a420e440b9446e231341ab316a48a41f813031d4a0ed50dd4",
+      "filename": "FeatherShot-1.3.28-.macOS.dmg"
+    },
+    "windows_exe": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-Setup-1.3.28-.Windows.exe?alt=media",
+      "sha256": "08a557eb964406dc83ad898d91d65de9b36d0f69cff2c0698b1045c3439aea6c",
+      "filename": "FeatherShot-Setup-1.3.28-.Windows.exe"
+    },
+    "linux_deb": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Debian.deb?alt=media",
+      "sha256": "d1649833f72ab7e31198b6ff1e6417bdbd4af41372ca6d0af8f3cb7a981f14e2",
+      "filename": "FeatherShot-1.3.28-.Debian.deb"
+    },
+    "linux_appimage": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Ubuntu.AppImage?alt=media",
+      "sha256": "5b4c485d1bed2d7794f520b4a073189c0f5d36eaba601a14ee7818d358b81e73",
+      "filename": "FeatherShot-1.3.28-.Ubuntu.AppImage"
+    },
+    "linux_pacman": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Arch.pacman?alt=media",
+      "sha256": "811c71466ef3424a4ee0957c58e0c28beb29a47fe8ae35a9170859685f2d65a9",
+      "filename": "FeatherShot-1.3.28-.Arch.pacman"
+    },
+    "chrome_zip": {
+      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-Chrome-Extension.zip?alt=media",
+      "sha256": "f2ecefd288f986673d8aa7a029fb1bb3070c66fc6086995c97c0bf7e5e9f0bb5",
+      "filename": "FeatherShot-Chrome-Extension.zip"
+    }
+  }
 }
