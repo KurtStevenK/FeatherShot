@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct AnnotationView: View {
     let image: NSImage
@@ -495,46 +496,57 @@ struct AnnotationView: View {
 
     @MainActor
     func finish() {
+        commitTextEdit()
+
         let scale = NSScreen.main?.backingScaleFactor ?? 2.0
-        
-        // Use the EXACT same drawingContent view for the renderer
-        // It's already topLeading and correctly framed
-        let renderView = drawingContent
-
-        let renderer = ImageRenderer(content: renderView)
+        let renderer = ImageRenderer(content: drawingContent)
         renderer.scale = scale
-        
-        if let nsImage = renderer.nsImage {
-            // Provide visual feedback before closing
-            isSaved = true
+        renderer.isOpaque = true
 
-            // Execute completion and saving
-            onComplete(nsImage)
-            saveToDownloads(image: nsImage)
-
-            // The window will be closed by the onComplete callback in AppDelegate
-            // but we have a brief moment to show the success state
-        }
-    }
-
-    func saveToDownloads(image: NSImage) {
-        guard let tiffData = image.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiffData),
-              let pngData = bitmap.representation(using: .png, properties: [:]) else {
+        // Encode while the renderer is still valid. Closing the editor (onComplete)
+        // drops the view-backed NSImage, and tiffRepresentation is often nil after that,
+        // which used to skip the Downloads write while the clipboard copy still succeeded.
+        guard let cgImage = renderer.cgImage,
+              let pngData = pngData(from: cgImage),
+              let savedImage = NSImage(data: pngData) else {
+            presentSaveError("Could not export the annotated screenshot.")
             return
         }
-        
+
+        do {
+            try writeToDownloads(pngData)
+        } catch {
+            presentSaveError(error.localizedDescription)
+            return
+        }
+
+        isSaved = true
+        onComplete(savedImage)
+    }
+
+    private func pngData(from cgImage: CGImage) -> Data? {
+        let rep = NSBitmapImageRep(cgImage: cgImage)
+        return rep.representation(using: .png, properties: [:])
+    }
+
+    private func writeToDownloads(_ pngData: Data) throws {
+        let fm = FileManager.default
+        let downloads = fm.urls(for: .downloadsDirectory, in: .userDomainMask).first
+            ?? fm.homeDirectoryForCurrentUser.appendingPathComponent("Downloads", isDirectory: true)
+        try fm.createDirectory(at: downloads, withIntermediateDirectories: true)
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let filename = "FeatherShot_\(formatter.string(from: Date())).png"
-        
-        let downloadsUrl = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-        let fileUrl = downloadsUrl.appendingPathComponent(filename)
-        
-        do {
-            try pngData.write(to: fileUrl)
-        } catch {
-            print("Error saving image: \(error)")
-        }
+        let fileUrl = downloads.appendingPathComponent(filename)
+        try pngData.write(to: fileUrl, options: .atomic)
+    }
+
+    private func presentSaveError(_ message: String) {
+        let alert = NSAlert()
+        alert.messageText = "Save & Copy failed"
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 }

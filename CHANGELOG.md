@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.28] - 2026-10-13
+
+### Fixed
+
+- **macOS Save & Copy** — Write the PNG to Downloads before the editor closes. The previous path encoded `ImageRenderer`'s `NSImage` after the window closed, when `tiffRepresentation` was already nil, so the clipboard could update and no file appeared.
+- **Mac App Store sandbox** — `com.apple.security.files.downloads.read-write` so a sandboxed build can save into Downloads.
+
+### Changed
+
+- **macOS capture** — `screencapture` waits off the main thread so the menu bar stays responsive while you select an area.
+- **Electron editor** — Multi-monitor composites skip a second PNG encode, and dragging a text annotation redraws at most once per frame.
+
 ## [1.3.27] - 2026-10-12
 
 ### Fixed
@@ -448,6 +460,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.28]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.27...v1.3.28
 [1.3.27]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.26...v1.3.27
 [1.3.26]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.25...v1.3.26
 [1.3.25]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.24...v1.3.25

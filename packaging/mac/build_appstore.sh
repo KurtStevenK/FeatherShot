@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-VERSION="${FEATHERSHOT_VERSION:-1.3.27}"
+VERSION="${FEATHERSHOT_VERSION:-1.3.28}"
 BUILD="${FEATHERSHOT_BUILD:-1327}"
 TEAM_ID="${APPLE_TEAM_ID:-XPPUZJDN56}"
 BUNDLE_ID="xyz.kainzmayer.feathershot"

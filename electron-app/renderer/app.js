@@ -99,7 +99,14 @@ ipcRenderer.on('load-screenshot', (event, data) => {
         const ctx2 = canvas.getContext('2d');
         ctx2.drawImage(img, 0, 0, img.width, img.height, p.destX, p.destY, p.destW, p.destH);
         loaded++;
-        if (loaded === data.pieces.length) loadScreenshot(canvas.toDataURL('image/png'));
+        if (loaded === data.pieces.length) {
+          const snapshot = document.createElement('canvas');
+          snapshot.width = canvas.width;
+          snapshot.height = canvas.height;
+          snapshot.getContext('2d').drawImage(canvas, 0, 0);
+          screenshotImage = snapshot;
+          render();
+        }
       };
       img.src = p.dataUrl;
     });
@@ -158,7 +165,7 @@ canvas.addEventListener('mousemove', (e) => {
       d.startX = x;
       d.startY = y;
       if (editingTextId === draggingTextId) positionTextEditor(d);
-      render();
+      scheduleRender();
     }
     return;
   }
@@ -167,14 +174,7 @@ canvas.addEventListener('mousemove', (e) => {
   currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
   currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
 
-  // Performance: Throttle render calls to requestAnimationFrame to prevent "frame piling"
-  if (!renderRequested) {
-    renderRequested = true;
-    requestAnimationFrame(() => {
-      render();
-      renderRequested = false;
-    });
-  }
+  scheduleRender();
 });
 
 canvas.addEventListener('mouseup', (e) => {
@@ -229,6 +229,15 @@ canvas.addEventListener('mouseup', (e) => {
   render();
   updateActionStates();
 });
+
+function scheduleRender() {
+  if (renderRequested) return;
+  renderRequested = true;
+  requestAnimationFrame(() => {
+    render();
+    renderRequested = false;
+  });
+}
 
 // --- Render ---
 function render() {

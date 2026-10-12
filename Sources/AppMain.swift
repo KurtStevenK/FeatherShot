@@ -101,30 +101,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Remove old temp file to ensure we don't load a stale image
         try? FileManager.default.removeItem(atPath: tempPath)
 
-        Task {
+        let capturePath = tempPath
+        Task.detached(priority: .userInitiated) {
             let process = Process()
             process.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
             // -i: interactive (select area)
             // -x: no sound
-            process.arguments = ["-i", "-x", tempPath]
+            process.arguments = ["-i", "-x", capturePath]
 
             do {
                 try process.run()
                 process.waitUntilExit()
-
-                if FileManager.default.fileExists(atPath: tempPath) {
-                    // Success!
-                    self.showAnnotationWindow(imagePath: tempPath)
-                } else {
-                    // Failed to create file. Could be user cancelled, or permission denied.
-                    DispatchQueue.main.async {
-                        if !CGPreflightScreenCaptureAccess() {
-                            self.showPermissionAlert()
-                        }
-                    }
-                }
             } catch {
                 print("Error running screencapture: \(error)")
+                return
+            }
+
+            let captured = FileManager.default.fileExists(atPath: capturePath)
+            await MainActor.run {
+                if captured {
+                    self.showAnnotationWindow(imagePath: capturePath)
+                } else if !CGPreflightScreenCaptureAccess() {
+                    self.showPermissionAlert()
+                }
             }
         }
     }
