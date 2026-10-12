@@ -83,7 +83,18 @@ async function checkForUpdatesInteractive() {
       buttons: ['Open Download Page', 'OK'],
     });
     if (response === 0) {
-      shell.openExternal('https://github.com/KurtStevenK/FeatherShot/releases/latest');
+      const targetUrl = 'https://github.com/KurtStevenK/FeatherShot/releases/latest';
+      // Security: Validate protocol before opening external URLs to prevent arbitrary protocol handler execution
+      try {
+        const parsedUrl = new URL(targetUrl);
+        if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+          shell.openExternal(targetUrl);
+        } else {
+          console.warn('Blocked attempt to open non-http/https URL:', targetUrl);
+        }
+      } catch (e) {
+        console.error('Invalid URL passed to openExternal:', targetUrl, e);
+      }
     }
   } catch (e) {
     await dialog.showMessageBox({
