@@ -49,7 +49,7 @@ git tag v1.3.12
 git push origin v1.3.12
 ```
 
-CI builds `FeatherShot-<version>-(macOS).dmg` with Developer ID signing + notarization.
+CI builds `FeatherShot-<version>-macOS.dmg` with Developer ID signing + notarization.
 
 ## Local signed build
 
@@ -65,7 +65,7 @@ export FEATHERSHOT_VERSION=1.3.12
 
 ```bash
 codesign --verify --strict --verbose=2 FeatherShot.app
-xcrun stapler validate "FeatherShot-1.3.12-(macOS).dmg"
+xcrun stapler validate FeatherShot-1.3.12-macOS.dmg
 spctl -a -t exec -vv FeatherShot.app/Contents/MacOS/FeatherShot
 ```
 

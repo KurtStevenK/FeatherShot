@@ -7,6 +7,136 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.37] - 2026-10-15
+
+### Fixed
+
+- **VirusTotal detections on the Windows and Linux downloads** — In v1.3.36, 2 of 62 engines flagged the Windows installer, the portable `.exe`, the `.deb` and the `.pacman`: ESET-NOD32 ("MSIL/CaptureScreen.A potentially unsafe application") and DrWeb ("Trojan.ScreenShot.35"). The flagged code came from `screenshot-desktop`, a dependency the Electron app never used, since capture goes through Electron's `desktopCapturer`. electron-builder still packed it into every Windows and Linux build, including its Windows helper `screenCapture_1.3.2.bat`, a batch file that compiles a C# screen-capture program when run. The dependency is removed, so no package contains the script and `app.asar` drops from 406 to 321 files. Capture works as before.
+
+### Added
+
+- **Runtime dependency check** — `electron-app/test/check-dependencies.js` fails CI when no packaged file requires a runtime dependency, or when the production dependency tree contains `.bat`, `.cmd`, `.ps1`, `.vbs` or `.exe` files.
+
+## [1.3.36] - 2026-10-14
+
+### Added
+
+- **VirusTotal scans** — After every tagged release, the new VirusTotal workflow downloads the release's installers, the portable `.exe` and the Chrome extension, uploads them to VirusTotal, and appends a table to the release notes with each file's detection counts and a link to its full report. Files are uploaded first and then polled together, so the scan finishes in one queue wait instead of one per file. Files still queued after 45 minutes are listed as pending with their report link. The scan runs after Build & Release, so it does not hold up Homebrew, APT, Arch, Chocolatey or in-app updates. Run it from the Actions tab to scan an older release, or locally with `npm run scan:virustotal` (key in `.env.local`).
+- **SECURITY.md** — Secrets inventory, VirusTotal, repository protection and how to report vulnerabilities. `.env.example` is now committed.
+
+### Changed
+
+- **Repository protection** — `main` no longer accepts force pushes or deletion, and pull requests need the CI checks to pass before they merge. Secret scanning with push protection, Dependabot alerts and security updates, and private vulnerability reporting are on.
+- **`scripts/push-distribution-secrets-to-github.sh`** also uploads `VIRUSTOTAL_API_KEY`, falling back to cursor-auto-runner's `.env.local`.
+
+## [1.3.35] - 2026-10-14
+
+### Fixed
+
+- **Windows & Linux text annotations** — The editor's tool shortcuts also fired inside the text box, so typing `a`, `r`, `l`, `m`, a digit, `-`, `=` or `+` switched tools and ended the text: typing "Hallo" kept "H" and picked the Arrow tool. Ctrl+Z removed the annotation being typed while its text box stayed open. While a text annotation is being edited, its keys now go to the text box, and Ctrl+Z is the text box's own undo. Ctrl+S still commits the text and saves, as on macOS.
+
+### Added
+
+- **Text shortcuts smoke test** — `electron-app/test/text-shortcuts-smoke.js` types tool keys into a text annotation in real Electron, then checks that they stayed text and that the shortcuts work again afterwards. CI runs it on Windows and Linux.
+
+## [1.3.34] - 2026-10-14
+
+### Added
+
+- **macOS editor keyboard shortcuts** — The toolbar tooltips named a key for every tool, but the macOS editor had no key handling. It now uses the Windows/Linux keys: `1`–`8` for the first eight tools, `-` and `=` for the Exclamation Arrow and Rectangle, `T` for Text, `9` and `0` for the ABC tools, `M` for the Magnifier, plus the aliases `a`, `r`, `l`, `_` and `+`. **⌘Z** undoes the last annotation and **⌘S** runs Save & Copy. Keys follow the keyboard layout, so on a German keyboard `=` is ⇧0. ⌥ and ⌃ combinations are left alone, and a tool key pressed during a drag is ignored. The Undo and Save & Copy tooltips show their shortcuts, and a unit test compares the mapping with the Electron editor's keydown handler.
+
+### Changed
+
+- **Text annotations on macOS** — A new or reopened text annotation gets keyboard focus with its text selected, so you can type right away instead of clicking into the field first. While the field is open, typed keys go into the text and never switch tools. Only ⌘S still works there, because it commits the text before saving. Return, Tab or a click on the canvas finishes the text, as on Windows and Linux.
+
+## [1.3.33] - 2026-10-14
+
+### Fixed
+
+- **Windows in-app updates** — **Check for Updates…** never installed an update. electron-updater first downloads `latest.yml` from the latest GitHub release, and the release workflow never uploaded it, so the check failed and the app opened the download page instead. Windows installs stayed on old versions, including v1.3.26 and earlier, where Save & Copy does not work on Electron 44. Releases now include `latest.yml` and the installer's `.blockmap`, so installs from v1.3.16 on update in the app.
+- **Release asset names** — GitHub rewrites parentheses in uploaded file names (`FeatherShot-Setup-1.3.31-(Windows).exe` became `FeatherShot-Setup-1.3.31-.Windows.exe`), so `latest.yml` would still have named a file that does not exist. The assets are now `FeatherShot-Setup-<version>-Windows.exe`, `FeatherShot-<version>-Windows-Portable.exe`, `FeatherShot-<version>-macOS.dmg`, `FeatherShot-<version>-Debian.deb`, `FeatherShot-<version>-Ubuntu.AppImage` and `FeatherShot-<version>-Arch.pacman`.
+- **Chocolatey** — The package downloaded `FeatherShot-Setup-<version>-%28Windows%29.exe`, which GitHub answers with 404. It now uses the installer's asset name, and the Homebrew cask uses the DMG name directly instead of rewriting it.
+
+### Changed
+
+- **Portable Windows build** — **Check for Updates…** opens the download page, because electron-updater updates through the NSIS installer and would install a second copy. A failed update download now shows an error with **Open Download Page** instead of failing silently.
+
+### Added
+
+- **`scripts/verify-release-assets.mjs`** in `npm run verify` — release asset names must survive the GitHub upload, `latest.yml` and the blockmap must be attached to the release, and the Chocolatey and Homebrew URLs must match the built file names.
+- **Update feed check** — `scripts/verify-update-feed.mjs` resolves the Windows update with electron-updater's GitHub provider, as installed apps do, then downloads the installer and checks its SHA-512 and size against `latest.yml`. The Build & Release workflow runs it after publishing each release.
+
+## [1.3.32] - 2026-10-14
+
+### Changed
+
+- **Mac App Store & TestFlight updates** — App Store and TestFlight installs no longer show **Check for Updates…** in the menu bar menu. Apple delivers their updates, App Review guideline 2.4.5 allows no other update mechanism, and the GitHub DMG the item pointed to would have replaced the store install. The menu still shows **Version x.y.z**, and the Developer ID DMG and Homebrew builds keep the GitHub update check.
+
+### Added
+
+- **Store build detection** — `UpdateChecker.isAppStoreBuild` looks for a receipt in `Contents/_MASReceipt` (App Store, TestFlight) and for the App Sandbox, which every Mac App Store build has, so App Review does not see the GitHub check even without a receipt. Unit tests cover the receipt and sandbox cases.
+- `--smoke-test` lists the menu bar menu items in its output.
+
+## [1.3.31] - 2026-10-14
+
+### Fixed
+
+- **Windows & Linux Save & Copy** — Up to v1.3.26 the editor called `clipboard.writeImage` in the renderer, which Electron 44 no longer provides there (renderer `clipboard` is `undefined`), so the click threw before anything was written. v1.3.27 moved the copy to the main process but still wrote the file only after the clipboard succeeded. The PNG is now saved to Downloads and copied to the clipboard as independent steps. A busy clipboard times out after 5 s instead of blocking the save, a failed save offers **Save As…**, and the editor stays open on any failure.
+- **File names** — Local time in the same `FeatherShot_YYYY-MM-DD_HH-mm-ss.png` pattern as macOS (was UTC), with `-2`, `-3`, … instead of overwriting a capture from the same second.
+
+### Added
+
+- **`electron-app/save-and-copy.js`** with Node checks in `npm run verify` (`scripts/verify-electron-save.mjs`), including a guard that every module `main.js` requires is in electron-builder's `files` list.
+- **Real-Electron smoke test** — `electron-app/test/save-smoke.js` opens the editor, clicks Save & Copy, and checks Downloads and the clipboard. CI runs it on Windows and Linux.
+
+## [1.3.30] - 2026-10-14
+
+### Fixed
+
+- **macOS Save & Copy** — Saving and copying no longer depend on each other: a failed Downloads write still copies the image, and the editor stays open with a **Save As…** option instead of failing silently. The sandboxed 1.3.25 TestFlight build could not write to Downloads at all because it lacked the Downloads entitlement (added in 1.3.28).
+- **Clipboard** — The annotated image goes on the clipboard as PNG and TIFF, so browsers, chat apps, and older Cocoa apps all paste it.
+- **Export resolution** — The render scale comes from the captured image instead of the main screen, so a Retina capture keeps full resolution when the main display is not Retina. Window captures keep their transparent shadow.
+- **Several editors** — Save & Copy closes its own editor window, not the most recently opened one, and each open editor stays alive.
+- **File names** — Same-second captures get `-2`, `-3`, … instead of overwriting each other; timestamps use fixed digits regardless of locale.
+
+### Added
+
+- `NSDownloadsFolderUsageDescription` in the app's Info.plist for the macOS Downloads privacy prompt.
+- `ScreenshotExport` unit tests (file naming, save/copy independence, PNG + TIFF clipboard, capture-resolution rendering).
+
+## [1.3.29] - 2026-10-14
+
+### Fixed
+
+- **macOS launch** — v1.3.27 and v1.3.28 started without a menu bar icon. AppKit's default `@main` entry point only creates the app delegate from a main nib, so `applicationDidFinishLaunching` never ran. `AppDelegate.main()` now installs the delegate itself. There is no SwiftUI scene, so no empty "FeatherShot" or Settings window opens at launch (the window seen in the 1.3.25 TestFlight build).
+
+### Added
+
+- **Launch smoke test** — `FeatherShot --smoke-test` exits 0 only when the menu bar item exists and no window is open. CI and the release workflow run it against the release binary.
+
+## [1.3.28] - 2026-10-13
+
+### Fixed
+
+- **macOS Save & Copy** — Write the PNG to Downloads before the editor closes. The previous path encoded `ImageRenderer`'s `NSImage` after the window closed, when `tiffRepresentation` was already nil, so the clipboard could update and no file appeared.
+- **Mac App Store sandbox** — `com.apple.security.files.downloads.read-write` so a sandboxed build can save into Downloads.
+
+### Changed
+
+- **macOS capture** — `screencapture` waits off the main thread so the menu bar stays responsive while you select an area.
+- **Electron editor** — Multi-monitor composites skip a second PNG encode, and dragging a text annotation redraws at most once per frame.
+
+## [1.3.27] - 2026-10-12
+
+### Fixed
+
+- **macOS launch** — Drop the SwiftUI `WindowGroup` / Settings placeholder; `@main` `AppDelegate` starts via AppKit only so no empty FeatherShot window appears at launch.
+- **Windows & Linux Save & Copy** — Export runs in the main process with Electron 44 `clipboard.write` and `app.getPath('downloads')`; errors show a dialog instead of failing silently in the renderer.
+
+### Changed
+
+- **Firebase release upload** — `upload-releases.sh` falls back to `upload_object.py` when `gcloud storage cp` fails.
+
 ## [1.3.26] - 2026-10-11
 
 ### Added
@@ -437,6 +567,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.37]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.36...v1.3.37
+[1.3.36]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.35...v1.3.36
+[1.3.35]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.34...v1.3.35
+[1.3.34]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.33...v1.3.34
+[1.3.33]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.32...v1.3.33
+[1.3.32]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.31...v1.3.32
+[1.3.31]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.30...v1.3.31
+[1.3.30]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.29...v1.3.30
+[1.3.29]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.28...v1.3.29
+[1.3.28]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.27...v1.3.28
+[1.3.27]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.26...v1.3.27
 [1.3.26]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.25...v1.3.26
 [1.3.25]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.24...v1.3.25
 [1.3.24]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.23...v1.3.24

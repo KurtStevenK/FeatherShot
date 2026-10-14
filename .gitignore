@@ -33,6 +33,7 @@ AuthKey_*.p8
 # Local env
 .env
 .env.*
+!.env.example
 
 # Node.js / Electron
 node_modules/

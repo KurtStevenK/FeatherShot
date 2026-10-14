@@ -1,0 +1,71 @@
+name: VirusTotal
+
+# Scans the files of a published release on VirusTotal and appends the results to its release notes.
+# Runs after Build & Release instead of inside it, so the scan (often 30+ minutes on the free API
+# quota) does not hold up the package managers, in-app updates or the next release tag.
+on:
+  workflow_run:
+    workflows: [Build & Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to scan, e.g. v1.3.36
+        required: true
+
+permissions:
+  contents: write
+
+# One scan at a time: parallel scans would share the 4 requests a minute.
+concurrency:
+  group: virustotal
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    # workflow_run reports a tag push's tag as head_branch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (startsWith(github.event.workflow_run.head_branch, 'v') &&
+       github.event.workflow_run.conclusion != 'cancelled' &&
+       github.event.workflow_run.conclusion != 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TAG: ${{ inputs.tag || github.event.workflow_run.head_branch }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Scan release files
+        env:
+          VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${VIRUSTOTAL_API_KEY:-}" ]]; then
+            echo "::notice::VIRUSTOTAL_API_KEY not set — skipping VirusTotal"
+            exit 0
+          fi
+          # The files users download: installers, the portable .exe and the Chrome extension.
+          gh release download "$TAG" --dir release-files \
+            --pattern '*.dmg' --pattern '*.exe' --pattern '*.deb' \
+            --pattern '*.AppImage' --pattern '*.pacman' --pattern '*.zip'
+          node scripts/virustotal-scan.mjs --artifacts-dir release-files --report virustotal-report.md
+          cat virustotal-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Add the report to the release notes
+        if: hashFiles('virustotal-report.md') != ''
+        run: |
+          set -euo pipefail
+          # A re-run replaces the earlier report instead of adding a second one; trailing blank
+          # lines are dropped so the notes do not grow on every run.
+          gh release view "$TAG" --json body -q .body \
+            | awk '/^## VirusTotal$/ { exit } /^[[:space:]]*$/ { blank++; next } { while (blank) { print ""; blank-- } print }' \
+            > notes.md
+          { echo; cat virustotal-report.md; } >> notes.md
+          gh release edit "$TAG" --notes-file notes.md

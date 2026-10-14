@@ -9,7 +9,7 @@
 
 ## Architecture
 
-- Entry point: `AppMain.swift` → `FeatherShotApp` with `@NSApplicationDelegateAdaptor`.
+- Entry point: `AppMain.swift` → `@main` `AppDelegate` (`NSApplicationDelegate`) with AppKit only — no SwiftUI `App` scene, so no empty launch window.
 - `AppDelegate` owns the status bar item, manages screen capture via `/usr/sbin/screencapture`, and presents the annotation window.
 - `AnnotationView` is the SwiftUI editor. It uses `ImageRenderer` for pixel-perfect export.
 - `DrawingShapes.swift` defines the `Tool` enum and all shape/view implementations. Swift tests use `@testable import FeatherShot`.

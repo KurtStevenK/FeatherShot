@@ -41,6 +41,9 @@ Never commit the key. Rotating: generate a new key on Chocolatey, update GitHub 
 ## Local build
 
 ```bash
-gh release download v1.3.13 --pattern 'FeatherShot-Setup-1.3.13-(Windows).exe' -D electron-app/dist
-bash scripts/build-chocolatey-nupkg.sh 1.3.13 electron-app/dist/FeatherShot-Setup-1.3.13-\(Windows\).exe
+VERSION=1.3.33
+gh release download "v$VERSION" --pattern "FeatherShot-Setup-$VERSION-Windows.exe" -D electron-app/dist
+bash scripts/build-chocolatey-nupkg.sh "$VERSION"
 ```
+
+The install script downloads `FeatherShot-Setup-<version>-Windows.exe`. Releases before v1.3.33 named the installer `FeatherShot-Setup-<version>-(Windows).exe`, which GitHub stores as `FeatherShot-Setup-<version>-.Windows.exe`, so the package's download URL did not exist.

@@ -28,6 +28,11 @@ Included in the App Store build template:
 - `ITSAppUsesNonExemptEncryption` = false (HTTPS only)
 - `LSApplicationCategoryType` = `public.app-category.graphics-design`
 - `NSScreenCaptureUsageDescription`
+- `NSDownloadsFolderUsageDescription` (macOS asks once before Save & Copy writes to Downloads; needs the `com.apple.security.files.downloads.read-write` entitlement)
+
+### Updates
+
+App Review guideline 2.4.5 lets only the Mac App Store update a store app, so the menu bar menu hides **Check for Updates…** (the GitHub DMG check) in store builds and keeps **Version x.y.z**. `UpdateChecker.isAppStoreBuild` counts the app as a store build when it has a receipt in `Contents/_MASReceipt` (App Store, TestFlight) or runs in the App Sandbox (App Review may launch it without a receipt). Keep the Developer ID build's [`FeatherShot.entitlements`](FeatherShot.entitlements) unsandboxed, or the DMG loses its update check.
 
 ## Upload
 

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.26-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.37-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.26:** Firebase website (feathershot.web.app), privacy policy, press kit, and release mirror CI. **v1.3.25** webview hardening & editor a11y; **v1.3.24** Windows 1:1 capture.
+> **New in v1.3.37:** The Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
 
 ---
 
@@ -63,8 +63,12 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 ### Updates
 
-- **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`).
-- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (Windows uses in-app updater; Linux shows `apt` or `pacman` upgrade hints by distro).
+- **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`). Mac App Store and TestFlight installs update through the App Store or TestFlight instead.
+- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (the Windows installer version updates in the app, the portable `.exe` opens the download page; Linux shows `apt` or `pacman` upgrade hints by distro).
+
+### Verify downloads
+
+Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. The two detections on the v1.3.36 Windows and Linux packages came from an unused library's Windows helper script, which v1.3.37 removes. See [SECURITY.md](SECURITY.md#known-detections).
 
 ---
 
@@ -93,6 +97,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 - 📏 **Line Width Slider** — Adjust stroke thickness from 2px to 15px.
 - ↩️ **Undo / Clear** — Step back or wipe all annotations.
 - 💾 **Save & Copy** — Saves a timestamped PNG to `~/Downloads` and copies to clipboard in one click.
+- ⌨️ **Keyboard Shortcuts** (macOS, Windows, Linux) — The key in each tool's tooltip picks it (`1`–`0`, `-`, `=`, `T`, `M`); **⌘Z** / **Ctrl+Z** undoes and **⌘S** / **Ctrl+S** saves and copies.
 
 ---
 
