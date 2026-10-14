@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.33-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.34-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.33:** Windows **Check for Updates…** downloads and installs new versions in the app instead of opening the download page. **v1.3.32** Mac App Store and TestFlight installs update through Apple; **v1.3.31** Windows/Linux **Save & Copy** always saves to Downloads.
+> **New in v1.3.34:** The macOS editor gets the Windows/Linux keyboard shortcuts: **1**–**0**, **-**, **=**, **T** and **M** pick a tool, **⌘Z** undoes and **⌘S** saves and copies. **v1.3.33** Windows **Check for Updates…** installs new versions in the app; **v1.3.32** Mac App Store and TestFlight installs update through Apple.
 
 ---
 
@@ -93,6 +93,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 - 📏 **Line Width Slider** — Adjust stroke thickness from 2px to 15px.
 - ↩️ **Undo / Clear** — Step back or wipe all annotations.
 - 💾 **Save & Copy** — Saves a timestamped PNG to `~/Downloads` and copies to clipboard in one click.
+- ⌨️ **Keyboard Shortcuts** (macOS, Windows, Linux) — The key in each tool's tooltip picks it (`1`–`0`, `-`, `=`, `T`, `M`); **⌘Z** / **Ctrl+Z** undoes and **⌘S** / **Ctrl+S** saves and copies.
 
 ---
 

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.34] - 2026-10-14
+
+### Added
+
+- **macOS editor keyboard shortcuts** — The toolbar tooltips named a key for every tool, but the macOS editor had no key handling. It now uses the Windows/Linux keys: `1`–`8` for the first eight tools, `-` and `=` for the Exclamation Arrow and Rectangle, `T` for Text, `9` and `0` for the ABC tools, `M` for the Magnifier, plus the aliases `a`, `r`, `l`, `_` and `+`. **⌘Z** undoes the last annotation and **⌘S** runs Save & Copy. Keys follow the keyboard layout, so on a German keyboard `=` is ⇧0. ⌥ and ⌃ combinations are left alone, and a tool key pressed during a drag is ignored. The Undo and Save & Copy tooltips show their shortcuts, and a unit test compares the mapping with the Electron editor's keydown handler.
+
+### Changed
+
+- **Text annotations on macOS** — A new or reopened text annotation gets keyboard focus with its text selected, so you can type right away instead of clicking into the field first. While the field is open, typed keys go into the text and never switch tools. Only ⌘S still works there, because it commits the text before saving. Return, Tab or a click on the canvas finishes the text, as on Windows and Linux.
+
 ## [1.3.33] - 2026-10-14
 
 ### Fixed
@@ -525,6 +535,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.34]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.33...v1.3.34
 [1.3.33]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.32...v1.3.33
 [1.3.32]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.31...v1.3.32
 [1.3.31]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.30...v1.3.31
