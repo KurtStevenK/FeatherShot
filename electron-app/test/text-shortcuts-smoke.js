@@ -7,6 +7,8 @@ const path = require('path');
 
 // Each character is also a tool shortcut: Arrow, Arrow, Magnifier, Exclamation Arrow and Rectangle.
 const TYPED = 'a3m-=';
+// The platform's undo modifier, so Ctrl/Cmd+Z in the text box is also the browser's own undo.
+const UNDO = process.platform === 'darwin' ? 'meta' : 'control';
 
 function finish(code, message) {
   console.log(`Text shortcuts smoke test ${code === 0 ? 'passed' : 'failed'}: ${message}`);
@@ -53,29 +55,35 @@ app.whenReady().then(async () => {
     document.getElementById('canvas').width === 400 ? resolve() : setTimeout(wait, 50);
   })())`);
 
-  await press('t');
-  await expect((s) => s.tool === 'text', 'T to pick the Text tool');
-
   const [x, y] = await page(`(() => {
     const r = document.getElementById('canvas').getBoundingClientRect();
     return [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2)];
   })()`);
-  editor.webContents.sendInputEvent({ type: 'mouseDown', x, y, button: 'left', clickCount: 1 });
-  editor.webContents.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 });
-  await expect((s) => s.editing && s.focused, 'a click to open a focused text box');
+  const openTextBox = async () => {
+    await press('t');
+    await expect((s) => s.tool === 'text', 'T to pick the Text tool');
+    editor.webContents.sendInputEvent({ type: 'mouseDown', x, y, button: 'left', clickCount: 1 });
+    editor.webContents.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 });
+    await expect((s) => s.editing && s.focused, 'a click to open a focused text box');
+  };
 
-  await press('z', ['control']);
+  await openTextBox();
   for (const ch of TYPED) await press(ch);
   await expect((s) => s.typed === TYPED, `"${TYPED}" typed into the text box`);
-  await expect((s) => s.tool === 'text' && s.editing && s.texts.length === 1, 'no tool switch and no undo while typing');
-
+  await expect((s) => s.tool === 'text' && s.editing, 'no tool switch while typing');
   await press('Enter');
   await expect((s) => !s.editing && s.texts.join() === TYPED, 'Enter to commit the text');
 
   await press('3');
   await expect((s) => s.tool === 'arrow', '3 to pick the Arrow tool after the text is done');
-  await press('z', ['control']);
+  await press('z', [UNDO]);
   await expect((s) => s.texts.length === 0, 'Ctrl+Z to undo the text annotation');
+
+  // Input events are handled in order, so once Enter has closed the box, Ctrl+Z was handled too.
+  await openTextBox();
+  await press('z', [UNDO]);
+  await press('Enter');
+  await expect((s) => !s.editing && s.texts.length === 1, 'Ctrl+Z in the text box to keep the annotation');
 
   finish(0, `typed "${TYPED}" into a text annotation without switching tools; shortcuts work afterwards`);
 }).catch((e) => finish(1, e.message));
