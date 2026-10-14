@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.37] - 2026-10-15
+
+### Fixed
+
+- **VirusTotal detections on the Windows and Linux downloads** — In v1.3.36, 2 of 62 engines flagged the Windows installer, the portable `.exe`, the `.deb` and the `.pacman`: ESET-NOD32 ("MSIL/CaptureScreen.A potentially unsafe application") and DrWeb ("Trojan.ScreenShot.35"). The flagged code came from `screenshot-desktop`, a dependency the Electron app never used, since capture goes through Electron's `desktopCapturer`. electron-builder still packed it into every Windows and Linux build, including its Windows helper `screenCapture_1.3.2.bat`, a batch file that compiles a C# screen-capture program when run. The dependency is removed, so no package contains the script and `app.asar` drops from 406 to 321 files. Capture works as before.
+
+### Added
+
+- **Runtime dependency check** — `electron-app/test/check-dependencies.js` fails CI when no packaged file requires a runtime dependency, or when the production dependency tree contains `.bat`, `.cmd`, `.ps1`, `.vbs` or `.exe` files.
+
 ## [1.3.36] - 2026-10-14
 
 ### Added
@@ -557,6 +567,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.37]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.36...v1.3.37
+[1.3.36]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.35...v1.3.36
 [1.3.35]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.34...v1.3.35
 [1.3.34]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.33...v1.3.34
 [1.3.33]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.32...v1.3.33

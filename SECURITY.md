@@ -37,6 +37,10 @@ npm run scan:virustotal
 
 Some engines flag new Electron apps heuristically. Read the full report, not a single detection.
 
+### Known detections
+
+- **v1.3.36:** 2 of 62 engines flagged the Windows installer, the portable `.exe`, the `.deb` and the `.pacman`: ESET-NOD32 (`MSIL/CaptureScreen.A`, "potentially unsafe application") and DrWeb (`Trojan.ScreenShot.35`). All four packages contained `screenCapture_1.3.2.bat` from the `screenshot-desktop` npm package, a batch file that compiles a C# screen-capture program when run. FeatherShot never used that package (it captures with Electron's `desktopCapturer`) and never ran the script. The AppImage contained the same file but was not flagged. v1.3.37 removes the dependency. CI now runs `electron-app/test/check-dependencies.js`, which fails if no packaged file requires a runtime dependency or if one ships `.bat`, `.cmd`, `.ps1`, `.vbs` or `.exe` files.
+
 ## Repository protection
 
 - **`main` is protected:** no force pushes and no deletion. Pull requests must pass the [CI](.github/workflows/ci.yml) checks (`swift`, `shared`, `electron`, `chrome` and both `electron-save-smoke` jobs) on an up-to-date branch before they merge. Admins can still push release commits directly; tags are not affected.
