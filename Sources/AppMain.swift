@@ -42,7 +42,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let hasStatusItem = self.statusItem?.button != nil
                 let strayWindows = NSApp.windows.filter { $0.isVisible && $0.styleMask.contains(.titled) }
                 if hasStatusItem && strayWindows.isEmpty {
-                    print("Smoke test passed: status item ready, no windows open.")
+                    let menu = self.contextMenu?.items.filter { !$0.isSeparatorItem }.map(\.title) ?? []
+                    print("Smoke test passed: status item ready, no windows open. Menu: \(menu.joined(separator: ", "))")
                     exit(0)
                 }
                 print("Smoke test failed: status item \(hasStatusItem ? "ready" : "missing"), open windows: \(strayWindows.map(\.title))")
@@ -87,7 +88,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         contextMenu = NSMenu()
         contextMenu?.addItem(NSMenuItem(title: "Take Screenshot", action: #selector(captureScreen), keyEquivalent: "s"))
         contextMenu?.addItem(NSMenuItem.separator())
-        contextMenu?.addItem(NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: ""))
+        if UpdateChecker.isAvailable {
+            contextMenu?.addItem(NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: ""))
+        }
         let versionItem = NSMenuItem(title: "Version \(UpdateChecker.currentVersion)", action: nil, keyEquivalent: "")
         versionItem.isEnabled = false
         contextMenu?.addItem(versionItem)

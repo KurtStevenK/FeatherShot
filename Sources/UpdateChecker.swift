@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import Security
 
 enum UpdateChecker {
     private static let latestReleaseURL = URL(string: "https://api.github.com/repos/KurtStevenK/FeatherShot/releases/latest")!
@@ -7,6 +8,26 @@ enum UpdateChecker {
 
     static var currentVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
+    }
+
+    /// Only the Developer ID DMG / Homebrew build checks GitHub. The Mac App Store and TestFlight
+    /// update the app themselves, and App Review guideline 2.4.5 rejects any other update mechanism.
+    static var isAvailable: Bool {
+        !isAppStoreBuild(bundle: .main, sandboxed: isSandboxed)
+    }
+
+    /// App Store and TestFlight installs carry a receipt in `Contents/_MASReceipt`. App Review may
+    /// run the app without one, so the App Sandbox counts too: every Mac App Store build needs it,
+    /// and the Developer ID build (`FeatherShot.entitlements`) doesn't use it.
+    static func isAppStoreBuild(bundle: Bundle, sandboxed: Bool) -> Bool {
+        if sandboxed { return true }
+        guard let receipt = bundle.appStoreReceiptURL else { return false }
+        return FileManager.default.fileExists(atPath: receipt.path)
+    }
+
+    static var isSandboxed: Bool {
+        guard let task = SecTaskCreateFromSelf(nil) else { return false }
+        return SecTaskCopyValueForEntitlement(task, "com.apple.security.app-sandbox" as CFString, nil) as? Bool == true
     }
 
     static func checkForUpdates() {

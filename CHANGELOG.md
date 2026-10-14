@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.32] - 2026-10-14
+
+### Changed
+
+- **Mac App Store & TestFlight updates** — App Store and TestFlight installs no longer show **Check for Updates…** in the menu bar menu. Apple delivers their updates, App Review guideline 2.4.5 allows no other update mechanism, and the GitHub DMG the item pointed to would have replaced the store install. The menu still shows **Version x.y.z**, and the Developer ID DMG and Homebrew builds keep the GitHub update check.
+
+### Added
+
+- **Store build detection** — `UpdateChecker.isAppStoreBuild` looks for a receipt in `Contents/_MASReceipt` (App Store, TestFlight) and for the App Sandbox, which every Mac App Store build has, so App Review does not see the GitHub check even without a receipt. Unit tests cover the receipt and sandbox cases.
+- `--smoke-test` lists the menu bar menu items in its output.
+
 ## [1.3.31] - 2026-10-14
 
 ### Fixed
@@ -497,6 +508,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.32]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.31...v1.3.32
 [1.3.31]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.30...v1.3.31
 [1.3.30]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.29...v1.3.30
 [1.3.29]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.28...v1.3.29
