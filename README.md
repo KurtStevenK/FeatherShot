@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.30-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.31-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.30:** macOS **Save & Copy** saves and copies independently, keeps the capture's full resolution, and offers **Save As…** if Downloads is not writable. **v1.3.29** the menu bar app starts again, with no empty window at launch.
+> **New in v1.3.31:** Windows/Linux **Save & Copy** always saves to Downloads, even when the clipboard is busy, and offers **Save As…** if Downloads is not writable. **v1.3.30** the same for macOS; **v1.3.29** the macOS menu bar app starts again.
 
 ---
 

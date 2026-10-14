@@ -10,6 +10,7 @@ const selectionJs = fs.readFileSync(
 );
 const appJs = fs.readFileSync(path.join(root, 'electron-app/renderer/app.js'), 'utf8');
 const mainJs = fs.readFileSync(path.join(root, 'electron-app/main.js'), 'utf8');
+const saveJs = fs.readFileSync(path.join(root, 'electron-app/save-and-copy.js'), 'utf8');
 
 const usesElectronApi = /\bwindow\.electronAPI\b/.test(selectionJs);
 const preloadWired =
@@ -32,12 +33,13 @@ if (/\bclipboard\.writeImage\b/.test(appJs)) {
 
 const hasSaveHandler =
   /ipcMain\.handle\(\s*['"]save-and-copy['"]/.test(mainJs) &&
-  /\bclipboard\.write\s*\(/.test(mainJs) &&
-  /app\.getPath\(\s*['"]downloads['"]\s*\)/.test(mainJs);
+  /\bsaveAndCopy\s*\(/.test(mainJs) &&
+  /app\.getPath\(\s*['"]downloads['"]\s*\)/.test(mainJs) &&
+  /\bclipboard\.write\s*\(/.test(saveJs);
 
 if (!hasSaveHandler) {
   console.error(
-    'electron-app/main.js must handle save-and-copy with clipboard.write and app.getPath("downloads")'
+    'electron-app/main.js must handle save-and-copy via saveAndCopy() with app.getPath("downloads"), and save-and-copy.js must use clipboard.write'
   );
   process.exit(1);
 }

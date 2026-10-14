@@ -672,7 +672,9 @@ function saveAndCopy() {
         throw new Error('Failed to export screenshot');
       }
       const arrayBuffer = await blob.arrayBuffer();
-      await ipcRenderer.invoke('save-and-copy', arrayBuffer);
+      // The main process reports failures in a dialog; on failure keep the editor open.
+      const { ok } = await ipcRenderer.invoke('save-and-copy', arrayBuffer);
+      if (!ok) throw new Error('Save & Copy did not complete');
       btn.textContent = '✓ Saved & Copied!';
       btn.style.background = '#30d158';
       setTimeout(() => {

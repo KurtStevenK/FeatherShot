@@ -17,6 +17,7 @@ const fs = require('fs');
 const path = require('path');
 const { initUpdater, checkForUpdatesInteractive } = require('./updater');
 const { buildScreenshotFromCrop } = require('./capture');
+const { saveAndCopy, defaultFileName } = require('./save-and-copy');
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 const windowData = new Map();
 const gotTheLock = app.requestSingleInstanceLock();
@@ -90,31 +91,75 @@ function setupIPC() {
   });
   ipcMain.on('sel-cancel', () => cancelSelection());
 
-  ipcMain.handle('save-and-copy', async (_event, pngBytes) => {
+  // Returns { ok } — ok closes the editor; on any failure it stays open so annotations are not lost.
+  ipcMain.handle('save-and-copy', async (event, pngBytes) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
     try {
-      const buffer = Buffer.from(pngBytes);
-      const img = nativeImage.createFromBuffer(buffer);
-      if (img.isEmpty()) {
-        throw new Error('Failed to create image from screenshot data');
+      const result = await saveAndCopy(pngBytes, {
+        downloadsDir: () => app.getPath('downloads'),
+        clipboard,
+        ClipboardItem,
+      });
+      if (result.saveError) {
+        console.error('Save to Downloads failed:', result.saveError);
+        const savedAs = await offerSaveAs(win, result);
+        return { ok: savedAs };
       }
-      await clipboard.write([
-        new ClipboardItem({
-          'image/png': new Blob([buffer], { type: 'image/png' }),
-        }),
-      ]);
-      const downloadsDir = app.getPath('downloads');
-      fs.mkdirSync(downloadsDir, { recursive: true });
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-      const filePath = path.join(downloadsDir, `FeatherShot_${timestamp}.png`);
-      fs.writeFileSync(filePath, buffer);
-      return { filePath };
+      if (result.copyError) {
+        console.error('Copy to clipboard failed:', result.copyError);
+        await dialog.showMessageBox(win, {
+          type: 'warning',
+          title: 'FeatherShot',
+          message: 'Could not copy to the clipboard',
+          detail: `${result.copyError}\n\nThe screenshot was saved as ${path.basename(result.filePath)} in Downloads.`,
+        });
+        return { ok: false };
+      }
+      return { ok: true, filePath: result.filePath };
     } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
       console.error('Save & Copy failed:', e);
-      dialog.showErrorBox('Save & Copy failed', message);
-      throw e;
+      await dialog.showMessageBox(win, {
+        type: 'error',
+        title: 'FeatherShot',
+        message: 'Save & Copy failed',
+        detail: e instanceof Error ? e.message : String(e),
+      });
+      return { ok: false };
     }
   });
+}
+
+async function offerSaveAs(win, result) {
+  const copyNote = result.copyError
+    ? `It could not be copied to the clipboard either: ${result.copyError}`
+    : 'The screenshot was copied to the clipboard.';
+  const { response } = await dialog.showMessageBox(win, {
+    type: 'warning',
+    title: 'FeatherShot',
+    message: 'Could not save to Downloads',
+    detail: `${result.saveError}\n\n${copyNote}`,
+    buttons: ['Save As…', 'Cancel'],
+    defaultId: 0,
+    cancelId: 1,
+  });
+  if (response !== 0) return false;
+  const { canceled, filePath } = await dialog.showSaveDialog(win, {
+    defaultPath: defaultFileName(new Date()),
+    filters: [{ name: 'PNG Image', extensions: ['png'] }],
+  });
+  if (canceled || !filePath) return false;
+  try {
+    await fs.promises.writeFile(filePath, result.buffer);
+    return true;
+  } catch (e) {
+    await dialog.showMessageBox(win, {
+      type: 'error',
+      title: 'FeatherShot',
+      message: 'Save failed',
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return false;
+  }
 }
 
 function cancelSelection() {

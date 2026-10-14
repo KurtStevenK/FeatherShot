@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.31] - 2026-10-14
+
+### Fixed
+
+- **Windows & Linux Save & Copy** — Up to v1.3.26 the editor called `clipboard.writeImage` in the renderer, which Electron 44 no longer provides there (renderer `clipboard` is `undefined`), so the click threw before anything was written. v1.3.27 moved the copy to the main process but still wrote the file only after the clipboard succeeded. The PNG is now saved to Downloads and copied to the clipboard as independent steps. A busy clipboard times out after 5 s instead of blocking the save, a failed save offers **Save As…**, and the editor stays open on any failure.
+- **File names** — Local time in the same `FeatherShot_YYYY-MM-DD_HH-mm-ss.png` pattern as macOS (was UTC), with `-2`, `-3`, … instead of overwriting a capture from the same second.
+
+### Added
+
+- **`electron-app/save-and-copy.js`** with Node checks in `npm run verify` (`scripts/verify-electron-save.mjs`), including a guard that every module `main.js` requires is in electron-builder's `files` list.
+- **Real-Electron smoke test** — `electron-app/test/save-smoke.js` opens the editor, clicks Save & Copy, and checks Downloads and the clipboard. CI runs it on Windows and Linux.
+
 ## [1.3.30] - 2026-10-14
 
 ### Fixed
@@ -485,6 +497,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.31]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.30...v1.3.31
 [1.3.30]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.29...v1.3.30
 [1.3.29]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.28...v1.3.29
 [1.3.28]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.27...v1.3.28
