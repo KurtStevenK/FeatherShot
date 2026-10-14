@@ -7,7 +7,8 @@ import CoreGraphics
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var contextMenu: NSMenu?
-    var annotationWindow: NSWindow?
+    /// Every open editor, so a second capture doesn't drop the reference to the first.
+    var editorWindows: [NSWindow] = []
 
     /// NSApplication only holds its delegate weakly.
     private static var instance: AppDelegate?
@@ -47,10 +48,36 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 print("Smoke test failed: status item \(hasStatusItem ? "ready" : "missing"), open windows: \(strayWindows.map(\.title))")
                 exit(1)
             }
+
+            #if DEBUG
+            // Test hook: `--open-editor <png>` opens the editor on an image file;
+            // `--press-save` then presses Save & Copy and quits once the editor has closed.
+            let args = CommandLine.arguments
+            if let i = args.firstIndex(of: "--open-editor"), i + 1 < args.count {
+                let window = self.showAnnotationWindow(imagePath: args[i + 1])
+                if args.contains("--press-save") {
+                    self.pressSaveForTesting(in: window)
+                }
+            }
+            #endif
         }
 
         print("Initial launch steps complete.")
     }
+
+    #if DEBUG
+    private func pressSaveForTesting(in window: NSWindow?) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            print("Test hook: pressing Save & Copy")
+            NotificationCenter.default.post(name: .featherShotPressSaveForTesting, object: nil)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                let closed = window?.isVisible == false
+                print(closed ? "Test hook: editor closed after Save & Copy" : "Test hook: editor still open")
+                exit(closed ? 0 : 1)
+            }
+        }
+    }
+    #endif
 
     func setupStatusItem() {
         print("Creating status item...")
@@ -156,13 +183,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func showAnnotationWindow(imagePath: String) {
-        guard let nsImage = NSImage(contentsOfFile: imagePath) else { return }
-
-        let contentView = AnnotationView(image: nsImage) { @MainActor [weak self] finalImage in
-            self?.copyToClipboard(image: finalImage)
-            self?.annotationWindow?.close()
-        }
+    @discardableResult
+    func showAnnotationWindow(imagePath: String) -> NSWindow? {
+        guard let nsImage = NSImage(contentsOfFile: imagePath) else { return nil }
 
         // Use visibleFrame to respect the Dock and menu bar
         let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
@@ -184,7 +207,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.center()
         window.title = "FeatherShot Editor"
         window.isReleasedWhenClosed = false
-        window.contentView = NSHostingView(rootView: contentView)
+        window.delegate = self
+        // Each editor closes itself, even when a newer capture opened another editor.
+        window.contentView = NSHostingView(rootView: AnnotationView(image: nsImage) { [weak window] in
+            window?.close()
+        })
         window.makeKeyAndOrderFront(nil)
         window.level = .floating
         window.titlebarAppearsTransparent = true
@@ -194,13 +221,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Prevent window from extending behind the Dock or off-screen
         window.maxSize = NSSize(width: screenFrame.width, height: screenFrame.height)
 
-        self.annotationWindow = window
+        editorWindows.append(window)
         NSApp.activate(ignoringOtherApps: true)
+        return window
     }
+}
 
-    func copyToClipboard(image: NSImage) {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.writeObjects([image])
+extension AppDelegate: NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        editorWindows.removeAll { $0 === window }
     }
 }

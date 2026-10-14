@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.30] - 2026-10-14
+
+### Fixed
+
+- **macOS Save & Copy** — Saving and copying no longer depend on each other: a failed Downloads write still copies the image, and the editor stays open with a **Save As…** option instead of failing silently. The sandboxed 1.3.25 TestFlight build could not write to Downloads at all because it lacked the Downloads entitlement (added in 1.3.28).
+- **Clipboard** — The annotated image goes on the clipboard as PNG and TIFF, so browsers, chat apps, and older Cocoa apps all paste it.
+- **Export resolution** — The render scale comes from the captured image instead of the main screen, so a Retina capture keeps full resolution when the main display is not Retina. Window captures keep their transparent shadow.
+- **Several editors** — Save & Copy closes its own editor window, not the most recently opened one, and each open editor stays alive.
+- **File names** — Same-second captures get `-2`, `-3`, … instead of overwriting each other; timestamps use fixed digits regardless of locale.
+
+### Added
+
+- `NSDownloadsFolderUsageDescription` in the app's Info.plist for the macOS Downloads privacy prompt.
+- `ScreenshotExport` unit tests (file naming, save/copy independence, PNG + TIFF clipboard, capture-resolution rendering).
+
 ## [1.3.29] - 2026-10-14
 
 ### Fixed
@@ -470,6 +485,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.30]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.29...v1.3.30
 [1.3.29]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.28...v1.3.29
 [1.3.28]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.27...v1.3.28
 [1.3.27]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.26...v1.3.27

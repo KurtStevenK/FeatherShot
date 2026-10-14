@@ -28,6 +28,7 @@ Included in the App Store build template:
 - `ITSAppUsesNonExemptEncryption` = false (HTTPS only)
 - `LSApplicationCategoryType` = `public.app-category.graphics-design`
 - `NSScreenCaptureUsageDescription`
+- `NSDownloadsFolderUsageDescription` (macOS asks once before Save & Copy writes to Downloads; needs the `com.apple.security.files.downloads.read-write` entitlement)
 
 ## Upload
 

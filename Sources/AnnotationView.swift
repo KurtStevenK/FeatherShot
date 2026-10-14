@@ -1,9 +1,17 @@
 import SwiftUI
 import AppKit
 
+#if DEBUG
+extension Notification.Name {
+    /// Debug-only: `FeatherShot --open-editor <png> --press-save` posts this to run Save & Copy.
+    static let featherShotPressSaveForTesting = Notification.Name("FeatherShotPressSaveForTesting")
+}
+#endif
+
 struct AnnotationView: View {
     let image: NSImage
-    let onComplete: @MainActor @Sendable (NSImage) -> Void
+    /// Called after a successful Save & Copy so the owner can close the editor.
+    let onComplete: @MainActor @Sendable () -> Void
 
     @State private var drawings: [DrawingElement] = []
     @State private var currentStart: CGPoint?
@@ -47,6 +55,11 @@ struct AnnotationView: View {
             // Toolbar — always visible at the bottom
             toolbar
         }
+        #if DEBUG
+        .onReceive(NotificationCenter.default.publisher(for: .featherShotPressSaveForTesting)) { _ in
+            finish()
+        }
+        #endif
     }
 
     // This view is used for BOTH the UI and the ImageRenderer
@@ -498,52 +511,71 @@ struct AnnotationView: View {
     func finish() {
         commitTextEdit()
 
-        let scale = NSScreen.main?.backingScaleFactor ?? 2.0
+        guard let bitmap = renderBitmap() else {
+            showAlert("Save & Copy failed", "Could not render the annotated screenshot.")
+            return
+        }
+
+        let outcome = ScreenshotExport.perform(bitmap)
+        if outcome.saveError == nil && outcome.copied {
+            isSaved = true
+            onComplete()
+            return
+        }
+
+        // Keep the editor open on any failure so the annotations are not lost.
+        if let saveError = outcome.saveError {
+            let copyNote = outcome.copied
+                ? "The screenshot was copied to the clipboard."
+                : "It could not be copied to the clipboard either."
+            offerSaveAs(bitmap, reason: "\(saveError.localizedDescription)\n\n\(copyNote)")
+        } else if let savedURL = outcome.savedURL {
+            showAlert(
+                "Could not copy to the clipboard",
+                "The screenshot was saved as \(savedURL.lastPathComponent) in Downloads."
+            )
+        }
+    }
+
+    /// Renders the annotated image at the capture's own pixel density (1:1 with the screenshot).
+    @MainActor
+    func renderBitmap() -> NSBitmapImageRep? {
         let renderer = ImageRenderer(content: drawingContent)
-        renderer.scale = scale
-        renderer.isOpaque = true
-
-        // Encode while the renderer is still valid. Closing the editor (onComplete)
-        // drops the view-backed NSImage, and tiffRepresentation is often nil after that,
-        // which used to skip the Downloads write while the clipboard copy still succeeded.
-        guard let cgImage = renderer.cgImage,
-              let pngData = pngData(from: cgImage),
-              let savedImage = NSImage(data: pngData) else {
-            presentSaveError("Could not export the annotated screenshot.")
-            return
-        }
-
-        do {
-            try writeToDownloads(pngData)
-        } catch {
-            presentSaveError(error.localizedDescription)
-            return
-        }
-
-        isSaved = true
-        onComplete(savedImage)
+        renderer.scale = ScreenshotExport.pixelScale(of: image) ?? NSScreen.main?.backingScaleFactor ?? 2.0
+        // Not opaque: window captures (Space during selection) keep their transparent shadow.
+        guard let cgImage = renderer.cgImage else { return nil }
+        return NSBitmapImageRep(cgImage: cgImage)
     }
 
-    private func pngData(from cgImage: CGImage) -> Data? {
-        let rep = NSBitmapImageRep(cgImage: cgImage)
-        return rep.representation(using: .png, properties: [:])
-    }
-
-    private func writeToDownloads(_ pngData: Data) throws {
-        let fm = FileManager.default
-        let downloads = fm.urls(for: .downloadsDirectory, in: .userDomainMask).first
-            ?? fm.homeDirectoryForCurrentUser.appendingPathComponent("Downloads", isDirectory: true)
-        try fm.createDirectory(at: downloads, withIntermediateDirectories: true)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let filename = "FeatherShot_\(formatter.string(from: Date())).png"
-        let fileUrl = downloads.appendingPathComponent(filename)
-        try pngData.write(to: fileUrl, options: .atomic)
-    }
-
-    private func presentSaveError(_ message: String) {
+    @MainActor
+    private func offerSaveAs(_ bitmap: NSBitmapImageRep, reason: String) {
         let alert = NSAlert()
-        alert.messageText = "Save & Copy failed"
+        alert.messageText = "Could not save to Downloads"
+        alert.informativeText = reason
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Save As…")
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.png]
+        panel.nameFieldStringValue = "FeatherShot_\(ScreenshotExport.timestamp(Date())).png"
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            guard let png = bitmap.representation(using: .png, properties: [:]) else {
+                throw CocoaError(.fileWriteUnknown)
+            }
+            try png.write(to: url, options: .atomic)
+            isSaved = true
+            onComplete()
+        } catch {
+            showAlert("Save failed", error.localizedDescription)
+        }
+    }
+
+    private func showAlert(_ title: String, _ message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")

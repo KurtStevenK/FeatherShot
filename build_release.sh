@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
-VERSION="${FEATHERSHOT_VERSION:-1.3.29}"
+VERSION="${FEATHERSHOT_VERSION:-1.3.30}"
 ENTITLEMENTS="${ROOT}/packaging/mac/FeatherShot.entitlements"
 DMG_NAME="FeatherShot-${VERSION}-(macOS).dmg"
 
@@ -66,6 +66,8 @@ cat <<EOF > FeatherShot.app/Contents/Info.plist
     <true/>
     <key>NSScreenCaptureUsageDescription</key>
     <string>FeatherShot needs screen recording permission to capture the screen.</string>
+    <key>NSDownloadsFolderUsageDescription</key>
+    <string>FeatherShot saves your annotated screenshots to the Downloads folder.</string>
 </dict>
 </plist>
 EOF
