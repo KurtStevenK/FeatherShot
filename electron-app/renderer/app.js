@@ -66,6 +66,10 @@ document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+  // Save & Copy commits the text first, so it also works while a text annotation is being edited.
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); return; }
+  // Otherwise the text box gets every key: tool keys are text there, and Ctrl+Z is its own undo.
+  if (editingTextId) return;
   if (e.key === '1') setTool('step-arrow');
   if (e.key === '2') setTool('step-rect');
   if (e.key === '3' || e.key === 'a') setTool('arrow');
@@ -81,7 +85,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '0') setTool('abc-rect');
   if (e.key === 'm' || e.key === 'M') setTool('magnifier');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
 
 // --- IPC ---

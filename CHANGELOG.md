@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.35] - 2026-10-14
+
+### Fixed
+
+- **Windows & Linux text annotations** — The editor's tool shortcuts also fired inside the text box, so typing `a`, `r`, `l`, `m`, a digit, `-`, `=` or `+` switched tools and ended the text: typing "Hallo" kept "H" and picked the Arrow tool. Ctrl+Z removed the annotation being typed while its text box stayed open. While a text annotation is being edited, its keys now go to the text box, and Ctrl+Z is the text box's own undo. Ctrl+S still commits the text and saves, as on macOS.
+
+### Added
+
+- **Text shortcuts smoke test** — `electron-app/test/text-shortcuts-smoke.js` types tool keys into a text annotation in real Electron, then checks that they stayed text and that the shortcuts work again afterwards. CI runs it on Windows and Linux.
+
 ## [1.3.34] - 2026-10-14
 
 ### Added
@@ -535,6 +545,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.35]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.34...v1.3.35
 [1.3.34]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.33...v1.3.34
 [1.3.33]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.32...v1.3.33
 [1.3.32]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.31...v1.3.32

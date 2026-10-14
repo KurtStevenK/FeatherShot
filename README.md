@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.34-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.35-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.34:** The macOS editor gets the Windows/Linux keyboard shortcuts: **1**–**0**, **-**, **=**, **T** and **M** pick a tool, **⌘Z** undoes and **⌘S** saves and copies. **v1.3.33** Windows **Check for Updates…** installs new versions in the app; **v1.3.32** Mac App Store and TestFlight installs update through Apple.
+> **New in v1.3.35:** On Windows and Linux, a text annotation takes every key you type: **a**, **m**, digits, **-** and **=** no longer switch tools mid-word. **v1.3.34** the macOS editor gets keyboard shortcuts; **v1.3.33** Windows **Check for Updates…** installs new versions in the app.
 
 ---
 
