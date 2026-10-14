@@ -95,7 +95,7 @@ func drawDmgBackground() {
     let titleAttr: [NSAttributedString.Key: Any] = [.font: titleFont, .foregroundColor: NSColor(white: 0.1, alpha: 1.0), .paragraphStyle: pstyleCenter]
     NSAttributedString(string: title, attributes: titleAttr).draw(in: CGRect(x: 0, y: 310, width: 600, height: 60))
 
-    let subtitle = "Version 1.3.26"
+    let subtitle = "Version 1.3.37"
     let subFont = NSFont.systemFont(ofSize: 18, weight: .medium)
     let subAttr: [NSAttributedString.Key: Any] = [.font: subFont, .foregroundColor: NSColor(white: 0.4, alpha: 1.0), .paragraphStyle: pstyleCenter]
     NSAttributedString(string: subtitle, attributes: subAttr).draw(in: CGRect(x: 0, y: 280, width: 600, height: 30))

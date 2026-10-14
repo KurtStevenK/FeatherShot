@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, clipboard, nativeImage } = require('electron');
+const { contextBridge, ipcRenderer, clipboard, ClipboardItem, nativeImage } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -12,7 +12,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)
   },
   clipboard: {
-    writeImage: (image) => clipboard.writeImage(image)
+    writePngBuffer: async (pngBuffer) => {
+      const buffer = Buffer.from(pngBuffer);
+      await clipboard.write([
+        new ClipboardItem({
+          'image/png': new Blob([buffer], { type: 'image/png' }),
+        }),
+      ]);
+    },
   },
   nativeImage: {
     createFromDataURL: (dataURL) => nativeImage.createFromDataURL(dataURL)

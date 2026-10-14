@@ -84,5 +84,15 @@ else
   fi
 fi
 
+if [[ -n "${VIRUSTOTAL_API_KEY:-}" ]]; then
+  printf '%s' "$VIRUSTOTAL_API_KEY" | gh secret set VIRUSTOTAL_API_KEY --repo "$REPO"
+elif [[ -f "$CAR_ROOT/.env.local" ]] && grep -q '^VIRUSTOTAL_API_KEY=.' "$CAR_ROOT/.env.local"; then
+  grep '^VIRUSTOTAL_API_KEY=' "$CAR_ROOT/.env.local" | head -1 | cut -d= -f2- | tr -d '\r\n"'"'" \
+    | gh secret set VIRUSTOTAL_API_KEY --repo "$REPO"
+  echo "VIRUSTOTAL_API_KEY copied from $CAR_ROOT/.env.local"
+else
+  echo "VIRUSTOTAL_API_KEY not set — release files will not be scanned (see SECURITY.md)."
+fi
+
 echo "Done. Distribution secrets set on $REPO"
 echo "Re-run the latest release workflow (or tag a patch) to publish Homebrew tap, APT, Arch, and Chocolatey."

@@ -1,7 +1,4 @@
-const { ipcRenderer, clipboard, nativeImage } = require('electron');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const { ipcRenderer } = require('electron');
 
 // --- State ---
 let screenshotImage = null;
@@ -69,6 +66,10 @@ document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
+  // Save & Copy commits the text first, so it also works while a text annotation is being edited.
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); return; }
+  // Otherwise the text box gets every key: tool keys are text there, and Ctrl+Z is its own undo.
+  if (editingTextId) return;
   if (e.key === '1') setTool('step-arrow');
   if (e.key === '2') setTool('step-rect');
   if (e.key === '3' || e.key === 'a') setTool('arrow');
@@ -84,7 +85,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '0') setTool('abc-rect');
   if (e.key === 'm' || e.key === 'M') setTool('magnifier');
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); }
 });
 
 // --- IPC ---
@@ -102,7 +102,14 @@ ipcRenderer.on('load-screenshot', (event, data) => {
         const ctx2 = canvas.getContext('2d');
         ctx2.drawImage(img, 0, 0, img.width, img.height, p.destX, p.destY, p.destW, p.destH);
         loaded++;
-        if (loaded === data.pieces.length) loadScreenshot(canvas.toDataURL('image/png'));
+        if (loaded === data.pieces.length) {
+          const snapshot = document.createElement('canvas');
+          snapshot.width = canvas.width;
+          snapshot.height = canvas.height;
+          snapshot.getContext('2d').drawImage(canvas, 0, 0);
+          screenshotImage = snapshot;
+          render();
+        }
       };
       img.src = p.dataUrl;
     });
@@ -161,7 +168,7 @@ canvas.addEventListener('mousemove', (e) => {
       d.startX = x;
       d.startY = y;
       if (editingTextId === draggingTextId) positionTextEditor(d);
-      render();
+      scheduleRender();
     }
     return;
   }
@@ -170,14 +177,7 @@ canvas.addEventListener('mousemove', (e) => {
   currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
   currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
 
-  // Performance: Throttle render calls to requestAnimationFrame to prevent "frame piling"
-  if (!renderRequested) {
-    renderRequested = true;
-    requestAnimationFrame(() => {
-      render();
-      renderRequested = false;
-    });
-  }
+  scheduleRender();
 });
 
 canvas.addEventListener('mouseup', (e) => {
@@ -232,6 +232,15 @@ canvas.addEventListener('mouseup', (e) => {
   render();
   updateActionStates();
 });
+
+function scheduleRender() {
+  if (renderRequested) return;
+  renderRequested = true;
+  requestAnimationFrame(() => {
+    render();
+    renderRequested = false;
+  });
+}
 
 // --- Render ---
 function render() {
@@ -650,25 +659,37 @@ function updateActionStates() {
 }
 
 function saveAndCopy() {
-  const dataUrl = canvas.toDataURL('image/png');
-  const img = nativeImage.createFromDataURL(dataUrl);
-  clipboard.writeImage(img);
-
-  // Save to Downloads
-  const downloadsDir = path.join(os.homedir(), 'Downloads');
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const filePath = path.join(downloadsDir, `FeatherShot_${timestamp}.png`);
-
-  const buffer = img.toPNG();
-  fs.writeFileSync(filePath, buffer);
-
-  // Flash the save button briefly then close on Windows/Linux
   const btn = document.getElementById('btn-save');
-  btn.textContent = '✓ Saved & Copied!';
-  btn.style.background = '#30d158';
-  setTimeout(() => {
-    window.close();
-  }, 800);
+  const originalText = btn.textContent;
+  const originalBackground = btn.style.background;
+
+  commitTextEdit();
+  render();
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  canvas.toBlob(async (blob) => {
+    try {
+      if (!blob) {
+        throw new Error('Failed to export screenshot');
+      }
+      const arrayBuffer = await blob.arrayBuffer();
+      // The main process reports failures in a dialog; on failure keep the editor open.
+      const { ok } = await ipcRenderer.invoke('save-and-copy', arrayBuffer);
+      if (!ok) throw new Error('Save & Copy did not complete');
+      btn.textContent = '✓ Saved & Copied!';
+      btn.style.background = '#30d158';
+      setTimeout(() => {
+        window.close();
+      }, 800);
+    } catch (err) {
+      console.error('Save & Copy failed:', err);
+      btn.disabled = false;
+      btn.textContent = originalText;
+      btn.style.background = originalBackground;
+    }
+  }, 'image/png');
 }
 
 // Initial state

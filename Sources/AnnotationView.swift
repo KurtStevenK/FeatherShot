@@ -1,8 +1,17 @@
 import SwiftUI
+import AppKit
+
+#if DEBUG
+extension Notification.Name {
+    /// Debug-only: `FeatherShot --open-editor <png> --press-save` posts this to run Save & Copy.
+    static let featherShotPressSaveForTesting = Notification.Name("FeatherShotPressSaveForTesting")
+}
+#endif
 
 struct AnnotationView: View {
     let image: NSImage
-    let onComplete: @MainActor @Sendable (NSImage) -> Void
+    /// Called after a successful Save & Copy so the owner can close the editor.
+    let onComplete: @MainActor @Sendable () -> Void
 
     @State private var drawings: [DrawingElement] = []
     @State private var currentStart: CGPoint?
@@ -17,6 +26,11 @@ struct AnnotationView: View {
     @State private var editingTextBuffer: String = ""
     @State private var draggingTextId: UUID?
     @State private var textGestureStart: CGPoint?
+    @FocusState private var focus: EditorFocus?
+
+    /// Keyboard focus: the canvas receives the shortcuts, a text field receives typing.
+    /// Each text annotation is its own value, so focusing the next one is never a no-op.
+    private enum EditorFocus: Hashable { case canvas, text(UUID) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,10 +56,25 @@ struct AnnotationView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipped()
+            // Holds keyboard focus so the shortcuts work without clicking first.
+            .focusable()
+            .focusEffectDisabled()
+            .focused($focus, equals: .canvas)
 
             // Toolbar — always visible at the bottom
             toolbar
         }
+        .onKeyPress(phases: [.down, .repeat]) { press in handleKeyPress(press) }
+        // Focuses the canvas on appear and the text field while one is open. As a task this runs
+        // after the update that adds or removes the field, so focus lands on a view that exists.
+        .task(id: openTextId) {
+            focus = openTextId.map(EditorFocus.text) ?? .canvas
+        }
+        #if DEBUG
+        .onReceive(NotificationCenter.default.publisher(for: .featherShotPressSaveForTesting)) { _ in
+            finish()
+        }
+        #endif
     }
 
     // This view is used for BOTH the UI and the ImageRenderer
@@ -341,12 +370,11 @@ struct AnnotationView: View {
 
             // Actions
             HStack(spacing: 10) {
-                Button("Undo") {
-                    if !drawings.isEmpty { drawings.removeLast() }
-                }
+                Button("Undo", action: undo)
                 .buttonStyle(.plain)
                 .disabled(drawings.isEmpty)
                 .font(.caption)
+                .help("Undo (⌘Z)")
 
                 Button("Clear") {
                     drawings.removeAll()
@@ -368,6 +396,7 @@ struct AnnotationView: View {
                     .cornerRadius(8)
                 }
                 .buttonStyle(.plain)
+                .help("Save & Copy (⌘S)")
             }
             .fixedSize()
         }
@@ -385,7 +414,14 @@ struct AnnotationView: View {
                 .textFieldStyle(.roundedBorder)
                 .frame(width: min(280, image.size.width * 0.4))
                 .position(x: drawings[idx].start.x, y: drawings[idx].start.y)
+                .focused($focus, equals: .text(id))
                 .onSubmit { commitTextEdit() }
+                // Tab and ⇧Tab (U+0019) end the edit like Return, instead of moving focus to the
+                // canvas and leaving the field open.
+                .onKeyPress(keys: [.tab, KeyEquivalent("\u{19}")]) { _ in
+                    commitTextEdit()
+                    return .handled
+                }
                 .onChange(of: editingTextBuffer) { _, newValue in
                     if let i = drawings.firstIndex(where: { $0.id == id }) {
                         drawings[i].text = newValue
@@ -394,9 +430,21 @@ struct AnnotationView: View {
         }
     }
 
+    /// The text annotation whose field is on screen (the condition of `textEditingOverlay`).
+    private var openTextId: UUID? {
+        editingTextId.flatMap { id in drawings.contains { $0.id == id } ? id : nil }
+    }
+
+    private var isEditingText: Bool { openTextId != nil }
+
     private var canvasDragGesture: some Gesture {
         DragGesture(minimumDistance: 0)
             .onChanged { value in
+                // Clicking the canvas ends text editing, as in the Electron editor; otherwise
+                // the open text field would keep blocking the shortcuts.
+                if isEditingText && currentStart == nil && textGestureStart == nil {
+                    commitTextEdit()
+                }
                 if selectedTool == .text {
                     if draggingTextId == nil, textGestureStart == nil {
                         textGestureStart = value.startLocation
@@ -493,48 +541,105 @@ struct AnnotationView: View {
         editingTextBuffer = ""
     }
 
+    private func handleKeyPress(_ press: KeyPress) -> KeyPress.Result {
+        guard let shortcut = EditorShortcut.match(
+            press.characters, modifiers: press.modifiers, isEditingText: isEditingText
+        ) else {
+            return .ignored
+        }
+        switch shortcut {
+        case .select(let tool):
+            // Mid-drag, the gesture would end under the new tool and leave its preview behind.
+            if currentStart == nil && textGestureStart == nil {
+                selectedTool = tool
+            }
+        case .undo:
+            undo()
+        case .saveAndCopy:
+            // Once per press: holding ⌘S must not save again behind an error alert.
+            if press.phase == .down {
+                finish()
+            }
+        }
+        return .handled
+    }
+
+    private func undo() {
+        if !drawings.isEmpty { drawings.removeLast() }
+    }
+
     @MainActor
     func finish() {
-        let scale = NSScreen.main?.backingScaleFactor ?? 2.0
-        
-        // Use the EXACT same drawingContent view for the renderer
-        // It's already topLeading and correctly framed
-        let renderView = drawingContent
+        commitTextEdit()
 
-        let renderer = ImageRenderer(content: renderView)
-        renderer.scale = scale
-        
-        if let nsImage = renderer.nsImage {
-            // Provide visual feedback before closing
+        guard let bitmap = renderBitmap() else {
+            showAlert("Save & Copy failed", "Could not render the annotated screenshot.")
+            return
+        }
+
+        let outcome = ScreenshotExport.perform(bitmap)
+        if outcome.saveError == nil && outcome.copied {
             isSaved = true
+            onComplete()
+            return
+        }
 
-            // Execute completion and saving
-            onComplete(nsImage)
-            saveToDownloads(image: nsImage)
-
-            // The window will be closed by the onComplete callback in AppDelegate
-            // but we have a brief moment to show the success state
+        // Keep the editor open on any failure so the annotations are not lost.
+        if let saveError = outcome.saveError {
+            let copyNote = outcome.copied
+                ? "The screenshot was copied to the clipboard."
+                : "It could not be copied to the clipboard either."
+            offerSaveAs(bitmap, reason: "\(saveError.localizedDescription)\n\n\(copyNote)")
+        } else if let savedURL = outcome.savedURL {
+            showAlert(
+                "Could not copy to the clipboard",
+                "The screenshot was saved as \(savedURL.lastPathComponent) in Downloads."
+            )
         }
     }
 
-    func saveToDownloads(image: NSImage) {
-        guard let tiffData = image.tiffRepresentation,
-              let bitmap = NSBitmapImageRep(data: tiffData),
-              let pngData = bitmap.representation(using: .png, properties: [:]) else {
-            return
-        }
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let filename = "FeatherShot_\(formatter.string(from: Date())).png"
-        
-        let downloadsUrl = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first!
-        let fileUrl = downloadsUrl.appendingPathComponent(filename)
-        
+    /// Renders the annotated image at the capture's own pixel density (1:1 with the screenshot).
+    @MainActor
+    func renderBitmap() -> NSBitmapImageRep? {
+        let renderer = ImageRenderer(content: drawingContent)
+        renderer.scale = ScreenshotExport.pixelScale(of: image) ?? NSScreen.main?.backingScaleFactor ?? 2.0
+        // Not opaque: window captures (Space during selection) keep their transparent shadow.
+        guard let cgImage = renderer.cgImage else { return nil }
+        return NSBitmapImageRep(cgImage: cgImage)
+    }
+
+    @MainActor
+    private func offerSaveAs(_ bitmap: NSBitmapImageRep, reason: String) {
+        let alert = NSAlert()
+        alert.messageText = "Could not save to Downloads"
+        alert.informativeText = reason
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "Save As…")
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.png]
+        panel.nameFieldStringValue = "FeatherShot_\(ScreenshotExport.timestamp(Date())).png"
+        guard panel.runModal() == .OK, let url = panel.url else { return }
         do {
-            try pngData.write(to: fileUrl)
+            guard let png = bitmap.representation(using: .png, properties: [:]) else {
+                throw CocoaError(.fileWriteUnknown)
+            }
+            try png.write(to: url, options: .atomic)
+            isSaved = true
+            onComplete()
         } catch {
-            print("Error saving image: \(error)")
+            showAlert("Save failed", error.localizedDescription)
         }
+    }
+
+    private func showAlert(_ title: String, _ message: String) {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = message
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
     }
 }

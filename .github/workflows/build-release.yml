@@ -57,6 +57,8 @@ jobs:
         run: |
           swift test
           swift build -c release
+          # Fails if the app delegate never runs or a window opens at launch.
+          perl -e 'alarm 60; exec @ARGV' .build/release/FeatherShot --smoke-test
 
       - name: Generate DMG Background
         run: |
@@ -121,7 +123,7 @@ jobs:
           APP="FeatherShot.app"
           codesign --verify --strict --verbose=2 "$APP"
           if [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
-            DMG=$(ls FeatherShot-*-\(macOS\).dmg 2>/dev/null | head -1)
+            DMG=$(ls FeatherShot-*-macOS.dmg 2>/dev/null | head -1)
             if [[ -n "$DMG" ]] && xcrun stapler validate "$DMG" 2>/dev/null; then
               spctl -a -t exec -vv "$APP/Contents/MacOS/FeatherShot"
             else
@@ -197,9 +199,10 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${GITHUB_REF_NAME#v}"
-          EXE=$(find electron-app/dist -name "FeatherShot-Setup-${VERSION}-*.exe" | head -1)
-          if [[ -z "$EXE" ]]; then
-            echo "Windows installer not found for version $VERSION" >&2
+          # Same name as the url in packaging/chocolatey/tools/chocolateyinstall.ps1.
+          EXE="electron-app/dist/FeatherShot-Setup-${VERSION}-Windows.exe"
+          if [[ ! -f "$EXE" ]]; then
+            echo "Windows installer $EXE not found" >&2
             ls -la electron-app/dist || true
             exit 1
           fi
@@ -214,8 +217,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.platform }}
+          # latest.yml and the blockmap are the Windows in-app update feed (electron-updater).
           path: |
             electron-app/dist/*.exe
+            electron-app/dist/latest.yml
+            electron-app/dist/*.exe.blockmap
             electron-app/dist/*.deb
             electron-app/dist/*.AppImage
             electron-app/dist/*.pacman
@@ -263,6 +269,8 @@ jobs:
           files: |
             release-artifacts/**/*.dmg
             release-artifacts/**/*.exe
+            release-artifacts/**/latest.yml
+            release-artifacts/**/*.blockmap
             release-artifacts/**/*.deb
             release-artifacts/**/*.AppImage
             release-artifacts/**/*.pacman
@@ -337,16 +345,16 @@ jobs:
             exit 0
           fi
           VERSION="${GITHUB_REF_NAME#v}"
-          DMG=$(find release-artifacts -name "FeatherShot-${VERSION}-*.dmg" | head -1)
+          # The cask url expects this name (packaging/homebrew/feathershot.rb).
+          DMG=$(find release-artifacts -name "FeatherShot-${VERSION}-macOS.dmg" | head -1)
           if [[ -z "$DMG" ]]; then
             echo "DMG not found for version $VERSION" >&2
             find release-artifacts -type f >&2 || true
             exit 1
           fi
           SHA=$(shasum -a 256 "$DMG" | cut -d' ' -f1)
-          DMG_FILENAME=$(basename "$DMG" | sed 's/(/./g' | tr -d ')')
           mkdir -p Casks
-          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" -e "s/__DMG_FILENAME__/$DMG_FILENAME/g" packaging/homebrew/feathershot.rb > Casks/feathershot.rb
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" packaging/homebrew/feathershot.rb > Casks/feathershot.rb
           git clone "https://x-access-token:${TAP_TOKEN}@github.com/KurtStevenK/homebrew-tap.git" tap
           mkdir -p tap/Casks
           cp Casks/feathershot.rb tap/Casks/feathershot.rb
@@ -418,7 +426,7 @@ jobs:
             exit 0
           fi
           VERSION="${GITHUB_REF_NAME#v}"
-          PKG=$(find release-artifacts -name "FeatherShot-${VERSION}-*(Arch)*.pacman" | head -1)
+          PKG=$(find release-artifacts -name "FeatherShot-${VERSION}-Arch.pacman" | head -1)
           if [[ -z "$PKG" ]]; then
             PKG=$(find release-artifacts -name "*.pacman" | head -1)
           fi
@@ -491,3 +499,24 @@ jobs:
           while IFS= read -r -d '' f; do
             choco push "$f" --source https://push.chocolatey.org/
           done < <(find artifacts -name '*.nupkg' -print0)
+
+  # ─── Windows in-app update feed ────────────────────────────────────
+  # Installed Windows apps update through electron-updater: latest.yml on the latest release names the
+  # installer to download. Resolve it the same way and check the installer's SHA-512.
+  update-feed:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install electron-updater
+        working-directory: electron-app
+        run: npm ci --omit=dev
+
+      - name: Resolve the update like an installed app
+        run: node scripts/verify-update-feed.mjs "$GITHUB_REF_NAME"

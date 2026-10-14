@@ -14,6 +14,9 @@ jobs:
       - name: Build (release)
         run: swift build -c release
 
+      - name: Launch smoke test (menu bar item, no windows)
+        run: perl -e 'alarm 60; exec @ARGV' .build/release/FeatherShot --smoke-test
+
       - name: Test
         run: swift test
 
@@ -52,6 +55,53 @@ jobs:
       - name: Dependency audit
         working-directory: electron-app
         run: npm audit --audit-level=high
+
+      - name: Runtime dependencies are used and ship no Windows helpers
+        working-directory: electron-app
+        run: node test/check-dependencies.js
+
+  # Real Electron: open the editor, click Save & Copy, check Downloads and the clipboard;
+  # then type tool keys into a text annotation and check they stay text.
+  electron-save-smoke:
+    needs: shared
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: electron-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: electron-app
+        run: npm ci
+
+      - name: Save & Copy smoke test (Windows)
+        if: runner.os == 'Windows'
+        working-directory: electron-app
+        run: npx electron test/save-smoke.js
+
+      - name: Save & Copy smoke test (Linux, Xvfb)
+        if: runner.os == 'Linux'
+        working-directory: electron-app
+        run: xvfb-run -a npx electron --no-sandbox test/save-smoke.js
+
+      - name: Text shortcuts smoke test (Windows)
+        if: runner.os == 'Windows'
+        working-directory: electron-app
+        run: npx electron test/text-shortcuts-smoke.js
+
+      - name: Text shortcuts smoke test (Linux, Xvfb)
+        if: runner.os == 'Linux'
+        working-directory: electron-app
+        run: xvfb-run -a npx electron --no-sandbox test/text-shortcuts-smoke.js
 
   chrome:
     runs-on: ubuntu-latest

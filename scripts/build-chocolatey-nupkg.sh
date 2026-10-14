@@ -8,17 +8,11 @@ EXE="${2:-}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-if [[ -z "$EXE" ]]; then
-  for candidate in \
-    "electron-app/dist/FeatherShot-Setup-${VERSION}-(Windows).exe" \
-    "electron-app/dist/FeatherShot-Setup-${VERSION}-\(Windows\).exe"; do
-    [[ -f "$candidate" ]] && EXE="$candidate" && break
-  done
-fi
+EXE="${EXE:-electron-app/dist/FeatherShot-Setup-${VERSION}-Windows.exe}"
 
-if [[ -z "$EXE" || ! -f "$EXE" ]]; then
+if [[ ! -f "$EXE" ]]; then
   echo "Download installer first, e.g.:" >&2
-  echo "  gh release download v${VERSION} --pattern 'FeatherShot-Setup-${VERSION}-(Windows).exe' -D electron-app/dist" >&2
+  echo "  gh release download v${VERSION} --pattern 'FeatherShot-Setup-${VERSION}-Windows.exe' -D electron-app/dist" >&2
   exit 1
 fi
 
