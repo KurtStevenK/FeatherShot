@@ -14,6 +14,9 @@ jobs:
       - name: Build (release)
         run: swift build -c release
 
+      - name: Launch smoke test (menu bar item, no windows)
+        run: perl -e 'alarm 60; exec @ARGV' .build/release/FeatherShot --smoke-test
+
       - name: Test
         run: swift test
 

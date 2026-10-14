@@ -57,6 +57,8 @@ jobs:
         run: |
           swift test
           swift build -c release
+          # Fails if the app delegate never runs or a window opens at launch.
+          perl -e 'alarm 60; exec @ARGV' .build/release/FeatherShot --smoke-test
 
       - name: Generate DMG Background
         run: |

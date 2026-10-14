@@ -9,6 +9,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var contextMenu: NSMenu?
     var annotationWindow: NSWindow?
 
+    /// NSApplication only holds its delegate weakly.
+    private static var instance: AppDelegate?
+
+    /// AppKit's default `NSApplicationDelegate.main()` only calls `NSApplicationMain`, which creates
+    /// the delegate from a main nib. FeatherShot has no nib, so without this the delegate never
+    /// exists: no menu bar item, and the app runs invisibly. No SwiftUI `App` scene either, so
+    /// macOS has no empty placeholder or Settings window to open at launch.
+    static func main() {
+        let app = NSApplication.shared
+        let delegate = AppDelegate()
+        instance = delegate
+        app.delegate = delegate
+        app.setActivationPolicy(.accessory)
+        app.run()
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         print("FeatherShot starting...")
 
@@ -19,6 +35,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.setupStatusItem()
             print("Status item setup called.")
+
+            // CI launch check: the delegate ran, the menu bar item exists, and no window opened.
+            if CommandLine.arguments.contains("--smoke-test") {
+                let hasStatusItem = self.statusItem?.button != nil
+                let strayWindows = NSApp.windows.filter { $0.isVisible && $0.styleMask.contains(.titled) }
+                if hasStatusItem && strayWindows.isEmpty {
+                    print("Smoke test passed: status item ready, no windows open.")
+                    exit(0)
+                }
+                print("Smoke test failed: status item \(hasStatusItem ? "ready" : "missing"), open windows: \(strayWindows.map(\.title))")
+                exit(1)
+            }
         }
 
         print("Initial launch steps complete.")

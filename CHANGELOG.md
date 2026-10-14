@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.29] - 2026-10-14
+
+### Fixed
+
+- **macOS launch** — v1.3.27 and v1.3.28 started without a menu bar icon. AppKit's default `@main` entry point only creates the app delegate from a main nib, so `applicationDidFinishLaunching` never ran. `AppDelegate.main()` now installs the delegate itself. There is no SwiftUI scene, so no empty "FeatherShot" or Settings window opens at launch (the window seen in the 1.3.25 TestFlight build).
+
+### Added
+
+- **Launch smoke test** — `FeatherShot --smoke-test` exits 0 only when the menu bar item exists and no window is open. CI and the release workflow run it against the release binary.
+
 ## [1.3.28] - 2026-10-13
 
 ### Fixed
@@ -460,6 +470,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.29]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.28...v1.3.29
 [1.3.28]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.27...v1.3.28
 [1.3.27]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.26...v1.3.27
 [1.3.26]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.25...v1.3.26
