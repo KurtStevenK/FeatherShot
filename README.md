@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.32-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.33-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.32:** Mac App Store and TestFlight installs update through Apple, so their menu no longer offers **Check for Updates…** (the GitHub DMG and Homebrew builds keep it). **v1.3.31** Windows/Linux **Save & Copy** always saves to Downloads; **v1.3.30** the same for macOS.
+> **New in v1.3.33:** Windows **Check for Updates…** downloads and installs new versions in the app instead of opening the download page. **v1.3.32** Mac App Store and TestFlight installs update through Apple; **v1.3.31** Windows/Linux **Save & Copy** always saves to Downloads.
 
 ---
 
@@ -64,7 +64,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 ### Updates
 
 - **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`). Mac App Store and TestFlight installs update through the App Store or TestFlight instead.
-- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (Windows uses in-app updater; Linux shows `apt` or `pacman` upgrade hints by distro).
+- **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (the Windows installer version updates in the app, the portable `.exe` opens the download page; Linux shows `apt` or `pacman` upgrade hints by distro).
 
 ---
 

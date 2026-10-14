@@ -38,7 +38,9 @@ No Homebrew account or `brew` API key is required for maintaining the tap.
 
 ## DMG filename
 
-CI builds **`FeatherShot-<version>-(macOS).dmg`** via [`build_release.sh`](../../build_release.sh). The cask `url` must match exactly.
+CI builds **`FeatherShot-<version>-macOS.dmg`** via [`build_release.sh`](../../build_release.sh). The cask `url` must match exactly, and `npm run verify` checks it.
+
+Release asset names may only use letters, digits, `.`, `-` and `_`. GitHub rewrites other characters on upload: the DMGs before v1.3.33 were built as `FeatherShot-<version>-(macOS).dmg` and published as `FeatherShot-<version>-.macOS.dmg`.
 
 ## User upgrade
 

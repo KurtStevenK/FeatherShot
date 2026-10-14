@@ -3,6 +3,8 @@ const { app, dialog, shell } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { compareVersions, fetchLatestRelease } = require('./github-release');
 
+const DOWNLOAD_PAGE = 'https://github.com/KurtStevenK/FeatherShot/releases/latest';
+
 function linuxUpgradeHint() {
   if (fs.existsSync('/etc/arch-release')) {
     return 'sudo pacman -Sy feathershot';
@@ -23,7 +25,7 @@ function initUpdater(onTrayRefresh) {
       detail: 'Download and install now? The app will restart when finished.',
       buttons: ['Download', 'Later'],
     }).then(({ response }) => {
-      if (response === 0) autoUpdater.downloadUpdate();
+      if (response === 0) autoUpdater.downloadUpdate().catch(showDownloadFailed);
     });
   });
   autoUpdater.on('update-downloaded', () => {
@@ -49,10 +51,24 @@ function initUpdater(onTrayRefresh) {
   });
 }
 
+function showDownloadFailed(err) {
+  dialog.showMessageBox({
+    type: 'warning',
+    title: 'FeatherShot',
+    message: 'Could not download the update.',
+    detail: String(err.message || err),
+    buttons: ['Open Download Page', 'OK'],
+  }).then(({ response }) => {
+    if (response === 0) shell.openExternal(DOWNLOAD_PAGE);
+  });
+}
+
 async function checkForUpdatesInteractive() {
   const current = app.getVersion();
 
-  if (process.platform === 'win32') {
+  // electron-updater updates through the NSIS installer, which would install a second copy
+  // next to the portable .exe, so the portable build gets the download page instead.
+  if (process.platform === 'win32' && !process.env.PORTABLE_EXECUTABLE_FILE) {
     try {
       await autoUpdater.checkForUpdates();
       return;
@@ -83,7 +99,7 @@ async function checkForUpdatesInteractive() {
       buttons: ['Open Download Page', 'OK'],
     });
     if (response === 0) {
-      shell.openExternal('https://github.com/KurtStevenK/FeatherShot/releases/latest');
+      shell.openExternal(DOWNLOAD_PAGE);
     }
   } catch (e) {
     await dialog.showMessageBox({

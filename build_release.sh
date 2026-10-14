@@ -4,9 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$ROOT"
 
-VERSION="${FEATHERSHOT_VERSION:-1.3.32}"
+VERSION="${FEATHERSHOT_VERSION:-1.3.33}"
 ENTITLEMENTS="${ROOT}/packaging/mac/FeatherShot.entitlements"
-DMG_NAME="FeatherShot-${VERSION}-(macOS).dmg"
+DMG_NAME="FeatherShot-${VERSION}-macOS.dmg"
 
 echo "==> FeatherShot release ${VERSION}"
 

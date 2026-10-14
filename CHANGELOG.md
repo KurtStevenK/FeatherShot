@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.33] - 2026-10-14
+
+### Fixed
+
+- **Windows in-app updates** — **Check for Updates…** never installed an update. electron-updater first downloads `latest.yml` from the latest GitHub release, and the release workflow never uploaded it, so the check failed and the app opened the download page instead. Windows installs stayed on old versions, including v1.3.26 and earlier, where Save & Copy does not work on Electron 44. Releases now include `latest.yml` and the installer's `.blockmap`, so installs from v1.3.16 on update in the app.
+- **Release asset names** — GitHub rewrites parentheses in uploaded file names (`FeatherShot-Setup-1.3.31-(Windows).exe` became `FeatherShot-Setup-1.3.31-.Windows.exe`), so `latest.yml` would still have named a file that does not exist. The assets are now `FeatherShot-Setup-<version>-Windows.exe`, `FeatherShot-<version>-Windows-Portable.exe`, `FeatherShot-<version>-macOS.dmg`, `FeatherShot-<version>-Debian.deb`, `FeatherShot-<version>-Ubuntu.AppImage` and `FeatherShot-<version>-Arch.pacman`.
+- **Chocolatey** — The package downloaded `FeatherShot-Setup-<version>-%28Windows%29.exe`, which GitHub answers with 404. It now uses the installer's asset name, and the Homebrew cask uses the DMG name directly instead of rewriting it.
+
+### Changed
+
+- **Portable Windows build** — **Check for Updates…** opens the download page, because electron-updater updates through the NSIS installer and would install a second copy. A failed update download now shows an error with **Open Download Page** instead of failing silently.
+
+### Added
+
+- **`scripts/verify-release-assets.mjs`** in `npm run verify` — release asset names must survive the GitHub upload, `latest.yml` and the blockmap must be attached to the release, and the Chocolatey and Homebrew URLs must match the built file names.
+- **Update feed check** — `scripts/verify-update-feed.mjs` resolves the Windows update with electron-updater's GitHub provider, as installed apps do, then downloads the installer and checks its SHA-512 and size against `latest.yml`. The Build & Release workflow runs it after publishing each release.
+
 ## [1.3.32] - 2026-10-14
 
 ### Changed
@@ -508,6 +525,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.33]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.32...v1.3.33
 [1.3.32]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.31...v1.3.32
 [1.3.31]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.30...v1.3.31
 [1.3.30]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.29...v1.3.30
