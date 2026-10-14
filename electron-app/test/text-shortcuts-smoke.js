@@ -26,9 +26,14 @@ app.whenReady().then(async () => {
   const page = (js) => editor.webContents.executeJavaScript(js);
   const state = () => page(`({ tool, editing: editingTextId !== null, typed: textEditor.value,
     focused: document.activeElement === textEditor, texts: drawings.map((d) => d.text) })`);
-  const press = (keyCode, modifiers = []) => {
+  // keyDown/keyUp are real input events for the page's key listeners. The character is typed with
+  // execCommand: CI windows never get OS focus, so Chromium drops synthetic 'char' events there,
+  // and webContents.insertText never resolves without a focused window.
+  const press = async (keyCode, modifiers = []) => {
     editor.webContents.sendInputEvent({ type: 'keyDown', keyCode, modifiers });
-    if (modifiers.length === 0) editor.webContents.sendInputEvent({ type: 'char', keyCode });
+    if (keyCode.length === 1 && modifiers.length === 0) {
+      await page(`document.execCommand('insertText', false, ${JSON.stringify(keyCode)})`);
+    }
     editor.webContents.sendInputEvent({ type: 'keyUp', keyCode, modifiers });
   };
   // Resolves once `check(state)` holds; fails with the editor state otherwise.
@@ -48,7 +53,7 @@ app.whenReady().then(async () => {
     document.getElementById('canvas').width === 400 ? resolve() : setTimeout(wait, 50);
   })())`);
 
-  press('t');
+  await press('t');
   await expect((s) => s.tool === 'text', 'T to pick the Text tool');
 
   const [x, y] = await page(`(() => {
@@ -59,17 +64,17 @@ app.whenReady().then(async () => {
   editor.webContents.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 });
   await expect((s) => s.editing && s.focused, 'a click to open a focused text box');
 
-  press('z', ['control']);
-  for (const ch of TYPED) press(ch);
+  await press('z', ['control']);
+  for (const ch of TYPED) await press(ch);
   await expect((s) => s.typed === TYPED, `"${TYPED}" typed into the text box`);
   await expect((s) => s.tool === 'text' && s.editing && s.texts.length === 1, 'no tool switch and no undo while typing');
 
-  press('Enter');
+  await press('Enter');
   await expect((s) => !s.editing && s.texts.join() === TYPED, 'Enter to commit the text');
 
-  press('3');
+  await press('3');
   await expect((s) => s.tool === 'arrow', '3 to pick the Arrow tool after the text is done');
-  press('z', ['control']);
+  await press('z', ['control']);
   await expect((s) => s.texts.length === 0, 'Ctrl+Z to undo the text annotation');
 
   finish(0, `typed "${TYPED}" into a text annotation without switching tools; shortcuts work afterwards`);
