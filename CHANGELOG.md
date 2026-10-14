@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.39] - 2026-10-15
+
+### Changed
+
+- **Chrome extension editor accessibility** — Toolbar buttons have accessible names and a pressed state that follows the active tool, the width and zoom slider announces what it controls, and keyboard focus shows a visible outline.
+
 ## [1.3.38] - 2026-10-15
 
 ### Fixed
@@ -573,6 +579,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.39]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.38...v1.3.39
 [1.3.38]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.37...v1.3.38
 [1.3.37]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.36...v1.3.37
 [1.3.36]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.35...v1.3.36

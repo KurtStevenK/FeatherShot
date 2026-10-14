@@ -5,8 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-VERSION="${FEATHERSHOT_VERSION:-1.3.38}"
-BUILD="${FEATHERSHOT_BUILD:-1338}"
+VERSION="${FEATHERSHOT_VERSION:-1.3.39}"
+BUILD="${FEATHERSHOT_BUILD:-1339}"
 TEAM_ID="${APPLE_TEAM_ID:-XPPUZJDN56}"
 BUNDLE_ID="xyz.kainzmayer.feathershot"
 ENTITLEMENTS="${ROOT}/packaging/mac/FeatherShot-AppStore.entitlements"
