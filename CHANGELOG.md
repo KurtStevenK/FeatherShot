@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.38] - 2026-10-15
+
+### Fixed
+
+- **Chrome extension editor** — The canvas position is read once on mouse down instead of on every mouse move, which removes forced layout work while drawing.
+
 ## [1.3.37] - 2026-10-15
 
 ### Fixed
@@ -567,6 +573,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.38]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.37...v1.3.38
 [1.3.37]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.36...v1.3.37
 [1.3.36]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.35...v1.3.36
 [1.3.35]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.34...v1.3.35

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.37-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.38-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.37:** The Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
+> **New in v1.3.38:** The Chrome extension editor reads the canvas position once per drag instead of on every mouse move. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
 
 ---
 
@@ -68,7 +68,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 ### Verify downloads
 
-Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. The two detections on the v1.3.36 Windows and Linux packages came from an unused library's Windows helper script, which v1.3.37 removes. See [SECURITY.md](SECURITY.md#known-detections).
+Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. The two detections on the v1.3.36 Windows and Linux packages came from an unused library's Windows helper script, which v1.3.38 removes. See [SECURITY.md](SECURITY.md#known-detections).
 
 ---
 
