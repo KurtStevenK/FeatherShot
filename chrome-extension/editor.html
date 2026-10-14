@@ -14,29 +14,29 @@
     </div>
     <div id="toolbar">
       <div class="tool-group">
-        <button id="tool-step" class="tool-btn active" title="Step Arrow">1→</button>
-        <button id="tool-step-rect" class="tool-btn" title="Step Rectangle">1▢</button>
-        <button id="tool-arrow" class="tool-btn" title="Arrow">↗</button>
-        <button id="tool-rect" class="tool-btn" title="Rectangle">▢</button>
-        <button id="tool-circle" class="tool-btn" title="Circle / Ellipse">◯</button>
-        <button id="tool-line" class="tool-btn" title="Line">╱</button>
-        <button id="tool-question-arrow" class="tool-btn" title="Question Arrow">?→</button>
-        <button id="tool-question-rect" class="tool-btn" title="Question Rectangle">?▢</button>
-        <button id="tool-exclamation-arrow" class="tool-btn" title="Exclamation Arrow">!→</button>
-        <button id="tool-exclamation-rect" class="tool-btn" title="Exclamation Rectangle">!▢</button>
-        <button id="tool-text" class="tool-btn" title="Text">T</button>
-        <button id="tool-abc-arrow" class="tool-btn" title="ABC Arrow">a→</button>
-        <button id="tool-abc-rect" class="tool-btn" title="ABC Rectangle">a▢</button>
-        <button id="tool-magnifier" class="tool-btn" title="Magnifier">🔍</button>
+        <button id="tool-step" class="tool-btn active" title="Step Arrow" aria-label="Step Arrow" aria-pressed="true">1→</button>
+        <button id="tool-step-rect" class="tool-btn" title="Step Rectangle" aria-label="Step Rectangle" aria-pressed="false">1▢</button>
+        <button id="tool-arrow" class="tool-btn" title="Arrow" aria-label="Arrow" aria-pressed="false">↗</button>
+        <button id="tool-rect" class="tool-btn" title="Rectangle" aria-label="Rectangle" aria-pressed="false">▢</button>
+        <button id="tool-circle" class="tool-btn" title="Circle / Ellipse" aria-label="Circle or Ellipse" aria-pressed="false">◯</button>
+        <button id="tool-line" class="tool-btn" title="Line" aria-label="Line" aria-pressed="false">╱</button>
+        <button id="tool-question-arrow" class="tool-btn" title="Question Arrow" aria-label="Question Arrow" aria-pressed="false">?→</button>
+        <button id="tool-question-rect" class="tool-btn" title="Question Rectangle" aria-label="Question Rectangle" aria-pressed="false">?▢</button>
+        <button id="tool-exclamation-arrow" class="tool-btn" title="Exclamation Arrow" aria-label="Exclamation Arrow" aria-pressed="false">!→</button>
+        <button id="tool-exclamation-rect" class="tool-btn" title="Exclamation Rectangle" aria-label="Exclamation Rectangle" aria-pressed="false">!▢</button>
+        <button id="tool-text" class="tool-btn" title="Text" aria-label="Text annotation" aria-pressed="false">T</button>
+        <button id="tool-abc-arrow" class="tool-btn" title="ABC Arrow" aria-label="ABC Arrow" aria-pressed="false">a→</button>
+        <button id="tool-abc-rect" class="tool-btn" title="ABC Rectangle" aria-label="ABC Rectangle" aria-pressed="false">a▢</button>
+        <button id="tool-magnifier" class="tool-btn" title="Magnifier" aria-label="Magnifier" aria-pressed="false">🔍</button>
       </div>
       <div class="sep"></div>
-      <input type="color" id="color" value="#FF3B30">
-      <input type="range" id="width" min="2" max="15" value="4">
-      <span id="w-label">4px</span>
+      <input type="color" id="color" value="#FF3B30" title="Color" aria-label="Color">
+      <input type="range" id="width" min="2" max="15" value="4" title="Line Width" aria-label="Line Width">
+      <span id="w-label" aria-hidden="true">4px</span>
       <div class="spacer"></div>
-      <button id="undo" class="act">Undo</button>
-      <button id="clear" class="act danger">Clear</button>
-      <button id="save" class="act primary">💾 Save & Download</button>
+      <button id="undo" class="act" title="Undo" aria-label="Undo last annotation">Undo</button>
+      <button id="clear" class="act danger" title="Clear All" aria-label="Clear all annotations">Clear</button>
+      <button id="save" class="act primary" title="Save & Download" aria-label="Save screenshot and download">💾 Save & Download</button>
     </div>
   </div>
   <script src="letterLabel.js"></script>
