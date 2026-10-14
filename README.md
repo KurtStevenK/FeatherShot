@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.35-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.36-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.35:** On Windows and Linux, a text annotation takes every key you type: **a**, **m**, digits, **-** and **=** no longer switch tools mid-word. **v1.3.34** the macOS editor gets keyboard shortcuts; **v1.3.33** Windows **Check for Updates…** installs new versions in the app.
+> **New in v1.3.36:** Every release is scanned on VirusTotal, and the release notes link each installer's report ([verify downloads](#verify-downloads)). **v1.3.35** Windows and Linux text annotations take every key you type; **v1.3.34** the macOS editor gets keyboard shortcuts.
 
 ---
 
@@ -65,6 +65,10 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 - **macOS (menu bar):** Right-click 🪶 → **Check for Updates…** (or use `brew upgrade --cask feathershot`). Mac App Store and TestFlight installs update through the App Store or TestFlight instead.
 - **Windows / Linux (tray):** Right-click tray icon → **Check for Updates…** (the Windows installer version updates in the app, the portable `.exe` opens the download page; Linux shows `apt` or `pacman` upgrade hints by distro).
+
+### Verify downloads
+
+Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. See [SECURITY.md](SECURITY.md).
 
 ---
 

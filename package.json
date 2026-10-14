@@ -9,6 +9,7 @@
     "verify:capture-crop": "node scripts/verify-capture-crop.mjs",
     "verify:electron-save": "node scripts/verify-electron-save.mjs",
     "verify:release-assets": "node scripts/verify-release-assets.mjs",
+    "scan:virustotal": "node scripts/virustotal-scan.mjs --artifacts-dir electron-app/dist",
     "verify": "npm run sync:shared && npm run verify:letter-label && npm run verify:chrome && npm run verify:electron-ipc && npm run verify:electron-save && npm run verify:capture-crop && npm run verify:release-assets"
   }
 }

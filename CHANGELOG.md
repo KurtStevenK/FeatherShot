@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.36] - 2026-10-14
+
+### Added
+
+- **VirusTotal scans** — After every tagged release, the new VirusTotal workflow downloads the release's installers, the portable `.exe` and the Chrome extension, uploads them to VirusTotal, and appends a table to the release notes with each file's detection counts and a link to its full report. Files are uploaded first and then polled together, so the scan finishes in one queue wait instead of one per file. Files still queued after 45 minutes are listed as pending with their report link. The scan runs after Build & Release, so it does not hold up Homebrew, APT, Arch, Chocolatey or in-app updates. Run it from the Actions tab to scan an older release, or locally with `npm run scan:virustotal` (key in `.env.local`).
+- **SECURITY.md** — Secrets inventory, VirusTotal, repository protection and how to report vulnerabilities. `.env.example` is now committed.
+
+### Changed
+
+- **Repository protection** — `main` no longer accepts force pushes or deletion, and pull requests need the CI checks to pass before they merge. Secret scanning with push protection, Dependabot alerts and security updates, and private vulnerability reporting are on.
+- **`scripts/push-distribution-secrets-to-github.sh`** also uploads `VIRUSTOTAL_API_KEY`, falling back to cursor-auto-runner's `.env.local`.
+
 ## [1.3.35] - 2026-10-14
 
 ### Fixed
