@@ -1,37 +1,8 @@
 {
-  "version": "1.3.28",
-  "published_at": "2026-10-12T23:35:37Z",
+  "version": "1.3.40",
+  "published_at": "2026-10-15T01:04:30Z",
   "bucket": "feathershot.firebasestorage.app",
   "assets": {
-    "macos_dmg": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.macOS.dmg?alt=media",
-      "sha256": "e5f7d2905a40814a420e440b9446e231341ab316a48a41f813031d4a0ed50dd4",
-      "filename": "FeatherShot-1.3.28-.macOS.dmg"
-    },
-    "windows_exe": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-Setup-1.3.28-.Windows.exe?alt=media",
-      "sha256": "08a557eb964406dc83ad898d91d65de9b36d0f69cff2c0698b1045c3439aea6c",
-      "filename": "FeatherShot-Setup-1.3.28-.Windows.exe"
-    },
-    "linux_deb": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Debian.deb?alt=media",
-      "sha256": "d1649833f72ab7e31198b6ff1e6417bdbd4af41372ca6d0af8f3cb7a981f14e2",
-      "filename": "FeatherShot-1.3.28-.Debian.deb"
-    },
-    "linux_appimage": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Ubuntu.AppImage?alt=media",
-      "sha256": "5b4c485d1bed2d7794f520b4a073189c0f5d36eaba601a14ee7818d358b81e73",
-      "filename": "FeatherShot-1.3.28-.Ubuntu.AppImage"
-    },
-    "linux_pacman": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-1.3.28-.Arch.pacman?alt=media",
-      "sha256": "811c71466ef3424a4ee0957c58e0c28beb29a47fe8ae35a9170859685f2d65a9",
-      "filename": "FeatherShot-1.3.28-.Arch.pacman"
-    },
-    "chrome_zip": {
-      "url": "https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.28%2FFeatherShot-Chrome-Extension.zip?alt=media",
-      "sha256": "f2ecefd288f986673d8aa7a029fb1bb3070c66fc6086995c97c0bf7e5e9f0bb5",
-      "filename": "FeatherShot-Chrome-Extension.zip"
-    }
+    "macos_dmg":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-1.3.40-macOS.dmg?alt=media","sha256":"2dc22c3166e19cc6bbf63bb4134fbfbd5b1b02ba5398e2c42f75318747228c49","filename":"FeatherShot-1.3.40-macOS.dmg"},"windows_exe":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-Setup-1.3.40-Windows.exe?alt=media","sha256":"c2572b1eda1eda1e9abe369bda541a579215c02254cea7b1c5d77538aaa35b3e","filename":"FeatherShot-Setup-1.3.40-Windows.exe"},"linux_deb":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-1.3.40-Debian.deb?alt=media","sha256":"eb8fe4c34ad480cb224c46bf196fb007df401f3e4b6441fc66bf00905afaff35","filename":"FeatherShot-1.3.40-Debian.deb"},"linux_appimage":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-1.3.40-Ubuntu.AppImage?alt=media","sha256":"69c9aa8a52ccfd020289a0e23ca47d8aaa9e044e7c27fa30ba92f71afaa60341","filename":"FeatherShot-1.3.40-Ubuntu.AppImage"},"linux_pacman":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-1.3.40-Arch.pacman?alt=media","sha256":"d4f01f903279fa483fe8ed43ceb7cde110b979bda48ae826f6868e6f87a981f1","filename":"FeatherShot-1.3.40-Arch.pacman"},"chrome_zip":{"url":"https://firebasestorage.googleapis.com/v0/b/feathershot.firebasestorage.app/o/releases%2Fv1.3.40%2FFeatherShot-Chrome-Extension.zip?alt=media","sha256":"af1c894cbd1af981a20e140e840cf499bf15694214d25e96c41099493d40b87b","filename":"FeatherShot-Chrome-Extension.zip"}
   }
 }
