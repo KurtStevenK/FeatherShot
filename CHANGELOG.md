@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.41] - 2026-10-15
+
+### Fixed
+
+- **Windows selection overlay** — The overlay is pinned to the full display bounds and raised above the taskbar, so the taskbar can be part of a selection.
+- **Silent capture failures** — When the screen capture after a selection fails or comes back empty, an error dialog shows the reason, the selection and the display layout instead of the editor silently not opening.
+
 ## [1.3.40] - 2026-10-15
 
 ### Fixed
@@ -585,6 +592,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.41]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.40...v1.3.41
 [1.3.40]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.39...v1.3.40
 [1.3.39]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.38...v1.3.39
 [1.3.38]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.37...v1.3.38

@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.40-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.41-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.40:** The CI workflow declares read-only token permissions, which clears the code-scanning alerts on it. **v1.3.39** the Chrome extension editor's toolbar announces each tool and its pressed state to screen readers, and keyboard focus shows a visible ring. **v1.3.38** the editor reads the canvas position once per drag instead of on every mouse move. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
+> **New in v1.3.41:** On Windows the area selector covers the whole screen including the taskbar again, and a failed capture shows an error instead of nothing. **v1.3.40** the CI workflow declares read-only token permissions. **v1.3.39** the Chrome extension editor's toolbar announces each tool and its pressed state to screen readers, and keyboard focus shows a visible ring. **v1.3.38** the editor reads the canvas position once per drag instead of on every mouse move. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
 
 ---
 

@@ -24,7 +24,7 @@ async function captureDisplaysForCrop(crop, displays, desktopCapturer) {
       thumbnailSize: thumbSize,
     });
     const src = matchSourceToDisplay(sources, display, displays);
-    if (!src) continue;
+    if (!src || src.thumbnail.isEmpty()) continue;
     const bitmapSize = src.thumbnail.getSize();
     captured.push({
       thumbnail: src.thumbnail,
@@ -34,7 +34,7 @@ async function captureDisplaysForCrop(crop, displays, desktopCapturer) {
     });
   }
 
-  if (captured.length === 0) return null;
+  if (captured.length === 0) throw new Error('Windows returned an empty screen capture.');
 
   if (captured.length === 1) {
     const c = captured[0];

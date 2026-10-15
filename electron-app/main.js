@@ -85,8 +85,10 @@ function setupIPC() {
       const displays = screen.getAllDisplays();
       const payload = await buildScreenshotFromCrop(crop, displays, desktopCapturer);
       if (payload) openEditor(payload);
+      else reportCaptureFailure('No screen image was returned for the selected area.', crop, displays);
     } catch (e) {
       console.error('Capture failed:', e);
+      reportCaptureFailure(e instanceof Error ? e.message : String(e), crop, displays);
     }
   });
   ipcMain.on('sel-cancel', () => cancelSelection());
@@ -162,6 +164,14 @@ async function offerSaveAs(win, result) {
   }
 }
 
+function reportCaptureFailure(reason, crop, displays) {
+  const layout = displays.map((d) => `${d.id}: ${JSON.stringify(d.bounds)} x${d.scaleFactor}`).join('\n');
+  dialog.showErrorBox(
+    'FeatherShot could not capture the screenshot',
+    `${reason}\n\nSelection: ${JSON.stringify(crop)}\nDisplays:\n${layout}`
+  );
+}
+
 function cancelSelection() {
   closeAll();
 }
@@ -215,9 +225,15 @@ function startSelection() {
       if (process.platform === 'darwin') {
         win.setSimpleFullScreen(true);
       }
-      win.setAlwaysOnTop(true, 'screen-saver');
+      win.setAlwaysOnTop(true, 'screen-saver', 1);
       win.show();
       win.focus();
+      if (process.platform === 'win32') {
+        // Windows can clamp a new window to the work area; pin it to the full display and
+        // raise it above the taskbar, which is topmost too.
+        win.setBounds(display.bounds);
+        win.moveTop();
+      }
     });
     win.on('closed', () => {
       selectionWindows.splice(selectionWindows.indexOf(win), 1);
