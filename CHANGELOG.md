@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.40] - 2026-10-15
+
+### Fixed
+
+- **CI workflow permissions** — `ci.yml` now declares `contents: read` for its GITHUB_TOKEN, so the workflow no longer runs with default token permissions. This clears the five open code-scanning alerts for missing workflow permissions.
+
 ## [1.3.39] - 2026-10-15
 
 ### Changed
@@ -579,6 +585,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.40]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.39...v1.3.40
 [1.3.39]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.38...v1.3.39
 [1.3.38]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.37...v1.3.38
 [1.3.37]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.36...v1.3.37
