@@ -68,7 +68,7 @@ Or **build from source** — see [Build Instructions](#-build-from-source) below
 
 ### Verify downloads
 
-Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. The two detections on the v1.3.36 Windows and Linux packages came from an unused library's Windows helper script, which v1.3.40 removes. See [SECURITY.md](SECURITY.md#known-detections).
+Every release is scanned on [VirusTotal](https://www.virustotal.com). The release notes list each installer's detection count and link to its full multi-engine report. Some engines flag new Electron apps heuristically, so read the whole report rather than a single detection. The two detections on the v1.3.36 Windows and Linux packages came from an unused library's Windows helper script, which v1.3.37 removes. See [SECURITY.md](SECURITY.md#known-detections).
 
 ---
 
