@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.42] - 2026-10-18
+
+### Fixed
+
+- **Windows & Linux: editor not opening after a selection** — The screen was captured only after the selection overlay closed, 150 ms later. That raced the overlay windows being destroyed: on Windows the capture could come back empty, include the dimmed overlay, or never resolve, and then nothing happened. Every display is now captured before the overlay opens, and the selection is cropped from those frozen images. No capture runs after the selection, so the editor opens whenever the overlay could. A capture that does not answer within 15 s is reported as an error instead of hanging. One `desktopCapturer` call is made per distinct physical display size, so same-size monitors share a call and every display stays 1:1.
+- **Selection overlay** — The overlay shows the frozen capture of its display, dimmed, with the selection undimmed, instead of a transparent window over the live desktop. It is an opaque window now, so it no longer depends on Windows handling transparent, frameless, always-on-top windows; what you see is exactly what is cropped.
+- **Save & Copy never fails silently** — When the main process reports a failure, the editor's toolbar shows the reason next to the buttons (in addition to the dialog), and the button is usable again. The result of the IPC call now carries the error text.
+- **Editor page load failures** — If the editor page cannot load, an error dialog says so instead of the window never showing.
+
+### Added
+
+- **Log file** — The app writes `feathershot.log` to its user data folder (`%APPDATA%\FeatherShot` on Windows, `~/.config/FeatherShot` on Linux): version and platform at start, the display layout and the capture timings for every selection, and every save or capture failure. **Show Log File** in the tray menu reveals it, and capture error dialogs name its path, so a failure can be reported without a terminal.
+- **Selection smoke test** — `electron-app/test/selection-smoke.js` starts a selection in real Electron, checks that every display was captured and the overlay shows the frozen capture, finishes the selection and checks that the editor opened with a screenshot of the selected size. CI runs it on Windows and Linux. On a Mac without Screen Recording permission it substitutes a generated capture.
+- **Capture flow checks** — `scripts/verify-capture-flow.mjs` in `npm run verify` covers one call per physical size, the capture timeout, empty thumbnails, single-display 1:1 crops and cross-display composites with a fake `desktopCapturer`.
+
 ## [1.3.41] - 2026-10-15
 
 ### Fixed

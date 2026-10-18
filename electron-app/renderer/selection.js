@@ -3,7 +3,7 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const dimLabel = document.getElementById('dimensions');
 const instructions = document.getElementById('instructions');
-let displayBounds=null, globalBounds=null;
+let displayBounds=null, globalBounds=null, preview=null;
 let selecting=false, gsx=0,gsy=0,gex=0,gey=0;
 
 (async()=>{
@@ -12,6 +12,12 @@ let selecting=false, gsx=0,gsy=0,gex=0,gey=0;
   displayBounds=data.displayBounds;
   globalBounds=data.globalBounds;
   setupCanvas(); render();
+  // The overlay shows the frozen capture of this display; the selection is cropped from the same image.
+  if(data.preview){
+    const img=new Image();
+    img.onload=()=>{preview=img;render();};
+    img.src=data.preview;
+  }
 })();
 
 function setupCanvas(){
@@ -45,6 +51,14 @@ canvas.addEventListener('pointerup',(e)=>{
 });
 document.addEventListener('keydown',(e)=>{if(e.key==='Escape')ipcRenderer.send('sel-cancel');});
 
+// Draws the part of the frozen capture under the window rect (x, y, w, h) in CSS pixels.
+function drawPreview(x,y,w,h){
+  if(!preview){ctx.fillStyle='#000';ctx.fillRect(x,y,w,h);return;}
+  const W=window.innerWidth,H=window.innerHeight;
+  const rx=preview.width/W,ry=preview.height/H;
+  ctx.drawImage(preview,x*rx,y*ry,w*rx,h*ry,x,y,w,h);
+}
+
 function render(){
   if(!displayBounds)return;
   const W=window.innerWidth,H=window.innerHeight;
@@ -52,7 +66,8 @@ function render(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  // Semi-transparent dark overlay — window is transparent, so desktop shows through dimly
+  drawPreview(0,0,W,H);
+  // Dim the frozen capture; the selection shows it undimmed.
   ctx.fillStyle='rgba(0,0,0,0.45)';
   ctx.fillRect(0,0,W,H);
   if(!selecting&&gsx===gex)return;
@@ -60,7 +75,7 @@ function render(){
   const lx=sx-displayBounds.x,ly=sy-displayBounds.y;
   const cx=Math.max(0,lx),cy=Math.max(0,ly),cr=Math.min(W,lx+sw),cb=Math.min(H,ly+sh);
   if(cr>cx&&cb>cy){
-    ctx.clearRect(cx,cy,cr-cx,cb-cy); // Clear to transparent — shows live desktop
+    drawPreview(cx,cy,cr-cx,cb-cy);
     ctx.strokeStyle='#0a84ff';ctx.lineWidth=2;ctx.setLineDash([6,3]);
     ctx.strokeRect(lx,ly,sw,sh);ctx.setLineDash([]);
   }

@@ -676,8 +676,9 @@ function saveAndCopy() {
       }
       const arrayBuffer = await blob.arrayBuffer();
       // The main process reports failures in a dialog; on failure keep the editor open.
-      const { ok } = await ipcRenderer.invoke('save-and-copy', arrayBuffer);
-      if (!ok) throw new Error('Save & Copy did not complete');
+      const { ok, error } = await ipcRenderer.invoke('save-and-copy', arrayBuffer);
+      if (!ok) throw new Error(error || 'Save & Copy did not complete');
+      showSaveStatus('', false);
       btn.textContent = '✓ Saved & Copied!';
       btn.style.background = '#30d158';
       setTimeout(() => {
@@ -685,11 +686,22 @@ function saveAndCopy() {
       }, 800);
     } catch (err) {
       console.error('Save & Copy failed:', err);
+      // Never fail silently: the toolbar shows why, and the button is usable again.
+      showSaveStatus(err && err.message ? err.message : String(err), true);
       btn.disabled = false;
       btn.textContent = originalText;
       btn.style.background = originalBackground;
     }
   }, 'image/png');
+}
+
+function showSaveStatus(message, isError) {
+  const status = document.getElementById('save-status');
+  if (!status) return;
+  status.textContent = message;
+  status.title = message;
+  status.classList.toggle('error', Boolean(isError));
+  status.hidden = !message;
 }
 
 // Initial state

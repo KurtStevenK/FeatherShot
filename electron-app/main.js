@@ -12,13 +12,22 @@ const {
   clipboard,
   ClipboardItem,
   dialog,
+  shell,
 } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { initUpdater, checkForUpdatesInteractive } = require('./updater');
-const { buildScreenshotFromCrop } = require('./capture');
+const { captureAllDisplays, cropCaptures, previewDataUrl } = require('./capture');
 const { saveAndCopy, defaultFileName } = require('./save-and-copy');
+const logger = require('./log');
+const { log } = logger;
+
+// The tray menu is still fading out when "Take Screenshot" is clicked; capturing at once puts it in the shot.
+const MENU_CLOSE_SETTLE_MS = 120;
+
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
+// Frozen captures of every display, taken before the overlay opened; the selection is cropped from them.
+let pendingCaptures = null, pendingDisplays = null, capturing = false;
 const windowData = new Map();
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -42,6 +51,8 @@ if (!gotTheLock) {
 
 app.whenReady().then(() => {
   if (!gotTheLock) return;
+  logger.init(app.getPath('userData'));
+  log(`FeatherShot ${app.getVersion()} starting on ${process.platform} ${process.getSystemVersion()}, Electron ${process.versions.electron}`);
   if (process.platform === 'darwin') app.dock.hide();
   setupSecurity();
   initUpdater(refreshTrayMenu);
@@ -54,6 +65,7 @@ function buildTrayMenu() {
     { label: 'Take Screenshot', click: () => startSelection() },
     { type: 'separator' },
     { label: 'Check for Updates…', click: () => checkForUpdatesInteractive() },
+    { label: 'Show Log File', click: () => showLogFile() },
     { label: `Version ${app.getVersion()}`, enabled: false },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() },
@@ -71,6 +83,17 @@ function createTray() {
   tray.on('click',()=>startSelection());
 }
 
+function showLogFile() {
+  const logPath = logger.getLogPath();
+  if (!logPath) return;
+  try {
+    if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, '');
+    shell.showItemInFolder(logPath);
+  } catch (e) {
+    dialog.showErrorBox('FeatherShot', `The log file is at:\n${logPath}`);
+  }
+}
+
 function setupIPC() {
   ipcMain.handle('sel-init-request',(event)=>{
     try{const w=BrowserWindow.fromWebContents(event.sender);return w?windowData.get(w.id):null;}catch(e){return null;}
@@ -79,21 +102,10 @@ function setupIPC() {
     for(const w of [...selectionWindows]){try{if(w&&!w.isDestroyed()&&w.webContents)w.webContents.send('sel-update',data);}catch(e){}}
   });
 
-  ipcMain.on('sel-done', async (event, crop) => {
-    closeAll();
-    try {
-      const displays = screen.getAllDisplays();
-      const payload = await buildScreenshotFromCrop(crop, displays, desktopCapturer);
-      if (payload) openEditor(payload);
-      else reportCaptureFailure('No screen image was returned for the selected area.', crop, displays);
-    } catch (e) {
-      console.error('Capture failed:', e);
-      reportCaptureFailure(e instanceof Error ? e.message : String(e), crop, displays);
-    }
-  });
+  ipcMain.on('sel-done', (event, crop) => finishSelection(crop));
   ipcMain.on('sel-cancel', () => cancelSelection());
 
-  // Returns { ok } — ok closes the editor; on any failure it stays open so annotations are not lost.
+  // Returns { ok, error? } — ok closes the editor; on any failure it stays open so annotations are not lost.
   ipcMain.handle('save-and-copy', async (event, pngBytes) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     try {
@@ -103,30 +115,32 @@ function setupIPC() {
         ClipboardItem,
       });
       if (result.saveError) {
-        console.error('Save to Downloads failed:', result.saveError);
+        log('Save to Downloads failed:', result.saveError);
         const savedAs = await offerSaveAs(win, result);
-        return { ok: savedAs };
+        return savedAs ? { ok: true } : { ok: false, error: `Could not save to Downloads: ${result.saveError}` };
       }
       if (result.copyError) {
-        console.error('Copy to clipboard failed:', result.copyError);
+        log('Copy to clipboard failed:', result.copyError, 'saved', result.filePath);
         await dialog.showMessageBox(win, {
           type: 'warning',
           title: 'FeatherShot',
           message: 'Could not copy to the clipboard',
           detail: `${result.copyError}\n\nThe screenshot was saved as ${path.basename(result.filePath)} in Downloads.`,
         });
-        return { ok: false };
+        return { ok: false, error: `Saved to Downloads, but the clipboard failed: ${result.copyError}` };
       }
+      log('Saved and copied', result.filePath);
       return { ok: true, filePath: result.filePath };
     } catch (e) {
-      console.error('Save & Copy failed:', e);
+      log('Save & Copy failed:', e);
+      const message = e instanceof Error ? e.message : String(e);
       await dialog.showMessageBox(win, {
         type: 'error',
         title: 'FeatherShot',
         message: 'Save & Copy failed',
-        detail: e instanceof Error ? e.message : String(e),
+        detail: message,
       });
-      return { ok: false };
+      return { ok: false, error: message };
     }
   });
 }
@@ -152,8 +166,10 @@ async function offerSaveAs(win, result) {
   if (canceled || !filePath) return false;
   try {
     await fs.promises.writeFile(filePath, result.buffer);
+    log('Saved as', filePath);
     return true;
   } catch (e) {
+    log('Save As failed:', e);
     await dialog.showMessageBox(win, {
       type: 'error',
       title: 'FeatherShot',
@@ -164,16 +180,23 @@ async function offerSaveAs(win, result) {
   }
 }
 
+function describeDisplays(displays) {
+  return displays.map((d) => `${d.id}: ${JSON.stringify(d.bounds)} x${d.scaleFactor}`).join('\n');
+}
+
 function reportCaptureFailure(reason, crop, displays) {
-  const layout = displays.map((d) => `${d.id}: ${JSON.stringify(d.bounds)} x${d.scaleFactor}`).join('\n');
+  log('Capture failed:', reason, 'selection', crop || '-', 'displays', displays.map((d) => ({ id: d.id, bounds: d.bounds, scaleFactor: d.scaleFactor })));
+  const where = crop ? `Selection: ${JSON.stringify(crop)}\n` : '';
   dialog.showErrorBox(
     'FeatherShot could not capture the screenshot',
-    `${reason}\n\nSelection: ${JSON.stringify(crop)}\nDisplays:\n${layout}`
+    `${reason}\n\n${where}Displays:\n${describeDisplays(displays)}\n\nLog file: ${logger.getLogPath()}`
   );
 }
 
 function cancelSelection() {
   closeAll();
+  pendingCaptures = null;
+  pendingDisplays = null;
 }
 
 function registerSelectionEscapeShortcut() {
@@ -202,23 +225,47 @@ function closeAll() {
   }
 }
 
-function startSelection() {
-  closeAll();
-  const displays=screen.getAllDisplays();
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function startSelection() {
+  if (capturing) return;
+  capturing = true;
+  cancelSelection();
+  const displays = screen.getAllDisplays();
+  try {
+    await delay(MENU_CLOSE_SETTLE_MS);
+    log('Capturing displays:', displays.map((d) => ({ id: d.id, bounds: d.bounds, scaleFactor: d.scaleFactor })));
+    const started = Date.now();
+    const captures = await captureAllDisplays(displays, desktopCapturer, { log });
+    log(`Captured ${captures.length} of ${displays.length} display(s) in ${Date.now() - started} ms`);
+    pendingCaptures = captures;
+    pendingDisplays = displays;
+    openSelectionOverlays(displays, captures);
+  } catch (e) {
+    reportCaptureFailure(e instanceof Error ? e.message : String(e), null, displays);
+  } finally {
+    capturing = false;
+  }
+}
+
+function openSelectionOverlays(displays, captures) {
   let mnX=Infinity,mnY=Infinity,mxX=-Infinity,mxY=-Infinity;
   for(const d of displays){mnX=Math.min(mnX,d.bounds.x);mnY=Math.min(mnY,d.bounds.y);mxX=Math.max(mxX,d.bounds.x+d.bounds.width);mxY=Math.max(mxY,d.bounds.y+d.bounds.height);}
   globalBounds={minX:mnX,minY:mnY,maxX:mxX,maxY:mxY};
 
-  // Overlays first; capture only overlapped displays after selection (see capture.js)
   for(const display of displays){
+    const capture = captures.find((c) => c.display.id === display.id);
+    // Opaque: the overlay shows the frozen capture, so nothing depends on window transparency.
     const win=new BrowserWindow({
       x:display.bounds.x,y:display.bounds.y,width:display.bounds.width,height:display.bounds.height,
-      frame:false,transparent:true,alwaysOnTop:true,skipTaskbar:true,
+      frame:false,transparent:false,alwaysOnTop:true,skipTaskbar:true,
       resizable:false,movable:false,hasShadow:false,focusable:true,
-      fullscreenable:true,backgroundColor:'#00000000',show:false,
+      fullscreenable:true,backgroundColor:'#000000',show:false,
       webPreferences:{nodeIntegration:true,contextIsolation:false}
     });
-    windowData.set(win.id,{displayBounds:display.bounds,globalBounds});
+    windowData.set(win.id,{displayBounds:display.bounds,globalBounds,preview:capture?previewDataUrl(capture):null});
     win.loadFile(path.join(__dirname,'renderer','selection.html'));
     win.once('ready-to-show', () => {
       if (win.isDestroyed()) return;
@@ -245,6 +292,30 @@ function startSelection() {
   registerSelectionEscapeShortcut();
 }
 
+function finishSelection(crop) {
+  closeAll();
+  const captures = pendingCaptures;
+  const displays = pendingDisplays || screen.getAllDisplays();
+  pendingCaptures = null;
+  pendingDisplays = null;
+  if (!captures) {
+    reportCaptureFailure('The selection ended without a screen capture to crop from. Please try again.', crop, displays);
+    return null;
+  }
+  try {
+    const payload = cropCaptures(crop, captures, displays);
+    if (!payload) {
+      reportCaptureFailure('No captured display covers the selected area.', crop, displays);
+      return null;
+    }
+    log('Selection', crop, '->', typeof payload === 'string' ? `${payload.length} chars data URL` : `composite ${payload.width}x${payload.height}`);
+    return openEditor(payload);
+  } catch (e) {
+    reportCaptureFailure(e instanceof Error ? e.message : String(e), crop, displays);
+    return null;
+  }
+}
+
 function openEditor(screenshotData) {
   if(editorWindow){try{editorWindow.close();}catch(e){}}
   const wa=screen.getPrimaryDisplay().workAreaSize;
@@ -256,16 +327,22 @@ function openEditor(screenshotData) {
 
   editorWindow=new BrowserWindow({width:w,height:h,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
     webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
-  editorWindow.loadFile(path.join(__dirname,'renderer','index.html'));
+  const win = editorWindow;
+  win.loadFile(path.join(__dirname,'renderer','index.html'));
 
   // Simple, reliable: send data after page loads, then show window
-  editorWindow.webContents.once('did-finish-load',()=>{
-    if(!editorWindow||editorWindow.isDestroyed()) return;
-    editorWindow.webContents.send('load-screenshot', screenshotData);
-    editorWindow.show();
-    editorWindow.focus();
+  win.webContents.once('did-finish-load',()=>{
+    if(win.isDestroyed()) return;
+    win.webContents.send('load-screenshot', screenshotData);
+    win.show();
+    win.focus();
   });
-  editorWindow.on('closed',()=>{editorWindow=null;});
+  win.webContents.once('did-fail-load', (event, code, description, url) => {
+    log('Editor page failed to load:', code, description, url);
+    dialog.showErrorBox('FeatherShot could not open the editor', `${description} (${code})\n${url}\n\nLog file: ${logger.getLogPath()}`);
+  });
+  win.on('closed',()=>{ if (editorWindow === win) editorWindow=null; });
+  return win;
 }
 
 function setupSecurity() {
@@ -300,3 +377,11 @@ function setupSecurity() {
 
 app.on('window-all-closed', (e) => e.preventDefault());
 app.on('will-quit', () => globalShortcut.unregisterAll());
+
+// Test hooks for the real-Electron smoke tests (electron-app/test/*.js).
+module.exports = {
+  startSelection,
+  finishSelection,
+  getSelectionWindows: () => selectionWindows,
+  getEditorWindow: () => editorWindow,
+};

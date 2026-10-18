@@ -64,7 +64,8 @@ jobs:
         run: node test/check-dependencies.js
 
   # Real Electron: open the editor, click Save & Copy, check Downloads and the clipboard;
-  # then type tool keys into a text annotation and check they stay text.
+  # type tool keys into a text annotation and check they stay text; then run a whole
+  # selection (capture every display, overlay, crop) and check the editor opens.
   electron-save-smoke:
     needs: shared
     strategy:
@@ -105,6 +106,16 @@ jobs:
         if: runner.os == 'Linux'
         working-directory: electron-app
         run: xvfb-run -a npx electron --no-sandbox test/text-shortcuts-smoke.js
+
+      - name: Selection smoke test (Windows)
+        if: runner.os == 'Windows'
+        working-directory: electron-app
+        run: npx electron test/selection-smoke.js
+
+      - name: Selection smoke test (Linux, Xvfb)
+        if: runner.os == 'Linux'
+        working-directory: electron-app
+        run: xvfb-run -a npx electron --no-sandbox test/selection-smoke.js
 
   chrome:
     runs-on: ubuntu-latest
