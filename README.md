@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.42-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.43-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.42:** Windows and Linux capture every screen before the area selector opens and crop the selection from that frozen image, so the editor no longer fails to open after a selection; the selector shows the frozen screen; Save & Copy shows any failure in the toolbar; and **Show Log File** in the tray menu opens a log for bug reports. **v1.3.41** the Windows selector covers the taskbar and a failed capture shows an error. **v1.3.40** the CI workflow declares read-only token permissions. **v1.3.39** the Chrome extension editor's toolbar announces each tool to screen readers. **v1.3.38** the editor reads the canvas position once per drag. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
+> **New in v1.3.43:** On Windows, releasing the mouse now always ends the area selection: the main process finishes the selection from the release it receives, the overlay also treats a document-level mouse-up or a pointer move without a pressed button as the release, and pointer-capture losses are written to the log. **v1.3.42** every screen is captured before the selector opens and the selection is cropped from that frozen image, Save & Copy shows failures in the toolbar, and **Show Log File** in the tray menu opens a log for bug reports. **v1.3.41** the Windows selector covers the taskbar. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
 
 ---
 

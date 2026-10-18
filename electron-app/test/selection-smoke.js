@@ -84,14 +84,19 @@ app.whenReady().then(async () => {
   );
   if (preview.width <= 0 || preview.height <= 0) return finish(1, `overlay preview is ${preview.width}x${preview.height}`);
 
-  // Drag on the primary display: 300×200 DIP starting 40,40 inside it.
+  // Drag on the primary display with real mouse input events (the overlay's pointer handlers,
+  // pointer capture included): 300×200 DIP starting 40,40 inside it.
   const crop = { x: primary.bounds.x + 40, y: primary.bounds.y + 40, width: 300, height: 200 };
-  const down = { type: 'down', gx: crop.x, gy: crop.y };
-  const up = { type: 'up', gx: crop.x + crop.width, gy: crop.y + crop.height };
-  await overlay.webContents.executeJavaScript(
-    `require('electron').ipcRenderer.send('sel-mouse', ${JSON.stringify(down)});` +
-      `require('electron').ipcRenderer.send('sel-mouse', ${JSON.stringify(up)}); true`
-  );
+  const local = (gx, gy) => ({ x: gx - primary.bounds.x, y: gy - primary.bounds.y });
+  const mouse = (type, gx, gy, extra = {}) =>
+    overlay.webContents.sendInputEvent({ type, ...local(gx, gy), button: 'left', clickCount: 1, ...extra });
+  await waitFor(() => overlay.webContents.executeJavaScript('displayBounds !== null'), 'the overlay to initialise');
+  // Sent back-to-back: the machine's real cursor also sits on the overlay, and a real mouse move with
+  // no button pressed in the middle of the synthetic drag would count as the release.
+  mouse('mouseDown', crop.x, crop.y);
+  mouse('mouseMove', crop.x + 150, crop.y + 100, { modifiers: ['leftButtonDown'] });
+  mouse('mouseMove', crop.x + crop.width, crop.y + crop.height, { modifiers: ['leftButtonDown'] });
+  mouse('mouseUp', crop.x + crop.width, crop.y + crop.height);
 
   const editor = await waitFor(() => main.getEditorWindow(), 'the editor window');
   await waitFor(() => editor.isVisible(), 'the editor to show');

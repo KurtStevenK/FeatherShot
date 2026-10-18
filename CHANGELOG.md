@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.43] - 2026-10-19
+
+### Fixed
+
+- **Windows: the area selection never ended** — In v1.3.42 the overlay could be dragged, but releasing the mouse did nothing and the overlay stayed. The release depended on the overlay's canvas receiving `pointerup` under pointer capture, which Windows does not always deliver, and on the overlay then sending a separate "done" message. The main process now finishes the selection itself from the release it already receives from the overlays, exactly once however many displays there are. The overlay reports the release from `pointerup`, from a document-level `mouseup`, or from the first pointer move that arrives with no button pressed, so a lost pointer capture no longer leaves the selection open. `pointercancel`, `lostpointercapture`, a failed `setPointerCapture` and a window blur during a drag are written to the log, together with every selection start and end and which path reported the release.
+- **Multi-monitor duplicate finishes** — Every overlay used to send its own "done" message on release, so a selection on a three-monitor setup finished three times: v1.3.41 and earlier then captured and opened the editor repeatedly, and v1.3.42 would have shown error dialogs after the first. One release now ends the selection once.
+
+### Changed
+
+- **Selection smoke test** — Drives the overlay with real mouse input events (press, drag, release through the canvas's pointer handlers and pointer capture) instead of injected IPC messages, so CI on Windows and Linux checks the pointer path itself.
+
 ## [1.3.42] - 2026-10-18
 
 ### Fixed

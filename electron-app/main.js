@@ -27,7 +27,7 @@ const MENU_CLOSE_SETTLE_MS = 120;
 
 let tray=null, editorWindow=null, selectionWindows=[], globalBounds=null;
 // Frozen captures of every display, taken before the overlay opened; the selection is cropped from them.
-let pendingCaptures = null, pendingDisplays = null, capturing = false;
+let pendingCaptures = null, pendingDisplays = null, capturing = false, dragStart = null;
 const windowData = new Map();
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -98,11 +98,26 @@ function setupIPC() {
   ipcMain.handle('sel-init-request',(event)=>{
     try{const w=BrowserWindow.fromWebContents(event.sender);return w?windowData.get(w.id):null;}catch(e){return null;}
   });
+  // Every overlay mirrors the drag; the main process finishes the selection on 'up' itself, so one
+  // release ends it exactly once, however many overlays there are and whichever one saw the release.
   ipcMain.on('sel-mouse',(event,data)=>{
     for(const w of [...selectionWindows]){try{if(w&&!w.isDestroyed()&&w.webContents)w.webContents.send('sel-update',data);}catch(e){}}
+    if (data.type === 'down') {
+      dragStart = { gx: data.gx, gy: data.gy };
+      log('Selection down at', data.gx, data.gy);
+    } else if (data.type === 'up') {
+      if (!dragStart) return;
+      const start = dragStart;
+      dragStart = null;
+      const crop = {
+        x: Math.min(start.gx, data.gx), y: Math.min(start.gy, data.gy),
+        width: Math.abs(data.gx - start.gx), height: Math.abs(data.gy - start.gy),
+      };
+      log('Selection up at', data.gx, data.gy, data.via ? `via ${data.via}` : '', '->', crop);
+      if (crop.width >= 10 && crop.height >= 10) finishSelection(crop);
+    }
   });
-
-  ipcMain.on('sel-done', (event, crop) => finishSelection(crop));
+  ipcMain.on('sel-log', (event, ...parts) => log('[overlay]', ...parts));
   ipcMain.on('sel-cancel', () => cancelSelection());
 
   // Returns { ok, error? } — ok closes the editor; on any failure it stays open so annotations are not lost.
@@ -195,6 +210,7 @@ function reportCaptureFailure(reason, crop, displays) {
 
 function cancelSelection() {
   closeAll();
+  dragStart = null;
   pendingCaptures = null;
   pendingDisplays = null;
 }
@@ -294,6 +310,7 @@ function openSelectionOverlays(displays, captures) {
 
 function finishSelection(crop) {
   closeAll();
+  dragStart = null;
   const captures = pendingCaptures;
   const displays = pendingDisplays || screen.getAllDisplays();
   pendingCaptures = null;
