@@ -82,7 +82,17 @@ widthSlider.oninput = (e) => {
     wLabel.textContent = lw + 'px';
   }
 };
-document.getElementById('undo').onclick = () => {
+document.getElementById('undo').onclick = undo;
+document.getElementById('clear').onclick = () => {
+  if (drawings.length === 0) return;
+  if (!confirm('Are you sure you want to clear all annotations?')) return;
+  drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0;
+  render();
+  updateActionStates();
+};
+document.getElementById('save').onclick = saveAndDownload;
+
+function undo() {
   if (drawings.length) {
     const r = drawings.pop();
     if (r.tool === 'step') stepN--;
@@ -90,10 +100,25 @@ document.getElementById('undo').onclick = () => {
     if (r.tool === 'abc-arrow') abcAN--;
     if (r.tool === 'abc-rect') abcRN--;
     render();
+    updateActionStates();
   }
-};
-document.getElementById('clear').onclick = () => { drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0; render(); };
-document.getElementById('save').onclick = saveAndDownload;
+}
+
+function updateActionStates() {
+  const hasDrawings = drawings.length > 0;
+  const undoBtn = document.getElementById('undo');
+  const clearBtn = document.getElementById('clear');
+  if (undoBtn) undoBtn.disabled = !hasDrawings;
+  if (clearBtn) clearBtn.disabled = !hasDrawings;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (editingTextId) return;
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+    e.preventDefault();
+    undo();
+  }
+});
 
 function setTool(t) {
   if (tool === 'text' && t !== 'text') commitTextEdit();
@@ -221,6 +246,7 @@ canvas.onmouseup = (e) => {
   }
   dragging = false;
   render();
+  updateActionStates();
 };
 
 function render() {
@@ -367,6 +393,7 @@ function commitTextEdit() {
   else drawings[idx].text = trimmed;
   hideTextEditor();
   render();
+  updateActionStates();
 }
 function hideTextEditor() {
   editingTextId = null;
@@ -445,3 +472,6 @@ function saveAndDownload() {
   btn.style.background = '#30d158';
   setTimeout(() => { btn.textContent = '💾 Save & Download'; btn.style.background = ''; }, 1500);
 }
+
+// Initial state
+updateActionStates();

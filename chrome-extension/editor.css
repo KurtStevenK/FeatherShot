@@ -89,6 +89,7 @@ body {
   transition: all .15s;
 }
 .act:hover { background: #333; }
+.act:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 .act.danger { color: #ff453a; }
 .act.danger:hover { background: rgba(255,69,58,.15); }
 .act.primary { background: #0a84ff; color: #fff; border-color: #0a84ff; font-weight: 600; }
