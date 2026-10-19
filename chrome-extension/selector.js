@@ -27,11 +27,33 @@
   document.body.appendChild(hint);
 
   let startX = 0, startY = 0, selecting = false;
+  let currentX = 0, currentY = 0;
+  let renderRequested = false;
+
+  function updateSelectionUI() {
+    if (!selecting) return;
+    const x = Math.min(currentX, startX);
+    const y = Math.min(currentY, startY);
+    const w = Math.abs(currentX - startX);
+    const h = Math.abs(currentY - startY);
+
+    sel.style.left = x + 'px';
+    sel.style.top = y + 'px';
+    sel.style.width = w + 'px';
+    sel.style.height = h + 'px';
+
+    dim.textContent = `${w} × ${h}`;
+    dim.style.display = 'block';
+    dim.style.left = (currentX + 12) + 'px';
+    dim.style.top = (currentY + 12) + 'px';
+  }
 
   overlay.addEventListener('mousedown', (e) => {
     selecting = true;
     startX = e.clientX;
     startY = e.clientY;
+    currentX = e.clientX;
+    currentY = e.clientY;
     sel.style.display = 'block';
     sel.style.left = startX + 'px';
     sel.style.top = startY + 'px';
@@ -41,27 +63,26 @@
     overlay.style.background = 'transparent'; // Let box-shadow handle dimming
   });
 
+  // Performance: Throttle DOM layout updates during mousemove to requestAnimationFrame.
+  // High polling rate mice (500-1000Hz) cause excessive layout thrashing if DOM style updates run synchronously on every event.
   overlay.addEventListener('mousemove', (e) => {
     if (!selecting) return;
-    const x = Math.min(e.clientX, startX);
-    const y = Math.min(e.clientY, startY);
-    const w = Math.abs(e.clientX - startX);
-    const h = Math.abs(e.clientY - startY);
+    currentX = e.clientX;
+    currentY = e.clientY;
 
-    sel.style.left = x + 'px';
-    sel.style.top = y + 'px';
-    sel.style.width = w + 'px';
-    sel.style.height = h + 'px';
-
-    dim.textContent = `${w} × ${h}`;
-    dim.style.display = 'block';
-    dim.style.left = (e.clientX + 12) + 'px';
-    dim.style.top = (e.clientY + 12) + 'px';
+    if (!renderRequested) {
+      renderRequested = true;
+      requestAnimationFrame(() => {
+        updateSelectionUI();
+        renderRequested = false;
+      });
+    }
   });
 
   overlay.addEventListener('mouseup', (e) => {
     if (!selecting) return;
     selecting = false;
+    renderRequested = false;
     dim.style.display = 'none';
 
     const x = Math.min(e.clientX, startX);
