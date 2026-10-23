@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.44] - 2026-10-23
+
+### Changed
+
+- macOS, Windows and Linux editor: redesigned in the website's look — deep navy bars, grouped tool palette with the blue → cyan selection, color swatches with a custom color, and Save & Copy as the gradient primary button with its shortcut.
+- The screenshot opens at its original size (1:1, one screenshot pixel per screen pixel) and is shrunk to fit only when it is bigger than the window. The bottom bar has zoom out, zoom level (menu on macOS), zoom in, **Fit** and **1:1**; ⌘/Ctrl + `+`, `-`, `0` (original size) and `9` (fit) and trackpad pinch / Ctrl+wheel zoom too. Exports stay 1:1 at any zoom.
+
+### Fixed
+
+- Small screenshots no longer open a window too narrow for the toolbar: the editor window is sized for the screenshot plus its bars and never gets narrower than every control needs, so Save & Copy is always visible without resizing.
+
 ## [1.3.43] - 2026-10-19
 
 ### Fixed

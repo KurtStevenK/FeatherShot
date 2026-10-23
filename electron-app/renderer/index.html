@@ -8,19 +8,22 @@
 </head>
 <body>
   <div id="editor">
-    <div id="canvas-container">
-      <canvas id="canvas"></canvas>
-      <textarea id="text-editor" class="text-editor-hidden" rows="1" aria-label="Text annotation input"></textarea>
-    </div>
-
-    <div id="toolbar">
-      <div class="tool-group">
+    <div id="toolbar" class="bar">
+      <div class="group">
         <button id="tool-step-arrow" class="tool-btn active" title="Step Arrow (1)" aria-label="Step Arrow (Shortcut: 1)" aria-pressed="true">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="8" fill="currentColor">1</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M11 13L19 5M19 5H13.5M19 5V10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="7" cy="17" r="5.5" fill="currentColor"/><text x="7" y="20" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">1</text></svg>
         </button>
         <button id="tool-step-rect" class="tool-btn" title="Step Rectangle (2)" aria-label="Step Rectangle (Shortcut: 2)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="7" fill="currentColor">1</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12.5 5H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="6.5" cy="6.5" r="5.5" fill="currentColor"/><text x="6.5" y="9.5" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">1</text></svg>
         </button>
+        <button id="tool-abc-arrow" class="tool-btn" title="ABC Arrow (9)" aria-label="ABC Arrow (Shortcut: 9)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M11 13L19 5M19 5H13.5M19 5V10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="7" cy="17" r="5.5" fill="currentColor"/><text x="7" y="20" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">a</text></svg>
+        </button>
+        <button id="tool-abc-rect" class="tool-btn" title="ABC Rectangle (0)" aria-label="ABC Rectangle (Shortcut: 0)" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12.5 5H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="6.5" cy="6.5" r="5.5" fill="currentColor"/><text x="6.5" y="9.5" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">a</text></svg>
+        </button>
+      </div>
+      <div class="group">
         <button id="tool-arrow" class="tool-btn" title="Arrow (3)" aria-label="Arrow (Shortcut: 3)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
         </button>
@@ -33,52 +36,88 @@
         <button id="tool-line" class="tool-btn" title="Line (6)" aria-label="Line (Shortcut: 6)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><line x1="5" y1="19" x2="19" y2="5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
+      </div>
+      <div class="group">
         <button id="tool-question-arrow" class="tool-btn" title="Question Arrow (7)" aria-label="Question Arrow (Shortcut: 7)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="8" font-weight="bold" fill="currentColor">?</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M11 13L19 5M19 5H13.5M19 5V10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="7" cy="17" r="5.5" fill="currentColor"/><text x="7" y="20" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">?</text></svg>
         </button>
         <button id="tool-question-rect" class="tool-btn" title="Question Rectangle (8)" aria-label="Question Rectangle (Shortcut: 8)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="7" font-weight="bold" fill="currentColor">?</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12.5 5H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="6.5" cy="6.5" r="5.5" fill="currentColor"/><text x="6.5" y="9.5" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">?</text></svg>
         </button>
         <button id="tool-exclamation-arrow" class="tool-btn" title="Exclamation Arrow (-)" aria-label="Exclamation Arrow (Shortcut: -)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="9" font-weight="bold" fill="currentColor">!</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M11 13L19 5M19 5H13.5M19 5V10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="7" cy="17" r="5.5" fill="currentColor"/><text x="7" y="20" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">!</text></svg>
         </button>
         <button id="tool-exclamation-rect" class="tool-btn" title="Exclamation Rectangle (=)" aria-label="Exclamation Rectangle (Shortcut: =)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="8" font-weight="bold" fill="currentColor">!</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12.5 5H19a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="6.5" cy="6.5" r="5.5" fill="currentColor"/><text x="6.5" y="9.5" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="800" fill="#12122a">!</text></svg>
         </button>
+      </div>
+      <div class="group">
         <button id="tool-text" class="tool-btn" title="Text (T)" aria-label="Text annotation (Shortcut: T)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 5h12M12 5v14M8 19h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-        <button id="tool-abc-arrow" class="tool-btn" title="ABC Arrow (9)" aria-label="ABC Arrow (Shortcut: 9)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="6" cy="17" r="4" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="6" y="20" text-anchor="middle" font-size="8" fill="currentColor">a</text><path d="M9 14L18 7M18 7H12M18 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-        </button>
-        <button id="tool-abc-rect" class="tool-btn" title="ABC Rectangle (0)" aria-label="ABC Rectangle (Shortcut: 0)" aria-pressed="false">
-          <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.5" fill="none"/><text x="5" y="7.5" text-anchor="middle" font-size="7" fill="currentColor">a</text><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
         </button>
         <button id="tool-magnifier" class="tool-btn" title="Magnifier (M)" aria-label="Magnifier (Shortcut: M)" aria-pressed="false">
           <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="10" cy="10" r="6" stroke="currentColor" stroke-width="2" fill="none"/><line x1="14.5" y1="14.5" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="10" x2="12" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="8" x2="10" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
+      <div class="group colors">
+        <button class="swatch active" data-color="#FF3B30" style="--swatch: #FF3B30" title="Red" aria-label="Red" aria-pressed="true"></button>
+        <button class="swatch" data-color="#FF9500" style="--swatch: #FF9500" title="Orange" aria-label="Orange" aria-pressed="false"></button>
+        <button class="swatch" data-color="#FFCC00" style="--swatch: #FFCC00" title="Yellow" aria-label="Yellow" aria-pressed="false"></button>
+        <button class="swatch" data-color="#34C759" style="--swatch: #34C759" title="Green" aria-label="Green" aria-pressed="false"></button>
+        <button class="swatch" data-color="#0A84FF" style="--swatch: #0A84FF" title="Blue" aria-label="Blue" aria-pressed="false"></button>
+        <button class="swatch" data-color="#AF52DE" style="--swatch: #AF52DE" title="Purple" aria-label="Purple" aria-pressed="false"></button>
+        <button class="swatch" data-color="#FFFFFF" style="--swatch: #FFFFFF" title="White" aria-label="White" aria-pressed="false"></button>
+        <label class="swatch custom" title="Custom color">
+          <input type="color" id="color-picker" value="#FF3B30" aria-label="Custom color">
+        </label>
+      </div>
+    </div>
 
-      <div class="separator"></div>
-
-      <div class="tool-group">
-        <input type="color" id="color-picker" value="#FF3B30" title="Color" aria-label="Color">
-        <div class="width-control">
-          <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width" aria-label="Line Width">
-          <span id="width-label" aria-hidden="true">4px</span>
+    <div id="canvas-container">
+      <div id="stage">
+        <div id="canvas-wrap">
+          <canvas id="canvas"></canvas>
+          <textarea id="text-editor" class="text-editor-hidden" rows="1" aria-label="Text annotation input"></textarea>
         </div>
+      </div>
+    </div>
+
+    <div id="actionbar" class="bar">
+      <div class="group zoom">
+        <button id="zoom-out" class="tool-btn small" title="Zoom Out (Ctrl+-)" aria-label="Zoom out">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <span id="zoom-label" aria-live="polite">100%</span>
+        <button id="zoom-in" class="tool-btn small" title="Zoom In (Ctrl++)" aria-label="Zoom in">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 12h12M12 6v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="group-divider"></div>
+        <button id="zoom-fit" class="tool-btn text active" title="Fit in Window (Ctrl+9)" aria-label="Fit in window" aria-pressed="true">Fit</button>
+        <button id="zoom-actual" class="tool-btn text" title="Original Size (Ctrl+0)" aria-label="Original size" aria-pressed="false">1:1</button>
+      </div>
+
+      <div class="group stroke">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M4 6h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 12h16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M4 18h16" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+        <input type="range" id="line-width" min="2" max="15" value="4" title="Line Width" aria-label="Line Width">
+        <span id="width-label" aria-hidden="true">4px</span>
       </div>
 
       <div class="spacer"></div>
 
-      <div class="tool-group actions">
-        <span id="save-status" role="status" aria-live="polite" hidden></span>
-        <button id="btn-undo" class="action-btn" title="Undo (Ctrl+Z)" aria-label="Undo last annotation (Shortcut: Ctrl+Z)">Undo</button>
-        <button id="btn-clear" class="action-btn danger" title="Clear All" aria-label="Clear all annotations">Clear</button>
-        <button id="btn-save" class="action-btn primary" title="Save & Copy (Ctrl+S)" aria-label="Save screenshot and copy to clipboard (Shortcut: Ctrl+S)">
-          💾 Save & Copy
-        </button>
-      </div>
+      <span id="save-status" role="status" aria-live="polite" hidden></span>
+      <button id="btn-undo" class="action-btn ghost" title="Undo (Ctrl+Z)" aria-label="Undo last annotation (Shortcut: Ctrl+Z)">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M9 14L4 9l5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <span>Undo</span>
+      </button>
+      <button id="btn-clear" class="action-btn danger" title="Clear All" aria-label="Clear all annotations">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Clear</span>
+      </button>
+      <button id="btn-save" class="action-btn primary" title="Save & Copy (Ctrl+S)" aria-label="Save screenshot and copy to clipboard (Shortcut: Ctrl+S)">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="label">Save &amp; Copy</span>
+        <kbd>Ctrl S</kbd>
+      </button>
     </div>
   </div>
 

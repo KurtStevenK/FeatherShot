@@ -6,6 +6,7 @@ enum EditorShortcut: Equatable {
     case select(Tool)
     case undo
     case saveAndCopy
+    case zoomIn, zoomOut, actualSize, zoomToFit
 
     /// Tool keys by the character they type, so `-`, `=` and `+` follow the keyboard layout
     /// (on a German keyboard `=` is ⇧0).
@@ -28,13 +29,19 @@ enum EditorShortcut: Equatable {
 
     /// The shortcut for a key press, or nil to let the key through.
     /// While a text annotation is being edited its keys belong to the text field; only ⌘S
-    /// still works, because Save & Copy commits the text first.
+    /// (Save & Copy commits the text first) and the ⌘ zoom keys still work.
     static func match(_ characters: String, modifiers: EventModifiers, isEditingText: Bool) -> EditorShortcut? {
         if modifiers.contains(.command) {
-            guard modifiers.isDisjoint(with: [.shift, .option, .control]) else { return nil }
+            guard modifiers.isDisjoint(with: [.option, .control]) else { return nil }
+            // ⌘+ is ⌘⇧= on a US keyboard and its own key on a German one.
+            if characters == "+" || characters == "=" { return .zoomIn }
+            guard !modifiers.contains(.shift) else { return nil }
             switch characters.lowercased() {
             case "s": return .saveAndCopy
             case "z": return isEditingText ? nil : .undo
+            case "-": return .zoomOut
+            case "0": return .actualSize
+            case "9": return .zoomToFit
             default: return nil
             }
         }

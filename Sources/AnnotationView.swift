@@ -18,7 +18,7 @@ struct AnnotationView: View {
     @State private var currentEnd: CGPoint?
     
     @State private var selectedTool: Tool = .stepArrow
-    @State private var selectedColor: Color = .red
+    @State private var selectedColor: Color = EditorTheme.swatches[0]
     @State private var lineWidth: CGFloat = 4.0
     @State private var zoomLevel: CGFloat = 2.0
     @State private var isSaved = false
@@ -26,6 +26,10 @@ struct AnnotationView: View {
     @State private var editingTextBuffer: String = ""
     @State private var draggingTextId: UUID?
     @State private var textGestureStart: CGPoint?
+    @State private var zoom: EditorZoom = .fit
+    /// The canvas area minus its margins, where `.fit` has to fit the screenshot.
+    @State private var viewport: CGSize = .zero
+    @State private var pinchBaseScale: CGFloat?
     @FocusState private var focus: EditorFocus?
 
     /// Keyboard focus: the canvas receives the shortcuts, a text field receives typing.
@@ -34,36 +38,12 @@ struct AnnotationView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Scrollable image area — allows large screenshots to scroll
-            // instead of pushing the toolbar off-screen
-            ScrollView([.horizontal, .vertical]) {
-                ZStack(alignment: .center) {
-                    Color.black.opacity(0.12)
-                    
-                    drawingContent
-                        .frame(width: image.size.width, height: image.size.height)
-                        .background(Color.white.opacity(0.05))
-                        .overlay(
-                            Rectangle()
-                                .stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                        )
-                        .overlay(textEditingOverlay)
-                        .shadow(color: .black.opacity(0.2), radius: 10)
-                        .contentShape(Rectangle())
-                        .gesture(canvasDragGesture)
-                }
-                .frame(width: max(image.size.width, 600), height: max(image.size.height, 300))
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
-            // Holds keyboard focus so the shortcuts work without clicking first.
-            .focusable()
-            .focusEffectDisabled()
-            .focused($focus, equals: .canvas)
-
-            // Toolbar — always visible at the bottom
-            toolbar
+            toolBar
+            canvasArea
+            actionBar
         }
+        .background(EditorTheme.background)
+        .environment(\.colorScheme, .dark)
         .onKeyPress(phases: [.down, .repeat]) { press in handleKeyPress(press) }
         // Focuses the canvas on appear and the text field while one is open. As a task this runs
         // after the update that adds or removes the field, so focus lands on a view that exists.
@@ -75,6 +55,66 @@ struct AnnotationView: View {
             finish()
         }
         #endif
+    }
+
+    // MARK: - Layout
+
+    /// Space around the screenshot inside the canvas area.
+    static let canvasMargin: CGFloat = 28
+    static let toolBarHeight: CGFloat = 52
+    static let actionBarHeight: CGFloat = 56
+    /// Narrowest window in which both bars show every control.
+    static let minimumWidth: CGFloat = 800
+
+    /// The scale the screenshot is shown at right now.
+    private var displayScale: CGFloat {
+        zoom.resolved(image: image.size, viewport: viewport)
+    }
+
+    /// The screenshot at the current zoom, centered in the window and scrollable when it is bigger.
+    private var canvasArea: some View {
+        GeometryReader { geo in
+            let margin = Self.canvasMargin
+            let available = CGSize(width: max(1, geo.size.width - 2 * margin), height: max(1, geo.size.height - 2 * margin))
+            let scale = zoom.resolved(image: image.size, viewport: available)
+            ScrollView([.horizontal, .vertical]) {
+                stage(scale: scale)
+                    .padding(margin)
+                    .frame(minWidth: geo.size.width, minHeight: geo.size.height)
+            }
+            .onAppear { viewport = available }
+            .onChange(of: available) { _, newValue in viewport = newValue }
+        }
+        .background(EditorCanvasBackdrop())
+        .clipped()
+        // Holds keyboard focus so the shortcuts work without clicking first.
+        .focusable()
+        .focusEffectDisabled()
+        .focused($focus, equals: .canvas)
+        // Trackpad pinch zooms around the current scale.
+        .simultaneousGesture(
+            MagnifyGesture()
+                .onChanged { value in
+                    let base = pinchBaseScale ?? displayScale
+                    pinchBaseScale = base
+                    zoom = .scale(EditorZoom.clamp(base * value.magnification))
+                }
+                .onEnded { _ in pinchBaseScale = nil }
+        )
+    }
+
+    /// The annotated screenshot drawn at `scale`. Drawing happens in image points, so the
+    /// gesture converts from the scaled view back to the image.
+    private func stage(scale: CGFloat) -> some View {
+        drawingContent
+            .scaleEffect(scale, anchor: .topLeading)
+            .frame(width: image.size.width * scale, height: image.size.height * scale, alignment: .topLeading)
+            .overlay(Rectangle().strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
+            .shadow(color: .black.opacity(0.55), radius: 24, y: 10)
+            .shadow(color: EditorTheme.blue.opacity(0.12), radius: 40)
+            .overlay(alignment: .topLeading) { textEditingOverlay(scale: scale) }
+            .contentShape(Rectangle())
+            .gesture(canvasDragGesture(scale: scale))
     }
 
     // This view is used for BOTH the UI and the ImageRenderer
@@ -166,254 +206,243 @@ struct AnnotationView: View {
         .clipped()
     }
     
-    var toolbar: some View {
+    // MARK: - Bars
+
+    private struct ToolItem {
+        let tool: Tool
+        let icon: String
+        let name: String
+        let key: String
+    }
+
+    /// The tool palette, in groups: counters, shapes, markers, then text and magnifier.
+    private static let toolGroups: [[ToolItem]] = [
+        [
+            ToolItem(tool: .stepArrow, icon: "list.number", name: "Step Arrow", key: "1"),
+            ToolItem(tool: .stepRectangle, icon: "number.square", name: "Step Rectangle", key: "2"),
+            ToolItem(tool: .abcArrow, icon: "textformat.abc", name: "ABC Arrow", key: "9"),
+            ToolItem(tool: .abcRectangle, icon: "character.textbox", name: "ABC Rectangle", key: "0"),
+        ],
+        [
+            ToolItem(tool: .arrow, icon: "arrow.up.right", name: "Arrow", key: "3"),
+            ToolItem(tool: .rectangle, icon: "square", name: "Rectangle", key: "4"),
+            ToolItem(tool: .circle, icon: "circle", name: "Circle", key: "5"),
+            ToolItem(tool: .line, icon: "line.diagonal", name: "Line", key: "6"),
+        ],
+        [
+            ToolItem(tool: .questionArrow, icon: "questionmark.circle", name: "Question Arrow", key: "7"),
+            ToolItem(tool: .questionRectangle, icon: "questionmark.square", name: "Question Rectangle", key: "8"),
+            ToolItem(tool: .exclamationArrow, icon: "exclamationmark.circle", name: "Exclamation Arrow", key: "-"),
+            ToolItem(tool: .exclamationRectangle, icon: "exclamationmark.square", name: "Exclamation Rectangle", key: "="),
+        ],
+        [
+            ToolItem(tool: .text, icon: "character.cursor.ibeam", name: "Text", key: "T"),
+            ToolItem(tool: .magnifier, icon: "plus.magnifyingglass", name: "Magnifier", key: "M"),
+        ],
+    ]
+
+    /// Top bar: the tools and the annotation color.
+    private var toolBar: some View {
         HStack(spacing: 8) {
-            // Tool Selection — counting tools first, then plain tools, then special tools
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 0) {
-                    // Tool 1: Step Arrow
-                    Button(action: { selectedTool = .stepArrow }) {
-                        Image(systemName: "list.number")
-                            .padding(8)
-                            .background(selectedTool == .stepArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .stepArrow ? .white : .primary)
+            Spacer(minLength: 0)
+            ForEach(Self.toolGroups.indices, id: \.self) { index in
+                EditorGroup {
+                    ForEach(Self.toolGroups[index], id: \.tool) { item in
+                        Button { selectTool(item.tool) } label: {
+                            Image(systemName: item.icon)
+                        }
+                        .buttonStyle(EditorIconButtonStyle(isSelected: selectedTool == item.tool))
+                        .help("\(item.name) (\(item.key))")
                     }
-                    .buttonStyle(.plain)
-                    .help("Step Arrow (1)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 2: Step Rectangle
-                    Button(action: { selectedTool = .stepRectangle }) {
-                        Image(systemName: "number.square")
-                            .padding(8)
-                            .background(selectedTool == .stepRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .stepRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Step Rectangle (2)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 3: Arrow
-                    Button(action: { selectedTool = .arrow }) {
-                        Image(systemName: "arrow.up.right")
-                            .padding(8)
-                            .background(selectedTool == .arrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .arrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Arrow (3)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 4: Rectangle
-                    Button(action: { selectedTool = .rectangle }) {
-                        Image(systemName: "square")
-                            .padding(8)
-                            .background(selectedTool == .rectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .rectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Rectangle (4)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 5: Circle/Ellipse (moved here from end)
-                    Button(action: { selectedTool = .circle }) {
-                        Image(systemName: "circle")
-                            .padding(8)
-                            .background(selectedTool == .circle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .circle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Circle (5)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 6: Line
-                    Button(action: { selectedTool = .line }) {
-                        Image(systemName: "line.diagonal")
-                            .padding(8)
-                            .background(selectedTool == .line ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .line ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Line (6)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 7: Question Arrow
-                    Button(action: { selectedTool = .questionArrow }) {
-                        Image(systemName: "questionmark.circle")
-                            .padding(8)
-                            .background(selectedTool == .questionArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .questionArrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Question Arrow (7)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 8: Question Rectangle
-                    Button(action: { selectedTool = .questionRectangle }) {
-                        Image(systemName: "questionmark.square")
-                            .padding(8)
-                            .background(selectedTool == .questionRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .questionRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Question Rectangle (8)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    Button(action: { selectedTool = .exclamationArrow }) {
-                        Image(systemName: "exclamationmark.circle")
-                            .padding(8)
-                            .background(selectedTool == .exclamationArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .exclamationArrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Exclamation Arrow (-)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    Button(action: { selectedTool = .exclamationRectangle }) {
-                        Image(systemName: "exclamationmark.square")
-                            .padding(8)
-                            .background(selectedTool == .exclamationRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .exclamationRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Exclamation Rectangle (=)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    Button(action: { selectedTool = .text }) {
-                        Image(systemName: "character.cursor.ibeam")
-                            .padding(8)
-                            .background(selectedTool == .text ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .text ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Text (T)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 9: ABC Arrow
-                    Button(action: { selectedTool = .abcArrow }) {
-                        Image(systemName: "textformat.abc")
-                            .padding(8)
-                            .background(selectedTool == .abcArrow ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .abcArrow ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("ABC Arrow (9)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 10: ABC Rectangle
-                    Button(action: { selectedTool = .abcRectangle }) {
-                        Image(systemName: "character.textbox")
-                            .padding(8)
-                            .background(selectedTool == .abcRectangle ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .abcRectangle ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("ABC Rectangle (0)")
-                    
-                    Divider().frame(height: 20)
-                    
-                    // Tool 11: Magnifier
-                    Button(action: { selectedTool = .magnifier }) {
-                        Image(systemName: "magnifyingglass")
-                            .padding(8)
-                            .background(selectedTool == .magnifier ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTool == .magnifier ? .white : .primary)
-                    }
-                    .buttonStyle(.plain)
-                    .help("Magnifier (M)")
-                }
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(8)
-                .fixedSize()
-            }
-
-            Divider().frame(height: 24)
-
-            // Color Selection
-            ColorPicker("", selection: $selectedColor)
-                .labelsHidden()
-                .fixedSize()
-
-            // Line Width / Zoom Level
-            HStack(spacing: 8) {
-                if selectedTool == .magnifier {
-                    Slider(value: $zoomLevel, in: 1.5...5.0, step: 0.5)
-                        .frame(width: 80)
-                    Text("\(String(format: "%.1f", zoomLevel))×")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.secondary)
-                        .frame(width: 30)
-                } else {
-                    Slider(value: $lineWidth, in: 2...15)
-                        .frame(width: 80)
-                    Text("\(Int(lineWidth))px")
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.secondary)
-                        .frame(width: 30)
                 }
             }
-            .fixedSize()
-
-            Spacer(minLength: 12)
-
-            // Actions
-            HStack(spacing: 10) {
-                Button("Undo", action: undo)
-                .buttonStyle(.plain)
-                .disabled(drawings.isEmpty)
-                .font(.caption)
-                .help("Undo (⌘Z)")
-
-                Button("Clear") {
-                    drawings.removeAll()
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(.red)
-                .font(.caption)
-
-                Button(action: finish) {
-                    HStack(spacing: 6) {
-                        Image(systemName: isSaved ? "checkmark" : "square.and.arrow.down.on.square")
-                        Text(isSaved ? "Saved & Copied!" : "Save & Copy")
-                            .fontWeight(.bold)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(isSaved ? Color.green : Color.blue)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
-                .help("Save & Copy (⌘S)")
-            }
-            .fixedSize()
+            colorPicker
+            Spacer(minLength: 0)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(Color(NSColor.windowBackgroundColor))
-        .frame(minWidth: 550)
+        .frame(height: Self.toolBarHeight)
+        .background(EditorTheme.bar)
+        .overlay(alignment: .bottom) { EditorTheme.border.frame(height: 1) }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var colorPicker: some View {
+        EditorGroup {
+            HStack(spacing: 5) {
+                ForEach(EditorTheme.swatches.indices, id: \.self) { index in
+                    let swatch = EditorTheme.swatches[index]
+                    let isSelected = swatch == selectedColor
+                    Button { selectedColor = swatch } label: {
+                        Circle()
+                            .fill(swatch)
+                            .frame(width: 16, height: 16)
+                            .overlay(Circle().strokeBorder(Color.black.opacity(0.25), lineWidth: 1))
+                            .padding(3)
+                            .overlay(Circle().strokeBorder(isSelected ? Color.white : .clear, lineWidth: 1.5))
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                // The system color well, hidden under a rainbow swatch that still passes its clicks.
+                let isCustom = !EditorTheme.swatches.contains(selectedColor)
+                ZStack {
+                    ColorPicker("Custom color", selection: $selectedColor, supportsOpacity: false)
+                        .labelsHidden()
+                        .frame(width: 22, height: 22)
+                        .opacity(0.02)
+                    Circle()
+                        .fill(AngularGradient(colors: [.red, .yellow, .green, .cyan, .blue, .purple, .red], center: .center))
+                        .overlay(Circle().fill(isCustom ? selectedColor : .clear).padding(4))
+                        .frame(width: 16, height: 16)
+                        .padding(3)
+                        .overlay(Circle().strokeBorder(isCustom ? Color.white : .clear, lineWidth: 1.5))
+                        .allowsHitTesting(false)
+                }
+                .help("Custom color")
+            }
+            .padding(.horizontal, 4)
+            .frame(height: 30)
+        }
+    }
+
+    /// Bottom bar: zoom and stroke on the left, the actions on the right.
+    private var actionBar: some View {
+        HStack(spacing: 10) {
+            zoomControl
+            strokeControl
+            Spacer(minLength: 12)
+
+            Button(action: undo) {
+                Label("Undo", systemImage: "arrow.uturn.backward")
+            }
+            .buttonStyle(EditorPillButtonStyle(kind: .ghost))
+            .disabled(drawings.isEmpty)
+            .help("Undo (⌘Z)")
+
+            Button { drawings.removeAll() } label: {
+                Label("Clear", systemImage: "trash")
+            }
+            .buttonStyle(EditorPillButtonStyle(kind: .danger))
+            .disabled(drawings.isEmpty)
+            .help("Remove all annotations")
+
+            Button(action: finish) {
+                HStack(spacing: 7) {
+                    Image(systemName: isSaved ? "checkmark" : "square.and.arrow.down.on.square")
+                    Text(isSaved ? "Saved & Copied" : "Save & Copy")
+                    if !isSaved {
+                        Text("⌘S")
+                            .font(.system(size: 10.5, weight: .semibold, design: .rounded))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 1.5)
+                            .background(Capsule().fill(Color.white.opacity(0.18)))
+                    }
+                }
+            }
+            .buttonStyle(EditorPillButtonStyle(kind: isSaved ? .success : .primary))
+            .help("Save to Downloads and copy to the clipboard (⌘S)")
+        }
+        .labelStyle(.titleAndIcon)
+        .padding(.horizontal, 16)
+        .frame(height: Self.actionBarHeight)
+        .background(EditorTheme.bar)
+        .overlay(alignment: .top) { EditorTheme.border.frame(height: 1) }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var zoomControl: some View {
+        let scale = displayScale
+        return EditorGroup {
+            Button { zoomOut() } label: { Image(systemName: "minus") }
+                .buttonStyle(EditorIconButtonStyle(size: 28))
+                .disabled(EditorZoom.zoomedOut(from: scale) == nil)
+                .help("Zoom Out (⌘-)")
+
+            Menu {
+                ForEach(EditorZoom.levels.reversed(), id: \.self) { level in
+                    Button(EditorZoom.percent(level)) { zoom = .scale(level) }
+                }
+            } label: {
+                Text(EditorZoom.percent(scale))
+                    .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                    .foregroundStyle(EditorTheme.text)
+                    .frame(width: 46, height: 28)
+                    .contentShape(Rectangle())
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .help("Zoom level")
+
+            Button { zoomIn() } label: { Image(systemName: "plus") }
+                .buttonStyle(EditorIconButtonStyle(size: 28))
+                .disabled(EditorZoom.zoomedIn(from: scale) == nil)
+                .help("Zoom In (⌘+)")
+
+            EditorTheme.border.frame(width: 1, height: 18).padding(.horizontal, 3)
+
+            Button { zoom = .fit } label: { Text("Fit").font(.system(size: 11.5, weight: .semibold)) }
+                .buttonStyle(EditorIconButtonStyle(isSelected: zoom == .fit, size: 34))
+                .help("Fit in Window (⌘9)")
+
+            Button { zoom = .scale(1) } label: { Text("1:1").font(.system(size: 11.5, weight: .semibold)) }
+                .buttonStyle(EditorIconButtonStyle(isSelected: zoom == .scale(1), size: 34))
+                .help("Original Size (⌘0)")
+        }
+    }
+
+    /// Line width, or the lens zoom while the magnifier is selected.
+    private var strokeControl: some View {
+        EditorGroup {
+            HStack(spacing: 8) {
+                Image(systemName: selectedTool == .magnifier ? "plus.magnifyingglass" : "lineweight")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(EditorTheme.muted)
+                if selectedTool == .magnifier {
+                    Slider(value: $zoomLevel, in: 1.5...5.0, step: 0.5)
+                        .frame(width: 84)
+                    Text("\(String(format: "%.1f", zoomLevel))×")
+                        .frame(width: 34, alignment: .trailing)
+                } else {
+                    Slider(value: $lineWidth, in: 2...15)
+                        .frame(width: 84)
+                    Text("\(Int(lineWidth)) px")
+                        .frame(width: 34, alignment: .trailing)
+                }
+            }
+            .font(.system(size: 11, weight: .medium).monospacedDigit())
+            .foregroundStyle(EditorTheme.muted)
+            .controlSize(.small)
+            .tint(EditorTheme.blue)
+            .padding(.horizontal, 8)
+            .frame(height: 28)
+            .help(selectedTool == .magnifier ? "Magnifier zoom" : "Line width")
+        }
+    }
+
+    private func selectTool(_ tool: Tool) {
+        // Mid-drag, the gesture would end under the new tool and leave its preview behind.
+        if currentStart == nil && textGestureStart == nil {
+            selectedTool = tool
+        }
+    }
+
+    private func zoomIn() {
+        if let next = EditorZoom.zoomedIn(from: displayScale) { zoom = .scale(next) }
+    }
+
+    private func zoomOut() {
+        if let next = EditorZoom.zoomedOut(from: displayScale) { zoom = .scale(next) }
     }
 
     @ViewBuilder
-    private var textEditingOverlay: some View {
+    private func textEditingOverlay(scale: CGFloat) -> some View {
         if let id = editingTextId,
            let idx = drawings.firstIndex(where: { $0.id == id }) {
             TextField("Text", text: $editingTextBuffer)
                 .textFieldStyle(.roundedBorder)
-                .frame(width: min(280, image.size.width * 0.4))
-                .position(x: drawings[idx].start.x, y: drawings[idx].start.y)
+                .frame(width: min(280, max(140, image.size.width * scale * 0.4)))
+                .position(x: drawings[idx].start.x * scale, y: drawings[idx].start.y * scale)
                 .focused($focus, equals: .text(id))
                 .onSubmit { commitTextEdit() }
                 // Tab and ⇧Tab (U+0019) end the edit like Return, instead of moving focus to the
@@ -437,9 +466,13 @@ struct AnnotationView: View {
 
     private var isEditingText: Bool { openTextId != nil }
 
-    private var canvasDragGesture: some Gesture {
-        DragGesture(minimumDistance: 0)
+    /// Drawing in image points: the view shows the image at `scale`.
+    private func canvasDragGesture(scale: CGFloat) -> some Gesture {
+        let toImage = { (point: CGPoint) in CGPoint(x: point.x / scale, y: point.y / scale) }
+        return DragGesture(minimumDistance: 0)
             .onChanged { value in
+                let startLocation = toImage(value.startLocation)
+                let location = toImage(value.location)
                 // Clicking the canvas ends text editing, as in the Electron editor; otherwise
                 // the open text field would keep blocking the shortcuts.
                 if isEditingText && currentStart == nil && textGestureStart == nil {
@@ -447,23 +480,25 @@ struct AnnotationView: View {
                 }
                 if selectedTool == .text {
                     if draggingTextId == nil, textGestureStart == nil {
-                        textGestureStart = value.startLocation
-                        if let hit = textHit(at: value.startLocation) {
+                        textGestureStart = startLocation
+                        if let hit = textHit(at: startLocation) {
                             draggingTextId = hit
                         }
                     }
                     if let id = draggingTextId,
                        let idx = drawings.firstIndex(where: { $0.id == id }) {
-                        drawings[idx].start = value.location
+                        drawings[idx].start = location
                     }
                     return
                 }
                 if currentStart == nil {
-                    currentStart = value.startLocation
+                    currentStart = startLocation
                 }
-                currentEnd = value.location
+                currentEnd = location
             }
             .onEnded { value in
+                let startLocation = toImage(value.startLocation)
+                let location = toImage(value.location)
                 if selectedTool == .text {
                     defer {
                         draggingTextId = nil
@@ -473,15 +508,15 @@ struct AnnotationView: View {
                     if dist > 6 {
                         return
                     }
-                    if let hit = textHit(at: value.startLocation) {
+                    if let hit = textHit(at: startLocation) {
                         editingTextId = hit
                         editingTextBuffer = drawings.first(where: { $0.id == hit })?.text ?? ""
                         return
                     }
                     let element = DrawingElement(
                         tool: .text,
-                        start: value.location,
-                        end: value.location,
+                        start: location,
+                        end: location,
                         color: selectedColor,
                         lineWidth: lineWidth,
                         text: "Text",
@@ -496,7 +531,7 @@ struct AnnotationView: View {
                     let element = DrawingElement(
                         tool: selectedTool,
                         start: start,
-                        end: value.location,
+                        end: location,
                         color: selectedColor,
                         lineWidth: lineWidth,
                         zoomLevel: zoomLevel
@@ -549,10 +584,15 @@ struct AnnotationView: View {
         }
         switch shortcut {
         case .select(let tool):
-            // Mid-drag, the gesture would end under the new tool and leave its preview behind.
-            if currentStart == nil && textGestureStart == nil {
-                selectedTool = tool
-            }
+            selectTool(tool)
+        case .zoomIn:
+            zoomIn()
+        case .zoomOut:
+            zoomOut()
+        case .actualSize:
+            zoom = .scale(1)
+        case .zoomToFit:
+            zoom = .fit
         case .undo:
             undo()
         case .saveAndCopy:

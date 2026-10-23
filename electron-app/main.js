@@ -335,15 +335,18 @@ function finishSelection(crop) {
 
 function openEditor(screenshotData) {
   if(editorWindow){try{editorWindow.close();}catch(e){}}
-  const wa=screen.getPrimaryDisplay().workAreaSize;
-  let w=700,h=400;
-  if(typeof screenshotData==='string'){
-    const img=nativeImage.createFromDataURL(screenshotData);
-    const sz=img.getSize(); w=Math.min(Math.max(sz.width,700),wa.width-80); h=Math.min(Math.max(sz.height+80,400),wa.height-80);
-  } else { w=Math.min(Math.max(screenshotData.width,700),wa.width-80); h=Math.min(Math.max(screenshotData.height+80,400),wa.height-80); }
+  // Size the window for the screenshot at 1:1 plus the editor's bars; a bigger screenshot opens
+  // fitted (the editor's default zoom). The minimum keeps every toolbar control visible.
+  const display=screen.getPrimaryDisplay(), wa=display.workAreaSize, sf=display.scaleFactor||1;
+  const px=typeof screenshotData==='string'?nativeImage.createFromDataURL(screenshotData).getSize():screenshotData;
+  const CHROME_H=52+56, MARGIN=28, MIN_W=Math.min(820,wa.width-40);
+  const w=Math.round(Math.min(Math.max(px.width/sf+2*MARGIN,MIN_W),wa.width-40));
+  const h=Math.round(Math.min(Math.max(px.height/sf+2*MARGIN,220)+CHROME_H,wa.height-60));
 
-  editorWindow=new BrowserWindow({width:w,height:h,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
-    webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:600,minHeight:360});
+  editorWindow=new BrowserWindow({width:w,height:h,useContentSize:true,title:'FeatherShot Editor',icon:path.join(__dirname,'assets','icon.png'),
+    backgroundColor:'#0e0e22',webPreferences:{nodeIntegration:true,contextIsolation:false},show:false,autoHideMenuBar:true,resizable:true,minWidth:MIN_W,minHeight:CHROME_H+160});
+  // No menu: its View > Zoom accelerators would zoom the page instead of the screenshot.
+  editorWindow.removeMenu();
   const win = editorWindow;
   win.loadFile(path.join(__dirname,'renderer','index.html'));
 

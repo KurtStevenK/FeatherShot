@@ -48,7 +48,20 @@ document.getElementById('tool-abc-rect').addEventListener('click', () => setTool
 document.getElementById('tool-magnifier').addEventListener('click', () => setTool('magnifier'));
 
 // Controls
-document.getElementById('color-picker').addEventListener('input', (e) => { color = e.target.value; });
+const swatches = document.querySelectorAll('.swatch');
+const customSwatch = document.querySelector('.swatch.custom');
+function setColor(value, swatch) {
+  color = value;
+  swatches.forEach((s) => {
+    s.classList.toggle('active', s === swatch);
+    if (!s.classList.contains('custom')) s.setAttribute('aria-pressed', s === swatch);
+  });
+  if (swatch === customSwatch) customSwatch.style.setProperty('--swatch', value);
+}
+swatches.forEach((s) => {
+  if (s.dataset.color) s.addEventListener('click', () => setColor(s.dataset.color, s));
+});
+document.getElementById('color-picker').addEventListener('input', (e) => setColor(e.target.value, customSwatch));
 lineWidthSlider.addEventListener('input', (e) => {
   if (tool === 'magnifier') {
     zoomLevel = parseFloat(e.target.value);
@@ -64,10 +77,19 @@ document.getElementById('btn-undo').addEventListener('click', undo);
 document.getElementById('btn-clear').addEventListener('click', clearAll);
 document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
+document.getElementById('zoom-in').addEventListener('click', zoomIn);
+document.getElementById('zoom-out').addEventListener('click', zoomOut);
+document.getElementById('zoom-fit').addEventListener('click', () => setZoom('fit'));
+document.getElementById('zoom-actual').addEventListener('click', () => setZoom(1));
+if (navigator.platform.startsWith('Mac')) document.querySelector('#btn-save kbd').textContent = '⌘S';
+
 // Keyboard shortcuts
+const ZOOM_KEYS = { '+': zoomIn, '=': zoomIn, '-': zoomOut, '0': () => setZoom(1), '9': () => setZoom('fit') };
 document.addEventListener('keydown', (e) => {
   // Save & Copy commits the text first, so it also works while a text annotation is being edited.
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); return; }
+  // Ctrl/Cmd with + - 0 9 zooms the view; without the modifier those keys select tools.
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && ZOOM_KEYS[e.key]) { e.preventDefault(); ZOOM_KEYS[e.key](); return; }
   // Otherwise the text box gets every key: tool keys are text there, and Ctrl+Z is its own undo.
   if (editingTextId) return;
   if (e.key === '1') setTool('step-arrow');
@@ -109,6 +131,7 @@ ipcRenderer.on('load-screenshot', (event, data) => {
           snapshot.getContext('2d').drawImage(canvas, 0, 0);
           screenshotImage = snapshot;
           render();
+          applyZoom();
         }
       };
       img.src = p.dataUrl;
@@ -123,9 +146,78 @@ function loadScreenshot(dataUrl) {
     canvas.width = img.width;
     canvas.height = img.height;
     render();
+    applyZoom();
   };
   img.src = dataUrl;
 }
+
+// --- Zoom ---
+// The same levels and rules as the macOS editor (Sources/EditorZoom.swift). 'fit' shows the
+// screenshot at 1:1, shrunk to fit the window when it is bigger. Exports are always 1:1.
+const ZOOM_LEVELS = [0.1, 0.25, 0.33, 0.5, 0.67, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8];
+const container = document.getElementById('canvas-container');
+let zoomMode = 'fit';
+let displayScale = 1;
+
+function fitScale() {
+  const margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--canvas-margin')) || 0;
+  const w = canvas.width / devicePixelRatio, h = canvas.height / devicePixelRatio;
+  const availW = container.clientWidth - 2 * margin, availH = container.clientHeight - 2 * margin;
+  if (w <= 0 || h <= 0 || availW <= 0 || availH <= 0) return 1;
+  return Math.max(ZOOM_LEVELS[0], Math.min(1, availW / w, availH / h));
+}
+
+// Sizes the canvas for the zoom: 100% shows one screenshot pixel per screen pixel.
+function applyZoom() {
+  const previous = displayScale;
+  displayScale = zoomMode === 'fit' ? fitScale() : zoomMode;
+  canvas.style.width = `${canvas.width / devicePixelRatio * displayScale}px`;
+  canvas.style.height = `${canvas.height / devicePixelRatio * displayScale}px`;
+  document.getElementById('zoom-label').textContent = `${Math.round(displayScale * 100)}%`;
+  document.getElementById('zoom-in').disabled = !ZOOM_LEVELS.some((l) => l > displayScale + 0.001);
+  document.getElementById('zoom-out').disabled = !ZOOM_LEVELS.some((l) => l < displayScale - 0.001);
+  for (const [id, active] of [['zoom-fit', zoomMode === 'fit'], ['zoom-actual', zoomMode === 1]]) {
+    const btn = document.getElementById(id);
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active);
+  }
+  // Keep the middle of the view in place.
+  if (previous !== displayScale) {
+    const ratio = displayScale / previous;
+    container.scrollLeft = (container.scrollLeft + container.clientWidth / 2) * ratio - container.clientWidth / 2;
+    container.scrollTop = (container.scrollTop + container.clientHeight / 2) * ratio - container.clientHeight / 2;
+  }
+  if (editingTextId) {
+    cachedRect = canvas.getBoundingClientRect();
+    cachedScaleX = canvas.width / cachedRect.width;
+    cachedScaleY = canvas.height / cachedRect.height;
+    const d = drawings.find((item) => item.id === editingTextId);
+    if (d) positionTextEditor(d);
+  }
+}
+
+function setZoom(mode) {
+  zoomMode = mode === 'fit' ? 'fit' : Math.min(8, Math.max(0.1, mode));
+  applyZoom();
+}
+
+function zoomIn() {
+  const next = ZOOM_LEVELS.find((l) => l > displayScale + 0.001);
+  if (next) setZoom(next);
+}
+
+function zoomOut() {
+  const next = [...ZOOM_LEVELS].reverse().find((l) => l < displayScale - 0.001);
+  if (next) setZoom(next);
+}
+
+window.addEventListener('resize', () => { if (zoomMode === 'fit') applyZoom(); });
+// Ctrl+wheel and touchpad pinch zoom the screenshot, not the page.
+container.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  setZoom(displayScale * Math.exp(-e.deltaY * 0.01));
+}, { passive: false });
 
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
@@ -160,6 +252,12 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
+  // Measured again on each move: zooming or scrolling mid-drag moves the canvas.
+  if (cachedRect) {
+    cachedRect = canvas.getBoundingClientRect();
+    cachedScaleX = canvas.width / cachedRect.width;
+    cachedScaleY = canvas.height / cachedRect.height;
+  }
   if (tool === 'text' && draggingTextId) {
     const x = (e.clientX - cachedRect.left) * cachedScaleX;
     const y = (e.clientY - cachedRect.top) * cachedScaleY;
@@ -433,8 +531,9 @@ function textHitAt(x, y) {
 
 function positionTextEditor(d) {
   if (!textEditor || !cachedRect) return;
-  const left = cachedRect.left + (d.startX / cachedScaleX);
-  const top = cachedRect.top + (d.startY / cachedScaleY);
+  // Relative to #canvas-wrap, which scrolls with the canvas.
+  const left = d.startX / cachedScaleX;
+  const top = d.startY / cachedScaleY;
   textEditor.style.left = `${left}px`;
   textEditor.style.top = `${top}px`;
   textEditor.style.transform = 'translate(-50%, -50%)';
@@ -660,14 +759,14 @@ function updateActionStates() {
 
 function saveAndCopy() {
   const btn = document.getElementById('btn-save');
-  const originalText = btn.textContent;
-  const originalBackground = btn.style.background;
+  const label = btn.querySelector('.label');
+  const originalText = label.textContent;
 
   commitTextEdit();
   render();
 
   btn.disabled = true;
-  btn.textContent = 'Saving…';
+  label.textContent = 'Saving…';
 
   canvas.toBlob(async (blob) => {
     try {
@@ -679,8 +778,8 @@ function saveAndCopy() {
       const { ok, error } = await ipcRenderer.invoke('save-and-copy', arrayBuffer);
       if (!ok) throw new Error(error || 'Save & Copy did not complete');
       showSaveStatus('', false);
-      btn.textContent = '✓ Saved & Copied!';
-      btn.style.background = '#30d158';
+      label.textContent = '✓ Saved & Copied';
+      btn.classList.add('saved');
       setTimeout(() => {
         window.close();
       }, 800);
@@ -689,8 +788,7 @@ function saveAndCopy() {
       // Never fail silently: the toolbar shows why, and the button is usable again.
       showSaveStatus(err && err.message ? err.message : String(err), true);
       btn.disabled = false;
-      btn.textContent = originalText;
-      btn.style.background = originalBackground;
+      label.textContent = originalText;
     }
   }, 'image/png');
 }
