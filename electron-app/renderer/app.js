@@ -159,6 +159,12 @@ const container = document.getElementById('canvas-container');
 let zoomMode = 'fit';
 let displayScale = 1;
 
+function updateCachedRect() {
+  cachedRect = canvas.getBoundingClientRect();
+  cachedScaleX = canvas.width / cachedRect.width;
+  cachedScaleY = canvas.height / cachedRect.height;
+}
+
 function fitScale() {
   const margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--canvas-margin')) || 0;
   const w = canvas.width / devicePixelRatio, h = canvas.height / devicePixelRatio;
@@ -188,9 +194,7 @@ function applyZoom() {
     container.scrollTop = (container.scrollTop + container.clientHeight / 2) * ratio - container.clientHeight / 2;
   }
   if (editingTextId) {
-    cachedRect = canvas.getBoundingClientRect();
-    cachedScaleX = canvas.width / cachedRect.width;
-    cachedScaleY = canvas.height / cachedRect.height;
+    updateCachedRect();
     const d = drawings.find((item) => item.id === editingTextId);
     if (d) positionTextEditor(d);
   }
@@ -218,14 +222,16 @@ container.addEventListener('wheel', (e) => {
   e.preventDefault();
   setZoom(displayScale * Math.exp(-e.deltaY * 0.01));
 }, { passive: false });
+// Update cached layout bounds if container is scrolled during/between drag operations
+container.addEventListener('scroll', () => {
+  if (isDragging) updateCachedRect();
+});
 
 // --- Drawing ---
 canvas.addEventListener('mousedown', (e) => {
   if (tool === 'text') {
     commitTextEdit();
-    cachedRect = canvas.getBoundingClientRect();
-    cachedScaleX = canvas.width / cachedRect.width;
-    cachedScaleY = canvas.height / cachedRect.height;
+    updateCachedRect();
     const x = (e.clientX - cachedRect.left) * cachedScaleX;
     const y = (e.clientY - cachedRect.top) * cachedScaleY;
     textPlaceStart = { x, y };
@@ -239,9 +245,7 @@ canvas.addEventListener('mousedown', (e) => {
     return;
   }
   isDragging = true;
-  cachedRect = canvas.getBoundingClientRect();
-  cachedScaleX = canvas.width / cachedRect.width;
-  cachedScaleY = canvas.height / cachedRect.height;
+  updateCachedRect();
 
   const x = (e.clientX - cachedRect.left) * cachedScaleX;
   const y = (e.clientY - cachedRect.top) * cachedScaleY;
@@ -252,12 +256,8 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mousemove', (e) => {
-  // Measured again on each move: zooming or scrolling mid-drag moves the canvas.
-  if (cachedRect) {
-    cachedRect = canvas.getBoundingClientRect();
-    cachedScaleX = canvas.width / cachedRect.width;
-    cachedScaleY = canvas.height / cachedRect.height;
-  }
+  // Use cached layout bounds to avoid forced layout thrashing on every mouse movement
+  if (!cachedRect) updateCachedRect();
   if (tool === 'text' && draggingTextId) {
     const x = (e.clientX - cachedRect.left) * cachedScaleX;
     const y = (e.clientY - cachedRect.top) * cachedScaleY;
@@ -288,9 +288,7 @@ canvas.addEventListener('mouseup', (e) => {
       return;
     }
     if (textPlaceStart) {
-      cachedRect = canvas.getBoundingClientRect();
-      cachedScaleX = canvas.width / cachedRect.width;
-      cachedScaleY = canvas.height / cachedRect.height;
+      if (!cachedRect) updateCachedRect();
       const x = (e.clientX - cachedRect.left) * cachedScaleX;
       const y = (e.clientY - cachedRect.top) * cachedScaleY;
       const dist = Math.hypot(x - textPlaceStart.x, y - textPlaceStart.y);
