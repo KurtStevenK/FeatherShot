@@ -93,3 +93,7 @@ body {
 .act.danger:hover { background: rgba(255,69,58,.15); }
 .act.primary { background: #0a84ff; color: #fff; border-color: #0a84ff; font-weight: 600; }
 .act.primary:hover { background: #0070e0; }
+.act:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

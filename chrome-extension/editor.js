@@ -92,7 +92,11 @@ document.getElementById('undo').onclick = () => {
     render();
   }
 };
-document.getElementById('clear').onclick = () => { drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0; render(); };
+document.getElementById('clear').onclick = () => {
+  if (drawings.length === 0) return;
+  if (!confirm('Are you sure you want to clear all annotations?')) return;
+  drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0; render();
+};
 document.getElementById('save').onclick = saveAndDownload;
 
 function setTool(t) {
@@ -223,7 +227,16 @@ canvas.onmouseup = (e) => {
   render();
 };
 
+function updateActionStates() {
+  const hasDrawings = drawings.length > 0;
+  const undoBtn = document.getElementById('undo');
+  const clearBtn = document.getElementById('clear');
+  if (undoBtn) undoBtn.disabled = !hasDrawings;
+  if (clearBtn) clearBtn.disabled = !hasDrawings;
+}
+
 function render() {
+  updateActionStates();
   if (!img) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0);
@@ -445,3 +458,5 @@ function saveAndDownload() {
   btn.style.background = '#30d158';
   setTimeout(() => { btn.textContent = '💾 Save & Download'; btn.style.background = ''; }, 1500);
 }
+
+updateActionStates();
