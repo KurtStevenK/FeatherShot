@@ -19,7 +19,7 @@ FeatherShot is a public repository. Signing keys, tokens and passwords live only
 | `TAP_TOKEN` | Pushing the Homebrew cask, APT and Arch repositories |
 | `APT_GPG_PRIVATE_KEY`, `APT_GPG_PASSPHRASE` | Signing the APT and Arch repositories |
 | `CHOCOLATEY_API_KEY` | Publishing the Chocolatey package |
-| `FIREBASE_SERVICE_ACCOUNT` | Mirroring downloads to feathershot.web.app |
+| `FIREBASE_SERVICE_ACCOUNT` | Mirroring downloads to feathershot.xyz |
 | `VIRUSTOTAL_API_KEY` | Scanning release files on VirusTotal |
 
 `scripts/push-distribution-secrets-to-github.sh` uploads the distribution secrets from `.env.local`. It takes `VIRUSTOTAL_API_KEY` from cursor-auto-runner's `.env.local` when FeatherShot's has none.

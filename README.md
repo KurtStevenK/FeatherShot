@@ -24,7 +24,7 @@
 <p align="center">
   <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest"><strong>📥 Download</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://feathershot.web.app/"><strong>🌐 Website</strong></a>
+  <a href="https://feathershot.xyz/"><strong>🌐 Website</strong></a>
   &nbsp;·&nbsp;
   <a href="CHANGELOG.md"><strong>📋 Changelog</strong></a>
 </p>

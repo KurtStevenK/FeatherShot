@@ -1,6 +1,6 @@
 # FeatherShot on Firebase
 
-- **Hosting**: https://feathershot.web.app (static site in [`hosting/public`](../../hosting/public))
+- **Hosting**: https://feathershot.xyz (static site in [`hosting/public`](../../hosting/public))
 - **Project ID**: `feathershot`
 - **Release binaries**: Firebase Storage path `releases/v{VERSION}/…` (public read via [`storage.rules`](../../storage.rules))
 
@@ -55,5 +55,5 @@ firebase deploy --only hosting,storage
 
 ## Mac App Store Connect
 
-- **Privacy Policy URL**: https://feathershot.web.app/privacy
+- **Privacy Policy URL**: https://feathershot.xyz/privacy
 - **App Privacy**: align with [`hosting/public/privacy/index.html`](../../hosting/public/privacy/index.html) (no account; optional GitHub API update check; screen capture is on-device).

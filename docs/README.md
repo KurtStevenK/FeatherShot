@@ -1,6 +1,6 @@
 # GitHub Pages (`docs/`)
 
-The product website is hosted on **Firebase**: https://feathershot.web.app/
+The product website is hosted on **Firebase**: https://feathershot.xyz/
 
 Source files live in [`hosting/public`](../hosting/public). This folder keeps a redirect for legacy GitHub Pages URLs (`kurtstevenk.github.io/FeatherShot/`).
 

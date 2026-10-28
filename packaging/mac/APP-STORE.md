@@ -55,8 +55,8 @@ Issuer ID: [App Store Connect → Users and Access → Integrations → App Stor
 
 | Field | URL |
 |-------|-----|
-| Privacy Policy | https://feathershot.web.app/privacy |
-| Marketing / support site | https://feathershot.web.app/ |
+| Privacy Policy | https://feathershot.xyz/privacy |
+| Marketing / support site | https://feathershot.xyz/ |
 
 Set **Privacy Policy URL** under App Information in App Store Connect before submitting for review. Align **App Privacy** answers with [`hosting/public/privacy/index.html`](../../hosting/public/privacy/index.html).
 
