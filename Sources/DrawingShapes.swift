@@ -1,4 +1,12 @@
 import SwiftUI
+#if canImport(AppKit)
+import AppKit
+/// The screenshot type: `NSImage` on the Mac, `UIImage` in the iOS app (which compiles this file too).
+typealias PlatformImage = NSImage
+#else
+import UIKit
+typealias PlatformImage = UIImage
+#endif
 
 enum Tool {
     case stepArrow, stepRectangle, arrow, rectangle, circle, line
@@ -406,7 +414,7 @@ struct EllipseView: View {
 
 // Magnifier tool — circular zoom lens showing magnified screenshot content
 struct MagnifierView: View {
-    var image: NSImage
+    var image: PlatformImage
     var start: CGPoint  // center of magnification
     var end: CGPoint    // defines radius via distance
     var color: Color
@@ -429,8 +437,8 @@ struct MagnifierView: View {
             
             ZStack {
                 // Magnified image content clipped to circle
-                if let croppedImage = cropNSImage(image, to: srcRect) {
-                    Image(nsImage: croppedImage)
+                if let croppedImage = Self.crop(image, to: srcRect) {
+                    Self.swiftUIImage(croppedImage)
                         .resizable()
                         .frame(width: radius * 2, height: radius * 2)
                         .clipShape(Circle())
@@ -455,19 +463,24 @@ struct MagnifierView: View {
         }
     }
     
-    // Crop an NSImage to a given CGRect
-    private func cropNSImage(_ nsImage: NSImage, to rect: CGRect) -> NSImage? {
-        let imgSize = nsImage.size
-        // Clamp the rect to image bounds
+    /// Clamps `rect` (image points) to the image bounds; nil when nothing is left.
+    static func clampedSourceRect(_ rect: CGRect, imageSize imgSize: CGSize) -> CGRect? {
         let clampedX = max(0, min(rect.origin.x, imgSize.width))
         let clampedY = max(0, min(rect.origin.y, imgSize.height))
         let clampedW = min(rect.width, imgSize.width - clampedX)
         let clampedH = min(rect.height, imgSize.height - clampedY)
-        
         if clampedW <= 0 || clampedH <= 0 { return nil }
-        
-        let cropRect = CGRect(x: clampedX, y: clampedY, width: clampedW, height: clampedH)
-        
+        return CGRect(x: clampedX, y: clampedY, width: clampedW, height: clampedH)
+    }
+
+    #if canImport(AppKit)
+    private static func swiftUIImage(_ image: NSImage) -> Image { Image(nsImage: image) }
+
+    // Crop an NSImage to a given CGRect
+    private static func crop(_ nsImage: NSImage, to rect: CGRect) -> NSImage? {
+        let imgSize = nsImage.size
+        guard let cropRect = clampedSourceRect(rect, imageSize: imgSize) else { return nil }
+
         let result = NSImage(size: cropRect.size)
         result.lockFocus()
         // NSImage uses flipped coordinates — need to flip Y for drawing
@@ -481,4 +494,20 @@ struct MagnifierView: View {
         result.unlockFocus()
         return result
     }
+    #else
+    private static func swiftUIImage(_ image: UIImage) -> Image { Image(uiImage: image) }
+
+    // Crop a UIImage (points, top-left origin) to a given CGRect
+    private static func crop(_ uiImage: UIImage, to rect: CGRect) -> UIImage? {
+        guard let cropRect = clampedSourceRect(rect, imageSize: uiImage.size),
+              let cgImage = uiImage.cgImage else { return nil }
+        let scale = uiImage.scale
+        let pixelRect = CGRect(
+            x: cropRect.minX * scale, y: cropRect.minY * scale,
+            width: cropRect.width * scale, height: cropRect.height * scale
+        ).integral
+        guard let cropped = cgImage.cropping(to: pixelRect) else { return nil }
+        return UIImage(cgImage: cropped, scale: scale, orientation: .up)
+    }
+    #endif
 }
