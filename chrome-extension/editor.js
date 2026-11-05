@@ -219,6 +219,7 @@ canvas.onmouseup = (e) => {
         drawings.push(entry);
         beginTextEdit(entry);
         render();
+        updateActionStates();
       }
       textPlaceStart = null;
     }
@@ -381,6 +382,7 @@ function commitTextEdit() {
   else drawings[idx].text = trimmed;
   hideTextEditor();
   render();
+  updateActionStates();
 }
 function hideTextEditor() {
   editingTextId = null;
