@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.44-blue?style=flat-square" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.3.45-blue?style=flat-square" alt="Version">
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Chrome-lightgrey?style=flat-square" alt="Platforms">
 </p>
@@ -37,7 +37,7 @@ FeatherShot is a **free, open-source** screenshot annotation tool. Capture a scr
 
 No Dock icon. No bloat. No subscription.
 
-> **New in v1.3.44:** A redesigned editor in the website's look. Screenshots open at their original size (1:1) and shrink to fit only when they are bigger than the window; zoom in, zoom out, **Fit** and **1:1** sit in the bottom bar (also ⌘/Ctrl + − 0 9 and pinch), and the window is always wide enough for Save & Copy. **v1.3.43** on Windows, releasing the mouse always ends the area selection. **v1.3.42** every screen is captured before the selector opens and the selection is cropped from that frozen image, Save & Copy shows failures in the toolbar, and **Show Log File** in the tray menu opens a log for bug reports. **v1.3.41** the Windows selector covers the taskbar. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
+> **New in v1.3.45:** Security updates for Windows and Linux (Electron 44.10.1, a 10-second timeout and 1 MB cap on the update check, and a Content Security Policy in the editor), a smoother Chrome extension selector, and Undo/Clear in the extension editor are disabled when there is nothing to undo, with a confirmation before Clear. **v1.3.44** a redesigned editor in the website's look. Screenshots open at their original size (1:1) and shrink to fit only when they are bigger than the window; zoom in, zoom out, **Fit** and **1:1** sit in the bottom bar (also ⌘/Ctrl + − 0 9 and pinch), and the window is always wide enough for Save & Copy. **v1.3.43** on Windows, releasing the mouse always ends the area selection. **v1.3.42** every screen is captured before the selector opens and the selection is cropped from that frozen image, Save & Copy shows failures in the toolbar, and **Show Log File** in the tray menu opens a log for bug reports. **v1.3.41** the Windows selector covers the taskbar. **v1.3.37** the Windows and Linux downloads no longer include an unused screen-capture library whose helper script two antivirus engines flagged ([verify downloads](#verify-downloads)). **v1.3.36** every release is scanned on VirusTotal; **v1.3.35** Windows and Linux text annotations take every key you type.
 
 ---
 

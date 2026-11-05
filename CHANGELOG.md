@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.45] - 2026-11-05
+
+### Security
+
+- Windows and Linux: Electron updated to 44.10.1 and electron-builder to 26.18.1, which removes the vulnerable `undici` versions (several high-severity denial-of-service and TLS advisories) from the build. CI's dependency audit passes again.
+- Windows and Linux: the update check gives up after 10 seconds and rejects a response larger than 1 MB, so a slow or oversized answer from the GitHub API can no longer hang the check or use unbounded memory.
+- Windows and Linux editor: the editor page sets a Content Security Policy that only allows the app's own scripts and `data:` images.
+
+### Changed
+
+- Chrome extension: the area selector updates the selection box once per animation frame instead of on every mouse event, so dragging stays smooth with high-polling-rate mice.
+
+### Fixed
+
+- Chrome extension editor: **Undo** and **Clear** are disabled when there is nothing to undo or clear, including after adding or removing a text label, and **Clear** asks for confirmation before deleting all annotations.
+
 ## [1.3.44] - 2026-10-23
 
 ### Changed
@@ -629,6 +645,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.45]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.44...v1.3.45
+[1.3.44]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.43...v1.3.44
+[1.3.43]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.42...v1.3.43
+[1.3.42]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.41...v1.3.42
 [1.3.41]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.40...v1.3.41
 [1.3.40]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.39...v1.3.40
 [1.3.39]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.38...v1.3.39
