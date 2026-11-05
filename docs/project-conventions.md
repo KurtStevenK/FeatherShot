@@ -22,12 +22,16 @@
 
 ## Adding New Drawing Tools
 
-When adding a new annotation tool, you must update **all 4 locations**:
+When adding a new annotation tool, you must update **all 5 locations**:
 
 1. `DrawingShapes.swift` — Add a case to the `Tool` enum.
 2. `DrawingShapes.swift` — Create a new `View` struct for the tool.
 3. `AnnotationView.swift` → `drawingContent` — Add rendering for both completed and active drawings.
 4. `AnnotationView.swift` → `toolGroups` — Add a palette entry with an SF Symbol icon.
+
+5. iPhone app: `ios/FeatherShot/Editor/AnnotationLayer.swift` → `AnnotationShape` (the exhaustive `switch` fails to compile until the tool is added) and `EditorView.swift` → `toolGroups`.
+
+`DrawingShapes.swift`, `EditorTheme.swift` and `EditorZoom.swift` are also compiled into the iPhone app, so they must build for iOS too (no AppKit outside `#if canImport(AppKit)`).
 
 See [adding-a-tool.md](adding-a-tool.md) for the full walkthrough.
 
@@ -40,13 +44,17 @@ See [adding-a-tool.md](adding-a-tool.md) for the full walkthrough.
 
 ## Version Bumping
 
-The version string exists in **7 places** across all platforms — all must be updated together:
+The version string exists in **8 places** across all platforms — all must be updated together:
 
 ### macOS (Swift)
 
 - `Info.plist` — `CFBundleShortVersionString` and `CFBundleVersion`
 - `build_release.sh` — bundle plist versions + DMG filename (4 occurrences)
 - `generate_assets.swift` — DMG background "Version X.X.X" text
+
+### iOS (iPhone)
+
+- `ios/Config/Version.xcconfig` — `MARKETING_VERSION` (the build number is set per TestFlight upload, see [packaging/ios/TESTFLIGHT.md](../packaging/ios/TESTFLIGHT.md))
 
 ### Electron (Windows & Linux)
 
