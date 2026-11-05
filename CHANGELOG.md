@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.46] - 2026-11-05
+
+### Added
+
+- **FeatherShot for iPhone** (iOS 18 or later, in internal TestFlight testing, not yet on the App Store): the "Annotate Screenshot" shortcut takes a screenshot, lets you select an area, and opens a touch editor with the Mac tools; Save & Copy adds the result to Photos and the clipboard. A bundled "FeatherShot Screenshot" shortcut can be put on the Action Button from the first-launch guide. The iPhone and Mac apps share the same drawing code.
+
+### Security
+
+- Windows and Linux build tooling: electron-builder's copies of `minimatch` (a moderate denial-of-service advisory, GHSA-g3hv-75wg-m249) are lifted to 11.0.4. The newest electron-builder still requires the affected versions, so an npm override replaces only those copies; the packaged app contains exactly the same files as before.
+
 ## [1.3.45] - 2026-11-05
 
 ### Security
@@ -645,6 +655,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Clipboard Integration** — One-click copy of the annotated image.
 - Built with Swift 6.0 and SwiftUI, targeting macOS 14 (Sonoma)+.
 
+[1.3.46]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.45...v1.3.46
 [1.3.45]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.44...v1.3.45
 [1.3.44]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.43...v1.3.44
 [1.3.43]: https://github.com/KurtStevenK/FeatherShot/compare/v1.3.42...v1.3.43

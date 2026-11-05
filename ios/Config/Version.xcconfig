@@ -1,5 +1,5 @@
 // The iOS app's version. Bump MARKETING_VERSION with the other platforms
 // (docs/project-conventions.md). packaging/ios/build_testflight.sh sets a fresh
 // CURRENT_PROJECT_VERSION for every upload, since TestFlight rejects a repeated build number.
-MARKETING_VERSION = 1.3.45
+MARKETING_VERSION = 1.3.46
 CURRENT_PROJECT_VERSION = 1
