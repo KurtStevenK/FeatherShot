@@ -11,7 +11,7 @@
 
 - Entry point: `AppMain.swift` → `@main` `AppDelegate` (`NSApplicationDelegate`) with AppKit only — no SwiftUI `App` scene, so no empty launch window.
 - `AppDelegate` owns the status bar item, manages screen capture via `/usr/sbin/screencapture`, and presents the annotation window.
-- `AnnotationView` is the SwiftUI editor. It uses `ImageRenderer` for pixel-perfect export.
+- `AnnotationView` is the SwiftUI editor. It uses `ImageRenderer` for pixel-perfect export. `EditorZoom` scales the view only (default: 1:1, shrunk to fit); `EditorTheme` holds the website's colors and the bar controls.
 - `DrawingShapes.swift` defines the `Tool` enum and all shape/view implementations. Swift tests use `@testable import FeatherShot`.
 
 ## Concurrency Rules
@@ -27,7 +27,7 @@ When adding a new annotation tool, you must update **all 4 locations**:
 1. `DrawingShapes.swift` — Add a case to the `Tool` enum.
 2. `DrawingShapes.swift` — Create a new `View` struct for the tool.
 3. `AnnotationView.swift` → `drawingContent` — Add rendering for both completed and active drawings.
-4. `AnnotationView.swift` → `toolbar` — Add a toolbar button with an SF Symbol icon.
+4. `AnnotationView.swift` → `toolGroups` — Add a palette entry with an SF Symbol icon.
 
 See [adding-a-tool.md](adding-a-tool.md) for the full walkthrough.
 

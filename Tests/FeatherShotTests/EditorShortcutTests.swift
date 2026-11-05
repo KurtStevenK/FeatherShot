@@ -71,3 +71,16 @@ private func electronToolKeys() throws -> [(key: String, tool: String)] {
     #expect(EditorShortcut.match("z", modifiers: .command, isEditingText: true) == nil)
     #expect(EditorShortcut.match("s", modifiers: .command, isEditingText: true) == .saveAndCopy)
 }
+
+@Test func commandZoomKeys() {
+    #expect(EditorShortcut.match("+", modifiers: .command, isEditingText: false) == .zoomIn)
+    #expect(EditorShortcut.match("+", modifiers: [.command, .shift], isEditingText: false) == .zoomIn)
+    #expect(EditorShortcut.match("=", modifiers: .command, isEditingText: false) == .zoomIn)
+    #expect(EditorShortcut.match("-", modifiers: .command, isEditingText: false) == .zoomOut)
+    #expect(EditorShortcut.match("0", modifiers: .command, isEditingText: false) == .actualSize)
+    #expect(EditorShortcut.match("9", modifiers: .command, isEditingText: false) == .zoomToFit)
+    #expect(EditorShortcut.match("0", modifiers: [.command, .option], isEditingText: false) == nil)
+    // Without ⌘ these keys stay tool shortcuts.
+    #expect(EditorShortcut.match("-", modifiers: [], isEditingText: false) == .select(.exclamationArrow))
+    #expect(EditorShortcut.match("0", modifiers: [], isEditingText: false) == .select(.abcRectangle))
+}

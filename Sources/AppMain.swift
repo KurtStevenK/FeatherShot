@@ -190,25 +190,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func showAnnotationWindow(imagePath: String) -> NSWindow? {
         guard let nsImage = NSImage(contentsOfFile: imagePath) else { return nil }
 
-        // Use visibleFrame to respect the Dock and menu bar
-        let screenFrame = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
-        let toolbarHeight: CGFloat = 60
-        let padding: CGFloat = 40
-        let maxWidth = screenFrame.width - padding
-        let maxHeight = screenFrame.height - padding
-
-        // Clamp window to screen bounds — ScrollView inside handles overflow
-        let windowWidth = min(max(nsImage.size.width, 600), maxWidth)
-        let windowHeight = min(max(nsImage.size.height, 300) + toolbarHeight, maxHeight)
+        // Size the window for the screenshot at 1:1 plus the editor's bars; a screenshot bigger
+        // than the screen opens fitted (the editor's default zoom) and can be zoomed to 1:1.
+        let screenFrame = (NSScreen.main ?? NSScreen.screens.first)?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1200, height: 800)
+        let margin = AnnotationView.canvasMargin
+        let chromeHeight = AnnotationView.toolBarHeight + AnnotationView.actionBarHeight
+        let maxWidth = screenFrame.width - 40
+        let maxHeight = screenFrame.height - 40 - 28 // 28: the title bar above the content
+        let minWidth = min(AnnotationView.minimumWidth, maxWidth)
+        let windowWidth = min(max(nsImage.size.width + 2 * margin, minWidth), maxWidth)
+        let windowHeight = min(max(nsImage.size.height + 2 * margin, 220) + chromeHeight, maxHeight)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: windowWidth, height: windowHeight),
-            styleMask: [.titled, .closable, .resizable, .miniaturizable, .fullSizeContentView],
+            styleMask: [.titled, .closable, .resizable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
         window.center()
         window.title = "FeatherShot Editor"
+        window.appearance = NSAppearance(named: .darkAqua)
+        window.backgroundColor = NSColor(EditorTheme.bar)
         window.isReleasedWhenClosed = false
         window.delegate = self
         // Each editor closes itself, even when a newer capture opened another editor.
@@ -219,10 +221,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.level = .floating
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
-        // Fixed min size — image scrolls if larger than window
-        window.minSize = NSSize(width: 600, height: 360)
-        // Prevent window from extending behind the Dock or off-screen
-        window.maxSize = NSSize(width: screenFrame.width, height: screenFrame.height)
+        // Narrow enough for small screens, wide enough that the bars never cut off Save & Copy.
+        window.contentMinSize = NSSize(width: minWidth, height: chromeHeight + 160)
 
         editorWindows.append(window)
         NSApp.activate(ignoringOtherApps: true)

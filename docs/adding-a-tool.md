@@ -59,19 +59,13 @@ In `Sources/AnnotationView.swift`, update the `drawingContent` computed property
 
 ## Step 4 — Add Toolbar Button
 
-In `Sources/AnnotationView.swift`, add a button in the `toolbar` computed property's tool selection `HStack`:
+In `Sources/AnnotationView.swift`, add an entry to `toolGroups` (the top tool palette), in the group it belongs to:
 
 ```swift
-Divider().frame(height: 20)
-
-Button(action: { selectedTool = .myNewTool }) {
-    Image(systemName: "star")  // Choose an appropriate SF Symbol
-        .padding(8)
-        .background(selectedTool == .myNewTool ? Color.blue : Color.clear)
-        .foregroundColor(selectedTool == .myNewTool ? .white : .primary)
-}
-.buttonStyle(.plain)
+ToolItem(tool: .myNewTool, icon: "star", name: "My New Tool", key: "S"),
 ```
+
+The palette draws the button, its selected state and the tooltip "My New Tool (S)". In the Electron editor, add the button to the matching `.group` in `electron-app/renderer/index.html`.
 
 **SF Symbol Picker:** Browse symbols at [developer.apple.com/sf-symbols](https://developer.apple.com/sf-symbols/)
 
@@ -80,7 +74,7 @@ Button(action: { selectedTool = .myNewTool }) {
 - [ ] `DrawingShapes.swift` — New case in `Tool` enum
 - [ ] `DrawingShapes.swift` — New View struct
 - [ ] `AnnotationView.swift` → `drawingContent` — Render completed + active drawings
-- [ ] `AnnotationView.swift` → `toolbar` — Toolbar button with SF Symbol
+- [ ] `AnnotationView.swift` → `toolGroups` — Palette entry with SF Symbol
 - [ ] Test: Draw the new tool, undo it, export with Save & Copy
 - [ ] Update `README.md` tool table
 - [ ] Update `CHANGELOG.md`

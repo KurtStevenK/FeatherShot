@@ -10,7 +10,7 @@ Written by CI on each tag (`packaging/firebase/upload-releases.sh`):
 
 ```json
 {
-  "version": "1.3.43",
+  "version": "1.3.44",
   "published_at": "2026-03-22T12:00:00Z",
   "bucket": "feathershot.firebasestorage.app",
   "assets": {
