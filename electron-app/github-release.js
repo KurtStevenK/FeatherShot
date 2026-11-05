@@ -21,10 +21,21 @@ function fetchLatestRelease() {
         hostname: 'api.github.com',
         path: `/repos/${REPO}/releases/latest`,
         headers: { 'User-Agent': 'FeatherShot' },
+        timeout: 10000,
       },
       (res) => {
         let body = '';
-        res.on('data', (chunk) => { body += chunk; });
+        let totalSize = 0;
+        const MAX_BODY_SIZE = 1024 * 1024; // 1MB payload limit to prevent unbounded memory usage
+
+        res.on('data', (chunk) => {
+          totalSize += chunk.length;
+          if (totalSize > MAX_BODY_SIZE) {
+            req.destroy(new Error('Response payload exceeded 1MB limit'));
+            return;
+          }
+          body += chunk;
+        });
         res.on('end', () => {
           if (res.statusCode !== 200) {
             reject(new Error(`GitHub API HTTP ${res.statusCode}`));
@@ -38,6 +49,9 @@ function fetchLatestRelease() {
         });
       }
     );
+    req.on('timeout', () => {
+      req.destroy(new Error('GitHub API request timed out'));
+    });
     req.on('error', reject);
   });
 }
