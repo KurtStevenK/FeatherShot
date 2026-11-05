@@ -82,6 +82,12 @@ widthSlider.oninput = (e) => {
     wLabel.textContent = lw + 'px';
   }
 };
+function updateActionStates() {
+  const hasDrawings = drawings.length > 0;
+  document.getElementById('undo').disabled = !hasDrawings;
+  document.getElementById('clear').disabled = !hasDrawings;
+}
+
 document.getElementById('undo').onclick = () => {
   if (drawings.length) {
     const r = drawings.pop();
@@ -90,9 +96,16 @@ document.getElementById('undo').onclick = () => {
     if (r.tool === 'abc-arrow') abcAN--;
     if (r.tool === 'abc-rect') abcRN--;
     render();
+    updateActionStates();
   }
 };
-document.getElementById('clear').onclick = () => { drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0; render(); };
+document.getElementById('clear').onclick = () => {
+  if (drawings.length === 0) return;
+  if (!confirm('Are you sure you want to clear all annotations?')) return;
+  drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0;
+  render();
+  updateActionStates();
+};
 document.getElementById('save').onclick = saveAndDownload;
 
 function setTool(t) {
@@ -206,6 +219,7 @@ canvas.onmouseup = (e) => {
         drawings.push(entry);
         beginTextEdit(entry);
         render();
+        updateActionStates();
       }
       textPlaceStart = null;
     }
@@ -221,6 +235,7 @@ canvas.onmouseup = (e) => {
   }
   dragging = false;
   render();
+  updateActionStates();
 };
 
 function render() {
@@ -367,6 +382,7 @@ function commitTextEdit() {
   else drawings[idx].text = trimmed;
   hideTextEditor();
   render();
+  updateActionStates();
 }
 function hideTextEditor() {
   editingTextId = null;
@@ -445,3 +461,6 @@ function saveAndDownload() {
   btn.style.background = '#30d158';
   setTimeout(() => { btn.textContent = '💾 Save & Download'; btn.style.background = ''; }, 1500);
 }
+
+// Initial action states
+updateActionStates();
