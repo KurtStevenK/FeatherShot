@@ -27,11 +27,34 @@
   document.body.appendChild(hint);
 
   let startX = 0, startY = 0, selecting = false;
+  // Performance: Throttle DOM updates to requestAnimationFrame during mousemove
+  let renderRequested = false, currentX = 0, currentY = 0, rafId = null;
+
+  function updateSelectionDOM() {
+    renderRequested = false;
+    if (!selecting) return;
+    const x = Math.min(currentX, startX);
+    const y = Math.min(currentY, startY);
+    const w = Math.abs(currentX - startX);
+    const h = Math.abs(currentY - startY);
+
+    sel.style.left = x + 'px';
+    sel.style.top = y + 'px';
+    sel.style.width = w + 'px';
+    sel.style.height = h + 'px';
+
+    dim.textContent = `${w} × ${h}`;
+    dim.style.display = 'block';
+    dim.style.left = (currentX + 12) + 'px';
+    dim.style.top = (currentY + 12) + 'px';
+  }
 
   overlay.addEventListener('mousedown', (e) => {
     selecting = true;
     startX = e.clientX;
     startY = e.clientY;
+    currentX = e.clientX;
+    currentY = e.clientY;
     sel.style.display = 'block';
     sel.style.left = startX + 'px';
     sel.style.top = startY + 'px';
@@ -43,25 +66,23 @@
 
   overlay.addEventListener('mousemove', (e) => {
     if (!selecting) return;
-    const x = Math.min(e.clientX, startX);
-    const y = Math.min(e.clientY, startY);
-    const w = Math.abs(e.clientX - startX);
-    const h = Math.abs(e.clientY - startY);
+    currentX = e.clientX;
+    currentY = e.clientY;
 
-    sel.style.left = x + 'px';
-    sel.style.top = y + 'px';
-    sel.style.width = w + 'px';
-    sel.style.height = h + 'px';
-
-    dim.textContent = `${w} × ${h}`;
-    dim.style.display = 'block';
-    dim.style.left = (e.clientX + 12) + 'px';
-    dim.style.top = (e.clientY + 12) + 'px';
+    if (!renderRequested) {
+      renderRequested = true;
+      rafId = requestAnimationFrame(updateSelectionDOM);
+    }
   });
 
   overlay.addEventListener('mouseup', (e) => {
     if (!selecting) return;
     selecting = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    renderRequested = false;
     dim.style.display = 'none';
 
     const x = Math.min(e.clientX, startX);
