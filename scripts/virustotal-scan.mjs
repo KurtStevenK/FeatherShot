@@ -214,7 +214,22 @@ async function main() {
   while (rows.some((r) => r.status === 'pending') && Date.now() < deadline) {
     const roundStart = Date.now();
     for (const row of rows.filter((r) => r.status === 'pending')) {
-      const body = await vtFetch(`${VT_BASE}/analyses/${row.analysisId}`, () => ({ headers }), `analysis ${row.file}`);
+      const body = await vtFetch(`${VT_BASE}/analyses/${row.analysisId}`, () => ({ headers }), `analysis ${row.file}`, {
+        allowMissing: true,
+      });
+      // VirusTotal sometimes answers 404 for an analysis id it just issued. Fall back to the
+      // file's own report by hash, and keep polling if that is not there yet either.
+      if (!body) {
+        const known = await vtFetch(`${VT_BASE}/files/${row.sha256}`, () => ({ headers }), `lookup ${row.file}`, {
+          allowMissing: true,
+        });
+        if (known?.data?.attributes?.last_analysis_date) {
+          setStats(row, known.data.attributes.last_analysis_stats || {});
+        } else {
+          console.log(`[virustotal] ${row.file}: analysis not found yet, checking again`);
+        }
+        continue;
+      }
       const status = body?.data?.attributes?.status;
       if (status === 'failed') throw new Error(`VirusTotal analysis failed for ${row.file}`);
       if (status !== 'completed') continue;
