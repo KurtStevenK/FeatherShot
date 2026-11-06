@@ -52,7 +52,10 @@ struct CropView: View {
                 image = loaded
                 cropRect = CGRect(origin: .zero, size: loaded.size)
                 #if DEBUG
-                if let demo = DemoScenes.cropRect { cropRect = demo }
+                if let px = DemoScenes.cropPixelRect {
+                    let k = 1 / loaded.scale
+                    cropRect = CGRect(x: px.minX * k, y: px.minY * k, width: px.width * k, height: px.height * k)
+                }
                 #endif
             } else {
                 loadFailed = true

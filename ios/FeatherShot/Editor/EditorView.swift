@@ -333,6 +333,7 @@ struct EditorView: View {
         let outcome = await PhotoExport.perform(png: png)
         isSaving = false
         if outcome.saveError == nil && outcome.copied {
+            WatchSync.shared.send(png: png)
             model.finish()
             return
         }

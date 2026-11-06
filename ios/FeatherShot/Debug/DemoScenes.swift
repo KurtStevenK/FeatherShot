@@ -6,18 +6,19 @@ import SwiftUI
 /// Coordinates are in points of packaging/ios/appstore/demo_screen.swift (402×874), relative to the crop.
 @MainActor
 enum DemoScenes {
-    /// The selection the crop screen starts with (`crop` scene).
-    static var cropRect: CGRect?
+    /// The selection the crop screen starts with (`crop` scene), in pixels of the demo image,
+    /// so it lands on the same rows whatever the screen scale (3x iPhone, 2x iPad).
+    static var cropPixelRect: CGRect?
 
     private static let red = EditorTheme.swatches[0], orange = EditorTheme.swatches[1]
     private static let yellow = EditorTheme.swatches[2], green = EditorTheme.swatches[3]
     private static let blue = EditorTheme.swatches[4], purple = EditorTheme.swatches[5]
     private static let white = EditorTheme.swatches[6]
 
-    static func run(_ scene: String, sourceURL: URL, model: AppModel) {
+    static func run(_ scene: String, sourceURL: URL, model: AppModel?) {
         switch scene {
         case "crop":
-            cropRect = CGRect(x: 14, y: 340, width: 374, height: 282)
+            cropPixelRect = CGRect(x: 42, y: 1020, width: 1122, height: 846)
         case "mixed":
             edit(sourceURL, model, crop: CGRect(x: 0, y: 118, width: 402, height: 580), tool: .circle, [
                 el(.circle, (296, 20), (382, 58), yellow),
@@ -48,7 +49,7 @@ enum DemoScenes {
                 el(.exclamationArrow, (250, 548), (325, 494), red),
             ])
         case "done":
-            model.finish()
+            model?.finish()
         default:
             break
         }
@@ -60,10 +61,37 @@ enum DemoScenes {
                        color: color, lineWidth: width, zoomLevel: zoom)
     }
 
-    private static func edit(_ url: URL, _ model: AppModel, crop: CGRect, tool: Tool, _ drawings: [DrawingElement]) {
+    /// The editor scenes, kept so `export` can render them too.
+    private static var edits: [String: (crop: CGRect, tool: Tool, drawings: [DrawingElement])] = [:]
+
+    /// Opens the editor on the scene, or, without a model (`export`), only records it.
+    private static func edit(_ url: URL, _ model: AppModel?, crop: CGRect, tool: Tool, _ drawings: [DrawingElement]) {
+        guard let model else {
+            edits[pendingName] = (crop, tool, drawings)
+            return
+        }
         guard let image = ScreenshotImage.load(url, scale: 3),
               let cropped = ScreenshotImage.crop(image, to: crop) else { return }
         model.startEditing(cropped, drawings: drawings, tool: tool)
+    }
+
+    /// The scene `export` is recording.
+    private static var pendingName = ""
+
+    /// Renders each editor scene (annotations on the cropped demo screen) to `<dir>/<scene>.png`.
+    static func export(sourceURL: URL, to dir: URL) {
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        guard let image = ScreenshotImage.load(sourceURL, scale: 3) else { return }
+        for name in ["mixed", "steps", "callouts"] {
+            pendingName = name
+            run(name, sourceURL: sourceURL, model: nil)
+            guard let scene = edits[name], let cropped = ScreenshotImage.crop(image, to: scene.crop) else { continue }
+            let renderer = ImageRenderer(content: AnnotationLayer(image: cropped, drawings: scene.drawings))
+            renderer.scale = cropped.scale
+            if let png = renderer.uiImage?.pngData() {
+                try? png.write(to: dir.appendingPathComponent("\(name).png"))
+            }
+        }
     }
 }
 #endif

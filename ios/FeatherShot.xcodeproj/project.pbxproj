@@ -10,14 +10,19 @@
 		08405DBEFEB016F42AB3DDFB /* DrawingShapes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F3718724B3F92CE8F0887AB /* DrawingShapes.swift */; };
 		0DD17AD640F9BCAF1A8F204B /* FeatherShotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F21FC47306942E8DEB4FC9E /* FeatherShotApp.swift */; };
 		1AB477B05C3EE7B8D6DB4ED8 /* ScreenshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5143566F56FBAB4992473971 /* ScreenshotStore.swift */; };
+		1E7F30C84C8935BC9C7E98A3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 14C58E2F2D9A83B71873D7AD /* Assets.xcassets */; };
 		1F8979324172370E759A53DF /* AnnotationLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD942937F99BAC28AB58E9A2 /* AnnotationLayer.swift */; };
+		21F8A54CC612ACE9981C9CE8 /* FeatherShotWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B06F568943F8B877EFFD48AD /* FeatherShotWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		22BEA1D1B9AC0D2C3B70D653 /* PhotoExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0348CEB435976F89CC41A115 /* PhotoExport.swift */; };
+		26D5A4CA8AB8A2F853882CF4 /* ShotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC84023B244743ABBEDBA7F /* ShotStore.swift */; };
 		4431089490D0F1F9E7F1D254 /* EditorTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC4625AF5D8E2DBB4CCA0DC9 /* EditorTheme.swift */; };
 		4C3B659B89EAF12FBAB1C7F7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = BDFC798DB007D2E193B6929F /* PrivacyInfo.xcprivacy */; };
 		4F8B2D362A789E66E628C961 /* ScreenshotImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5DBE7F338BAB81C9EB5548 /* ScreenshotImage.swift */; };
 		564AFB1F2045F1AFE1234788 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 125710148D591C1658029ED4 /* EditorView.swift */; };
+		57440E6F147E27E992365080 /* ShotListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABC2E2C6C8C28D83076BC01A /* ShotListView.swift */; };
 		5AFAA2F5FDB6267A96B3A73F /* SetupGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177C8DE4C49A2D8753E98ACB /* SetupGuideView.swift */; };
 		60E4A8920ABDAF57E68E75F3 /* FeatherShot-Screenshot.signedshortcut in Resources */ = {isa = PBXBuildFile; fileRef = F7954A9F979C1529EA75842B /* FeatherShot-Screenshot.signedshortcut */; };
+		7F9B0B9E416D5D8A0BAE2D63 /* WatchSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A86F71C999F2CC9EB7B8D61 /* WatchSync.swift */; };
 		8DE4A5A3AB0C9F75A7A45470 /* DoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DDA188CF0D5F7F2CEE215D /* DoneView.swift */; };
 		8EF1C1D977E317E304756E3B /* CropMathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F21C852702D3348B043B22F /* CropMathTests.swift */; };
 		9EF89A9660FEE42019E2F648 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCBAD64218A44D712F76C239 /* CropView.swift */; };
@@ -26,13 +31,23 @@
 		B5575A4DD983378B392157A7 /* EditorCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC0BA036C92B66F03FEB23C4 /* EditorCanvas.swift */; };
 		B7C636D1C087E795111FC84E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911994FD5F05C25527A23900 /* HomeView.swift */; };
 		BA369422D7ABEEB822A2B270 /* ExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751AAFBEA1C08F7D9B51B714 /* ExportTests.swift */; };
+		C27573C0DE2544EA50AB1C10 /* FeatherShotWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F004E29036CB3A3178914D0 /* FeatherShotWatchApp.swift */; };
 		C476E025CEFFF306DF3705C5 /* CropMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654EAD2E8141888F5F0CC7CD /* CropMath.swift */; };
 		DED01A07641A559A4F1CB6F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 03450AD3D8B29DE42A94D500 /* Assets.xcassets */; };
+		DF26926153A688F203AC4AC0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7004B7AB09D91121134DB6AC /* PrivacyInfo.xcprivacy */; };
 		E959C24CB877D0965E64E154 /* DemoScenes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25E44C11C2AB50C0F5DE4F8 /* DemoScenes.swift */; };
+		EA2FA219522DE02D7BC5ED33 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D025AE69873F9C9AF95E7D1 /* Device.swift */; };
 		F9397C6A8702F4F3568FDA22 /* EditorZoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA321C1AFC6E1281BA13E50D /* EditorZoom.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2078B2D57F306669056F2770 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 418C63699066CE5DFDD48DA2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E3E8A4C445F1D8AAA6C342ED;
+			remoteInfo = FeatherShotWatch;
+		};
 		82D15AD1E3F4FBA31C3CD72B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 418C63699066CE5DFDD48DA2 /* Project object */;
@@ -42,27 +57,50 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DB2227D0DCA84B108F678E1F /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				21F8A54CC612ACE9981C9CE8 /* FeatherShotWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		03450AD3D8B29DE42A94D500 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0348CEB435976F89CC41A115 /* PhotoExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoExport.swift; sourceTree = "<group>"; };
 		09C49A218566FACA702757B4 /* OpenScreenshotIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenScreenshotIntent.swift; sourceTree = "<group>"; };
 		125710148D591C1658029ED4 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
+		14C58E2F2D9A83B71873D7AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		177C8DE4C49A2D8753E98ACB /* SetupGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupGuideView.swift; sourceTree = "<group>"; };
 		21C7CF87E15DA2F50DA5F82C /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Version.xcconfig; sourceTree = "<group>"; };
+		2A86F71C999F2CC9EB7B8D61 /* WatchSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSync.swift; sourceTree = "<group>"; };
 		3D5DBE7F338BAB81C9EB5548 /* ScreenshotImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotImage.swift; sourceTree = "<group>"; };
 		5143566F56FBAB4992473971 /* ScreenshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotStore.swift; sourceTree = "<group>"; };
 		654EAD2E8141888F5F0CC7CD /* CropMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropMath.swift; sourceTree = "<group>"; };
+		6F004E29036CB3A3178914D0 /* FeatherShotWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatherShotWatchApp.swift; sourceTree = "<group>"; };
+		7004B7AB09D91121134DB6AC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		751AAFBEA1C08F7D9B51B714 /* ExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTests.swift; sourceTree = "<group>"; };
+		7D025AE69873F9C9AF95E7D1 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		7F21FC47306942E8DEB4FC9E /* FeatherShotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatherShotApp.swift; sourceTree = "<group>"; };
 		8B7B45F1A9D74F20895DE854 /* FeatherShot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FeatherShot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F3718724B3F92CE8F0887AB /* DrawingShapes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DrawingShapes.swift; path = ../Sources/DrawingShapes.swift; sourceTree = "<group>"; };
 		911994FD5F05C25527A23900 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9F21C852702D3348B043B22F /* CropMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropMathTests.swift; sourceTree = "<group>"; };
+		ABC2E2C6C8C28D83076BC01A /* ShotListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotListView.swift; sourceTree = "<group>"; };
 		AC4625AF5D8E2DBB4CCA0DC9 /* EditorTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EditorTheme.swift; path = ../Sources/EditorTheme.swift; sourceTree = "<group>"; };
+		B06F568943F8B877EFFD48AD /* FeatherShotWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FeatherShotWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7DDA188CF0D5F7F2CEE215D /* DoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoneView.swift; sourceTree = "<group>"; };
 		BDFC798DB007D2E193B6929F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C68AC6CA00EC083CB432F8E8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CCBAD64218A44D712F76C239 /* CropView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
 		CD942937F99BAC28AB58E9A2 /* AnnotationLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationLayer.swift; sourceTree = "<group>"; };
+		DAC84023B244743ABBEDBA7F /* ShotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShotStore.swift; sourceTree = "<group>"; };
 		DB40BCEAE6FDFFCB0ECB01E5 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		DD09C8E89B0FE25FBBF2D719 /* FeatherShotTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FeatherShotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8D2A7B5E37F65C4FCB5BDD8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -73,6 +111,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		01E6401B38B57E3DE90C578C /* Watch */ = {
+			isa = PBXGroup;
+			children = (
+				6F004E29036CB3A3178914D0 /* FeatherShotWatchApp.swift */,
+				C68AC6CA00EC083CB432F8E8 /* Info.plist */,
+				ABC2E2C6C8C28D83076BC01A /* ShotListView.swift */,
+				DAC84023B244743ABBEDBA7F /* ShotStore.swift */,
+				9BF33484F6E55DF6C504B6C3 /* Resources */,
+			);
+			path = Watch;
+			sourceTree = "<group>";
+		};
 		1E2FD96ED697294128C7F64E /* Export */ = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +146,7 @@
 			children = (
 				8B7B45F1A9D74F20895DE854 /* FeatherShot.app */,
 				DD09C8E89B0FE25FBBF2D719 /* FeatherShotTests.xctest */,
+				B06F568943F8B877EFFD48AD /* FeatherShotWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -104,6 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				DB40BCEAE6FDFFCB0ECB01E5 /* AppModel.swift */,
+				7D025AE69873F9C9AF95E7D1 /* Device.swift */,
 				B7DDA188CF0D5F7F2CEE215D /* DoneView.swift */,
 				7F21FC47306942E8DEB4FC9E /* FeatherShotApp.swift */,
 				911994FD5F05C25527A23900 /* HomeView.swift */,
@@ -120,6 +172,7 @@
 				5F56830786A41C3A73C4B935 /* FeatherShot */,
 				C1ECBA85DB1D93A39AC41DA2 /* FeatherShotTests */,
 				396B5B4E008D637675654061 /* Shared */,
+				01E6401B38B57E3DE90C578C /* Watch */,
 				3DAFA5228E562A861B8979CC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -143,8 +196,17 @@
 				1E2FD96ED697294128C7F64E /* Export */,
 				A675BEC34232A30984BCCF7E /* Intents */,
 				E4D89DEEAAA89018AE6B86ED /* Resources */,
+				84CCB9E9D0D41F921B7C3ED9 /* Sync */,
 			);
 			path = FeatherShot;
+			sourceTree = "<group>";
+		};
+		84CCB9E9D0D41F921B7C3ED9 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				2A86F71C999F2CC9EB7B8D61 /* WatchSync.swift */,
+			);
+			path = Sync;
 			sourceTree = "<group>";
 		};
 		97F105BF0E33244EE48F5AC7 /* Crop */ = {
@@ -155,6 +217,15 @@
 				3D5DBE7F338BAB81C9EB5548 /* ScreenshotImage.swift */,
 			);
 			path = Crop;
+			sourceTree = "<group>";
+		};
+		9BF33484F6E55DF6C504B6C3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				14C58E2F2D9A83B71873D7AD /* Assets.xcassets */,
+				7004B7AB09D91121134DB6AC /* PrivacyInfo.xcprivacy */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		A675BEC34232A30984BCCF7E /* Intents */ = {
@@ -211,16 +282,36 @@
 			buildPhases = (
 				E47755B3875F291EA0D0CA6B /* Sources */,
 				4E037221DA5CDC32B74639F2 /* Resources */,
+				DB2227D0DCA84B108F678E1F /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				36CD654132FBBBB1CC1A03CD /* PBXTargetDependency */,
 			);
 			name = FeatherShot;
 			packageProductDependencies = (
 			);
 			productName = FeatherShot;
 			productReference = 8B7B45F1A9D74F20895DE854 /* FeatherShot.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E3E8A4C445F1D8AAA6C342ED /* FeatherShotWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23958E1C5E4C065533F104DE /* Build configuration list for PBXNativeTarget "FeatherShotWatch" */;
+			buildPhases = (
+				BA55733CB783C8E009685EDA /* Sources */,
+				68FCC00AC6C90C2AA41B3076 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FeatherShotWatch;
+			packageProductDependencies = (
+			);
+			productName = FeatherShotWatch;
+			productReference = B06F568943F8B877EFFD48AD /* FeatherShotWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 		EAF89BEE582E55CDF8B79339 /* FeatherShotTests */ = {
@@ -254,6 +345,10 @@
 						DevelopmentTeam = XPPUZJDN56;
 						ProvisioningStyle = Automatic;
 					};
+					E3E8A4C445F1D8AAA6C342ED = {
+						DevelopmentTeam = XPPUZJDN56;
+						ProvisioningStyle = Automatic;
+					};
 					EAF89BEE582E55CDF8B79339 = {
 						DevelopmentTeam = XPPUZJDN56;
 						ProvisioningStyle = Automatic;
@@ -275,6 +370,7 @@
 			projectRoot = "";
 			targets = (
 				A7F2534C813BC26FEC1A3EA8 /* FeatherShot */,
+				E3E8A4C445F1D8AAA6C342ED /* FeatherShotWatch */,
 				EAF89BEE582E55CDF8B79339 /* FeatherShotTests */,
 			);
 		};
@@ -291,6 +387,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		68FCC00AC6C90C2AA41B3076 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E7F30C84C8935BC9C7E98A3 /* Assets.xcassets in Resources */,
+				DF26926153A688F203AC4AC0 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -303,6 +408,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BA55733CB783C8E009685EDA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C27573C0DE2544EA50AB1C10 /* FeatherShotWatchApp.swift in Sources */,
+				57440E6F147E27E992365080 /* ShotListView.swift in Sources */,
+				26D5A4CA8AB8A2F853882CF4 /* ShotStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E47755B3875F291EA0D0CA6B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -312,6 +427,7 @@
 				C476E025CEFFF306DF3705C5 /* CropMath.swift in Sources */,
 				9EF89A9660FEE42019E2F648 /* CropView.swift in Sources */,
 				E959C24CB877D0965E64E154 /* DemoScenes.swift in Sources */,
+				EA2FA219522DE02D7BC5ED33 /* Device.swift in Sources */,
 				8DE4A5A3AB0C9F75A7A45470 /* DoneView.swift in Sources */,
 				08405DBEFEB016F42AB3DDFB /* DrawingShapes.swift in Sources */,
 				B5575A4DD983378B392157A7 /* EditorCanvas.swift in Sources */,
@@ -325,12 +441,18 @@
 				4F8B2D362A789E66E628C961 /* ScreenshotImage.swift in Sources */,
 				1AB477B05C3EE7B8D6DB4ED8 /* ScreenshotStore.swift in Sources */,
 				5AFAA2F5FDB6267A96B3A73F /* SetupGuideView.swift in Sources */,
+				7F9B0B9E416D5D8A0BAE2D63 /* WatchSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		36CD654132FBBBB1CC1A03CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E3E8A4C445F1D8AAA6C342ED /* FeatherShotWatch */;
+			targetProxy = 2078B2D57F306669056F2770 /* PBXContainerItemProxy */;
+		};
 		40AADD43BC7940D3CD541B30 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A7F2534C813BC26FEC1A3EA8 /* FeatherShot */;
@@ -357,7 +479,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -379,7 +501,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -444,13 +566,26 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
+		};
+		7D3D311CB88E5D6078E72144 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				INFOPLIST_FILE = Watch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.kainzmayer.feathershot.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
 		};
 		A44A1D4751ACF2240881BBA9 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -464,7 +599,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.kainzmayer.feathershot.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FeatherShot.app/FeatherShot";
 			};
 			name = Debug;
@@ -481,10 +616,24 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.kainzmayer.feathershot.tests;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FeatherShot.app/FeatherShot";
 			};
 			name = Release;
+		};
+		BC5E1145464BA00623D9591F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				INFOPLIST_FILE = Watch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.kainzmayer.feathershot.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
 		};
 		FC77AB2BB6B31345ED0E8855 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -540,7 +689,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -551,6 +699,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		23958E1C5E4C065533F104DE /* Build configuration list for PBXNativeTarget "FeatherShotWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC5E1145464BA00623D9591F /* Debug */,
+				7D3D311CB88E5D6078E72144 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		67493BA1ECE1FAB6801B203A /* Build configuration list for PBXNativeTarget "FeatherShotTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

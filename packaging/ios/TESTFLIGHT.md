@@ -3,7 +3,8 @@
 The iPhone app lives in [`ios/`](../../ios). [`ios/project.yml`](../../ios/project.yml) is the source of the Xcode project. After editing it, run `xcodegen generate` in `ios/` and commit both files. The drawing code (`Sources/DrawingShapes.swift`, `EditorTheme.swift`, `EditorZoom.swift`) is compiled into both the Mac app and the iPhone app, so a change there must build on both.
 
 - Bundle ID `xyz.kainzmayer.feathershot`, the same as the Mac app (Universal Purchase: one App Store record, one listing)
-- iOS 18 or later, iPhone only, portrait
+- iOS 18 or later, iPhone (portrait) and iPad (all orientations). iPad has no Action Button, so its setup texts point to Control Center.
+- Apple Watch app (`ios/Watch`, watchOS 11+, `xyz.kainzmayer.feathershot.watchkitapp`), embedded in the iPhone app: after Save & Copy the iPhone sends a small copy (WatchConnectivity), and the watch shows the recent ones with Digital Crown zoom. Nothing leaves the user's own devices.
 - Version: `MARKETING_VERSION` in [`ios/Config/Version.xcconfig`](../../ios/Config/Version.xcconfig). The build number is set per upload.
 
 ## One-time setup in App Store Connect
@@ -48,24 +49,44 @@ The simulator cannot press the Action Button, so the main path needs a real iPho
 
 ## App Review notes (for the App Store submission)
 
-> FeatherShot annotates screenshots. To try it without setup, tap "Annotate a Screenshot from Photos" and pick any image. The main flow is a Shortcut ("Take Screenshot" → FeatherShot's "Annotate Screenshot" action), which the app offers with "Add the Shortcut", on the Action Button. The app takes no screenshots by itself, collects no data and has no network access.
+> FeatherShot annotates screenshots. To try it without setup, tap "Annotate a Screenshot from Photos" and pick any image. The main flow is a Shortcut ("Take Screenshot" → FeatherShot's "Annotate Screenshot" action), which the app offers with "Add the Shortcut", on the Action Button. On iPad the shortcut runs from Control Center. The Apple Watch app shows the screenshots the user saved on their iPhone (sent over WatchConnectivity after Save & Copy). The app takes no screenshots by itself, collects no data and has no network access.
 
 Privacy: "Data Not Collected", as on the Mac. `PrivacyInfo.xcprivacy` declares no tracking, no collected data, and file-timestamp access (C617.1) for the cleanup of its own temp files.
 
-## App Store screenshots
+## App Store images
 
-Six 1320×2868 images (the 6.9" size; App Store Connect scales them for smaller iPhones), in the style of the Mac set in `_archive/appstore`:
+Every size below is one App Store Connect lists for its slot (checked 2026-11-06). Output goes to `_archive/appstore-ios/` (not in git):
+
+| Slot in App Store Connect | Folder | Size | From |
+|---|---|---|---|
+| iPhone mit Dynamic Island (6.1"/6.3") | `iphone-6.3/` | 1206×2622 | iPhone 18 Pro simulator |
+| iPhone Duo | `iphone-duo/` | 1398×2034 | iPhone Duo simulator, cover display (`--display=1`) |
+| iPad 13" | `ipad-13/` | 2064×2752 | iPad Pro 13-inch (M5) simulator |
+| Apple Watch | `apple-watch/` | 422×514 | Apple Watch Ultra 4 (49mm) simulator, raw |
+| Kopfzeile (product page header) | `header/` | 3840×1646 and 5244×2950 | `banner.swift` |
+| Suchergebnisse | — | not made yet: the size was not visible | |
+
+Boot one simulator at a time (8 GB RAM), and shut it down before the next.
 
 ```bash
+# Debug build with the --demo scenes (iPhone, iPad and the embedded Watch app)
 xcodebuild build -project ios/FeatherShot.xcodeproj -scheme FeatherShot \
-  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -derivedDataPath /tmp/fs-dd
-xcrun simctl install booted /tmp/fs-dd/Build/Products/Debug-iphonesimulator/FeatherShot.app
-bash packaging/ios/appstore/capture.sh booted /tmp/fs-shots
-swift packaging/ios/appstore/compose.swift /tmp/fs-shots _archive/appstore-ios
+  -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/fs-dd
+APP=/tmp/fs-dd/Build/Products/Debug-iphonesimulator/FeatherShot.app
+
+# Per device: boot, install, capture, compose, shut down
+xcrun simctl boot <udid> && xcrun simctl bootstatus <udid> -b
+xcrun simctl install <udid> "$APP"
+bash packaging/ios/appstore/capture.sh <udid> /tmp/fs-shots-<device> [display]
+swift packaging/ios/appstore/compose.swift /tmp/fs-shots-<device> _archive/appstore-ios/<folder> <width> <height> <phone|duo|ipad>
+xcrun simctl shutdown <udid>
+
+# Header
+swift packaging/ios/appstore/banner.swift /tmp/fs-shots-iphone ios/FeatherShot/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png \
+  _archive/appstore-ios/header/header-3840x1646.png 3840 1646
 ```
 
 - [`demo_screen.swift`](appstore/demo_screen.swift) draws the screen that gets annotated: a made-up "Lisbon Weekend" itinerary, our own content.
-- [`capture.sh`](appstore/capture.sh) opens it in the Debug app with `--demo <scene>` ([`DemoScenes.swift`](../../ios/FeatherShot/Debug/DemoScenes.swift), Debug builds only) and saves each screen with a 9:41 status bar.
-- [`compose.swift`](appstore/compose.swift) adds the gradient, headline, subtitle and iPhone frame. The headlines and subtitles are in its `slides` list.
-
-The guide frame is picked from `guide-1` … `guide-8` (the intro animation keeps running); `compose.swift` uses `guide-3`, the "Annotate" step.
+- [`capture.sh`](appstore/capture.sh) opens it in the Debug app with `--demo <scene>` ([`DemoScenes.swift`](../../ios/FeatherShot/Debug/DemoScenes.swift), Debug builds only) and saves each screen with a 9:41 status bar. On the iPhone Duo pass `1` as display: the simulator starts folded, and its inner 2007×2853 display stays dark without the Simulator app's fold control.
+- [`compose.swift`](appstore/compose.swift) adds the gradient, headline, subtitle and device frame at the exact canvas size; headlines are in its `slides` list (iPad gets its own slide 2). The guide frame comes from `guide-1` … `guide-8` (the intro animation keeps running): copy the one showing "3 Annotate" to `guide-3.png`.
+- Apple Watch: launch the iPhone app once with `--open-screenshot demo.png --demo-export <dir>` to write the annotated demo images, copy them (JPEG, ≤900 px) into the Watch app's `Documents/Shots` (`xcrun simctl get_app_container <watch> xyz.kainzmayer.feathershot.watchkitapp data`), then launch the Watch app plain, with `--demo-detail`, and with `--demo-detail --demo-zoom 1.8`. Watch captures have transparent corners: flatten them onto black before uploading. watchOS ignores the 9:41 status bar override.

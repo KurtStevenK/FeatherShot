@@ -46,7 +46,7 @@ struct HomeView: View {
 
     private var setupSteps: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Put FeatherShot on the Action Button")
+            Text(Device.isPad ? "Run FeatherShot from Control Center" : "Put FeatherShot on the Action Button")
                 .font(.headline)
                 .foregroundStyle(EditorTheme.text)
             step(1, "Add the **FeatherShot Screenshot** shortcut. The guide shows each tap.")
@@ -57,10 +57,17 @@ struct HomeView: View {
                 .buttonStyle(EditorPillButtonStyle(kind: .ghost))
                 .padding(.leading, 32)
             }
-            step(2, "Open **Settings › Action Button**, swipe to **Shortcut**, and choose **FeatherShot Screenshot**.")
-            Text("Then press the Action Button in any app: it takes a screenshot and FeatherShot opens to select the area. On iPhones without an Action Button, use **Settings › Accessibility › Touch › Back Tap** instead.")
+            if Device.isPad {
+                step(2, "Open **Control Center**, tap **+ › Add a Control › Shortcut**, and choose **FeatherShot Screenshot**.")
+                Text("Then tap it in any app: it takes a screenshot and FeatherShot opens to select the area. Siri runs it too: “FeatherShot Screenshot”.")
+                    .font(.footnote)
+                    .foregroundStyle(EditorTheme.muted)
+            } else {
+                step(2, "Open **Settings › Action Button**, swipe to **Shortcut**, and choose **FeatherShot Screenshot**.")
+                Text("Then press the Action Button in any app: it takes a screenshot and FeatherShot opens to select the area. On iPhones without an Action Button, use **Settings › Accessibility › Touch › Back Tap** instead.")
                 .font(.footnote)
                 .foregroundStyle(EditorTheme.muted)
+            }
             DisclosureGroup("Build the shortcut yourself") {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("In **Shortcuts**, create a shortcut with **Take Screenshot**, then **Annotate Screenshot** (FeatherShot).")

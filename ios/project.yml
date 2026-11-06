@@ -29,6 +29,8 @@ targets:
         group: Shared
       - path: ../Sources/EditorZoom.swift
         group: Shared
+    dependencies:
+      - target: FeatherShotWatch
     info:
       path: FeatherShot/Info.plist
       properties:
@@ -44,19 +46,46 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UIRequiredDeviceCapabilities:
           - arm64
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.kainzmayer.feathershot
         PRODUCT_NAME: FeatherShot
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SUPPORTS_MACCATALYST: NO
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
         ENABLE_PREVIEWS: YES
+  FeatherShotWatch:
+    type: application
+    platform: watchOS
+    deploymentTarget: "11.0"
+    sources:
+      - path: Watch
+    info:
+      path: Watch/Info.plist
+      properties:
+        CFBundleDisplayName: FeatherShot
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: xyz.kainzmayer.feathershot
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: xyz.kainzmayer.feathershot.watchkitapp
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        TARGETED_DEVICE_FAMILY: "4"
+        SKIP_INSTALL: YES
   FeatherShotTests:
     type: bundle.unit-test
     platform: iOS
@@ -68,7 +97,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: xyz.kainzmayer.feathershot.tests
         GENERATE_INFOPLIST_FILE: YES
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
 schemes:
   FeatherShot:
     build:

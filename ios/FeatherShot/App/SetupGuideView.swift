@@ -11,13 +11,22 @@ struct SetupGuideView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var scene = 0
 
-    private static let scenes: [(title: LocalizedStringKey, caption: LocalizedStringKey)] = [
-        ("Screenshot with one press", "Press the Action Button in any app. FeatherShot opens with the screenshot: select the area, annotate, Save & Copy."),
-        ("Tap **Shortcuts**", "In the share sheet, choose the Shortcuts app."),
-        ("Tap **Add Shortcut**", "Shortcuts shows FeatherShot Screenshot. Add it."),
-        ("Pick it for the Action Button", "**Settings › Action Button**, swipe to **Shortcut**, choose **FeatherShot Screenshot**."),
-        ("Press the Action Button", "The first time, tap **Always Allow**. FeatherShot opens with your screenshot."),
-    ]
+    /// iPad has no Action Button: there the shortcut goes into Control Center.
+    private static var scenes: [(title: LocalizedStringKey, caption: LocalizedStringKey)] {
+        Device.isPad ? [
+            ("Screenshot with one tap", "Tap FeatherShot Screenshot in Control Center. FeatherShot opens with the screenshot: select the area, annotate, Save & Copy."),
+            ("Tap **Shortcuts**", "In the share sheet, choose the Shortcuts app."),
+            ("Tap **Add Shortcut**", "Shortcuts shows FeatherShot Screenshot. Add it."),
+            ("Add it to Control Center", "Open **Control Center**, tap **+ › Add a Control › Shortcut**, choose **FeatherShot Screenshot**."),
+            ("Tap it in any app", "The first time, tap **Always Allow**. FeatherShot opens with your screenshot."),
+        ] : [
+            ("Screenshot with one press", "Press the Action Button in any app. FeatherShot opens with the screenshot: select the area, annotate, Save & Copy."),
+            ("Tap **Shortcuts**", "In the share sheet, choose the Shortcuts app."),
+            ("Tap **Add Shortcut**", "Shortcuts shows FeatherShot Screenshot. Add it."),
+            ("Pick it for the Action Button", "**Settings › Action Button**, swipe to **Shortcut**, choose **FeatherShot Screenshot**."),
+            ("Press the Action Button", "The first time, tap **Always Allow**. FeatherShot opens with your screenshot."),
+        ]
+    }
 
     var body: some View {
         VStack(spacing: 18) {
@@ -27,7 +36,7 @@ struct SetupGuideView: View {
                 .shadow(color: EditorTheme.blue.opacity(0.35), radius: 8, y: 3)
                 .padding(.top, 16)
                 .accessibilityHidden(true)
-            Text(scene == 0 ? "Welcome to FeatherShot" : "Set up the Action Button")
+            Text(scene == 0 ? "Welcome to FeatherShot" : Device.isPad ? "Set up the shortcut" : "Set up the Action Button")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(EditorTheme.text)
 
@@ -37,7 +46,7 @@ struct SetupGuideView: View {
                     case 0: IntroScene()
                     case 1: ShareSheetScene()
                     case 2: ImportScene()
-                    case 3: ActionButtonScene()
+                    case 3: if Device.isPad { ControlCenterScene() } else { ActionButtonScene() }
                     default: PressScene()
                     }
                 }
@@ -48,7 +57,7 @@ struct SetupGuideView: View {
             .accessibilityHidden(true)
 
             VStack(spacing: 6) {
-                Text(scene == 0 ? "FeatherShot for iPhone" : "Step \(scene) of \(Self.scenes.count - 1)")
+                Text(scene == 0 ? (Device.isPad ? "FeatherShot for iPad" : "FeatherShot for iPhone") : "Step \(scene) of \(Self.scenes.count - 1)")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(EditorTheme.link)
                 Text(Self.scenes[scene].title)
@@ -82,7 +91,7 @@ struct SetupGuideView: View {
                 Button {
                     withAnimation(.easeInOut(duration: 0.3)) { scene += 1 }
                 } label: {
-                    Text(scene == 0 ? "Set Up the Action Button" : "Next").frame(maxWidth: .infinity)
+                    Text(scene == 0 ? (Device.isPad ? "Set Up the Shortcut" : "Set Up the Action Button") : "Next").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(EditorPillButtonStyle(kind: .primary))
                 .padding(.horizontal, 24)
@@ -237,7 +246,7 @@ private struct IntroScene: View {
     private func caption(for phase: Phase) -> some View {
         let text: String = switch phase {
         case .app: "In any app…"
-        case .press, .flash: "1  Press the Action Button"
+        case .press, .flash: Device.isPad ? "1  Tap the shortcut" : "1  Press the Action Button"
         case .selectStart, .selectEnd: "2  Select the area"
         case .annotate: "3  Annotate"
         case .save: "4  Tap Save & Copy"
@@ -464,6 +473,33 @@ private struct ImportScene: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(white: 0.95))
+    }
+}
+
+/// 3 (iPad). Control Center with the FeatherShot Screenshot control added.
+private struct ControlCenterScene: View {
+    var body: some View {
+        let tiles: [(String, Color)] = [("airplane", .orange), ("wifi", .blue), ("antenna.radiowaves.left.and.right", .green),
+                                        ("moon.fill", .indigo), ("flashlight.off.fill", .gray), ("timer", .gray)]
+        VStack(spacing: 10) {
+            Text("Control Center").font(.system(size: 10, weight: .semibold)).foregroundStyle(.white).padding(.top, 34)
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(34), spacing: 10), count: 3), spacing: 10) {
+                ForEach(tiles.indices, id: \.self) { i in
+                    Circle().fill(Color.white.opacity(0.16)).frame(width: 34, height: 34)
+                        .overlay(Image(systemName: tiles[i].0).font(.system(size: 13, weight: .semibold)).foregroundStyle(tiles[i].1))
+                }
+            }
+            VStack(spacing: 4) {
+                Circle().fill(Color.white).frame(width: 40, height: 40)
+                    .overlay(Image("Logo").resizable().frame(width: 26, height: 26).clipShape(RoundedRectangle(cornerRadius: 6)))
+                    .overlay(TapMarker())
+                Text("FeatherShot Screenshot").font(.system(size: 7, weight: .semibold)).foregroundStyle(.white)
+                    .lineLimit(1).minimumScaleFactor(0.7)
+            }
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(LinearGradient(colors: [Color(white: 0.18), Color(white: 0.08)], startPoint: .top, endPoint: .bottom))
     }
 }
 

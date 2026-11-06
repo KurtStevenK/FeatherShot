@@ -1,7 +1,10 @@
 #!/bin/bash
 # Captures the App Store scenes from the Debug app in a booted iPhone simulator.
 #
-#   bash packaging/ios/appstore/capture.sh <simulator-udid> <out-dir>
+#   bash packaging/ios/appstore/capture.sh <simulator-udid> <out-dir> [display]
+#
+# [display] picks the screen on devices with more than one, e.g. 3 for the iPhone Duo's inner
+# 2007×2853 display (`xcrun simctl io <udid> screenshot` lists them when it is missing).
 #
 # Needs a Debug build of ios/FeatherShot.xcodeproj installed on that simulator (the `--demo`
 # scenes exist only in Debug builds). Writes <out-dir>/<scene>.png at the device's resolution.
@@ -10,6 +13,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 DEVICE="$1"
 OUT="$2"
+DISPLAY_ARG=()
+if [[ -n "${3:-}" ]]; then DISPLAY_ARG=(--display="$3"); fi
 APP_ID="xyz.kainzmayer.feathershot"
 mkdir -p "$OUT"
 
@@ -32,7 +37,7 @@ launch() {
 }
 
 shoot() {
-  xcrun simctl io "$DEVICE" screenshot "$OUT/$1.png" >/dev/null 2>&1
+  xcrun simctl io "$DEVICE" screenshot ${DISPLAY_ARG[@]+"${DISPLAY_ARG[@]}"} "$OUT/$1.png" >/dev/null 2>&1
   echo "captured $1"
 }
 
