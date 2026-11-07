@@ -145,6 +145,8 @@ struct EditorView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
         }
+        // Keep the tools out of the iPhone Duo's status bar column; the bar's color still reaches the edge.
+        .clipped()
         .background(EditorTheme.bar)
         .overlay(alignment: .bottom) { EditorTheme.border.frame(height: 1) }
     }

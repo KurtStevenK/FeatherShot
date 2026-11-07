@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.47] - 2026-11-07
+
+### Fixed
+
+- iPhone app on the foldable iPhone Duo: the editor's tool row no longer scrolls under the status bar beside the camera, so no tool sits under the clock. Found with Apple's app resizability skill (Xcode 27.2), whose other checks the app already passes.
+
 ## [1.3.46] - 2026-11-05
 
 ### Added
