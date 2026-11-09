@@ -5,6 +5,19 @@ const { compareVersions, fetchLatestRelease } = require('./github-release');
 
 const DOWNLOAD_PAGE = 'https://github.com/KurtStevenK/FeatherShot/releases/latest';
 
+// Defense-in-depth: Validate URLs before handing off to the OS shell to prevent arbitrary protocol execution.
+function openExternalSafely(targetUrl) {
+  try {
+    const parsed = new URL(targetUrl);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return shell.openExternal(targetUrl);
+    }
+    console.warn('Blocked attempt to open unsafe external URL protocol:', targetUrl);
+  } catch (err) {
+    console.warn('Invalid URL passed to openExternalSafely:', targetUrl, err);
+  }
+}
+
 function linuxUpgradeHint() {
   if (fs.existsSync('/etc/arch-release')) {
     return 'sudo pacman -Sy feathershot';
@@ -59,7 +72,7 @@ function showDownloadFailed(err) {
     detail: String(err.message || err),
     buttons: ['Open Download Page', 'OK'],
   }).then(({ response }) => {
-    if (response === 0) shell.openExternal(DOWNLOAD_PAGE);
+    if (response === 0) openExternalSafely(DOWNLOAD_PAGE);
   });
 }
 
@@ -99,7 +112,7 @@ async function checkForUpdatesInteractive() {
       buttons: ['Open Download Page', 'OK'],
     });
     if (response === 0) {
-      shell.openExternal(DOWNLOAD_PAGE);
+      openExternalSafely(DOWNLOAD_PAGE);
     }
   } catch (e) {
     await dialog.showMessageBox({
