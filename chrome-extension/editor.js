@@ -84,11 +84,15 @@ widthSlider.oninput = (e) => {
 };
 function updateActionStates() {
   const hasDrawings = drawings.length > 0;
-  document.getElementById('undo').disabled = !hasDrawings;
-  document.getElementById('clear').disabled = !hasDrawings;
+  const undoBtn = document.getElementById('undo');
+  const clearBtn = document.getElementById('clear');
+  undoBtn.disabled = !hasDrawings;
+  clearBtn.disabled = !hasDrawings;
+  undoBtn.title = hasDrawings ? 'Undo (Ctrl+Z)' : 'Nothing to undo';
+  clearBtn.title = hasDrawings ? 'Clear All' : 'No annotations to clear';
 }
 
-document.getElementById('undo').onclick = () => {
+function undo() {
   if (drawings.length) {
     const r = drawings.pop();
     if (r.tool === 'step') stepN--;
@@ -98,15 +102,48 @@ document.getElementById('undo').onclick = () => {
     render();
     updateActionStates();
   }
-};
-document.getElementById('clear').onclick = () => {
+}
+
+function clearAll() {
   if (drawings.length === 0) return;
   if (!confirm('Are you sure you want to clear all annotations?')) return;
   drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0;
   render();
   updateActionStates();
-};
+}
+
+document.getElementById('undo').onclick = undo;
+document.getElementById('clear').onclick = clearAll;
 document.getElementById('save').onclick = saveAndDownload;
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+    e.preventDefault();
+    saveAndDownload();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) {
+    e.preventDefault();
+    undo();
+    return;
+  }
+  if (editingTextId || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === '1') setTool('step');
+  else if (e.key === '2') setTool('step-rect');
+  else if (e.key === '3' || e.key === 'a' || e.key === 'A') setTool('arrow');
+  else if (e.key === '4' || e.key === 'r' || e.key === 'R') setTool('rect');
+  else if (e.key === '5') setTool('circle');
+  else if (e.key === '6' || e.key === 'l' || e.key === 'L') setTool('line');
+  else if (e.key === '7') setTool('question-arrow');
+  else if (e.key === '8') setTool('question-rect');
+  else if (e.key === '-' || e.key === '_') setTool('exclamation-arrow');
+  else if (e.key === '=' || e.key === '+') setTool('exclamation-rect');
+  else if (e.key === 't' || e.key === 'T') setTool('text');
+  else if (e.key === '9') setTool('abc-arrow');
+  else if (e.key === '0') setTool('abc-rect');
+  else if (e.key === 'm' || e.key === 'M') setTool('magnifier');
+});
 
 function setTool(t) {
   if (tool === 'text' && t !== 'text') commitTextEdit();
