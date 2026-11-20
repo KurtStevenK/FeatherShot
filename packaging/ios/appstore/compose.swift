@@ -39,7 +39,7 @@ var slides = [
           subtitle: "Callouts with ! and ? markers\nin any color"),
     Slide(file: "done", title: "Save & Copy\nin one tap",
           subtitle: "Straight to Photos\nand your clipboard"),
-    Slide(file: "guide-3", title: "Free and\nopen source",
+    Slide(file: "guide-3", title: "Open source,\nprivate by design",
           subtitle: "No account, no tracking,\nno data collected"),
 ]
 
