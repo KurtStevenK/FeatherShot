@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.48] - 2026-11-21
+
+### Added
+
+- Linux: FeatherShot is built as a snap and published to the Snap Store (`snap install feathershot` once Canonical has reviewed the store name). Snap installs update through the store; the update check suggests `sudo snap refresh feathershot`. The `.snap` file is also attached to each GitHub release.
+
 ## [1.3.47] - 2026-11-07
 
 ### Fixed
