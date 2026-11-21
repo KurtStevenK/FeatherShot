@@ -6,6 +6,10 @@ const { compareVersions, fetchLatestRelease } = require('./github-release');
 const DOWNLOAD_PAGE = 'https://github.com/KurtStevenK/FeatherShot/releases/latest';
 
 function linuxUpgradeHint() {
+  // Snap Store installs update themselves; snap refresh only forces it now.
+  if (process.env.SNAP) {
+    return 'sudo snap refresh feathershot';
+  }
   if (fs.existsSync('/etc/arch-release')) {
     return 'sudo pacman -Sy feathershot';
   }

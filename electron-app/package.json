@@ -83,6 +83,12 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "snap",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.png",
@@ -99,6 +105,12 @@
     "pacman": {
       "artifactName": "FeatherShot-${version}-Arch.${ext}",
       "packageName": "feathershot"
+    },
+    "snap": {
+      "artifactName": "FeatherShot-${version}-Snap.${ext}",
+      "summary": "Lightweight screenshot annotations",
+      "grade": "stable",
+      "confinement": "strict"
     },
     "publish": [
       {
