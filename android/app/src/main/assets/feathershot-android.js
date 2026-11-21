@@ -4,6 +4,7 @@
  *
  * The editor was written for Chrome. This file gives it the few browser APIs it needs
  * on Android, without changing chrome-extension/editor.js:
+ *   0. assets/android/mobile.css -> phone layout for the toolbar
  *   1. chrome.storage.local  -> the image opened from the app's storage
  *   2. touch -> mouse        -> the editor draws with mouse events only
  *   3. <a download> data URL -> saved to Pictures/FeatherShot via the native bridge
@@ -11,14 +12,16 @@
 (function () {
   'use strict';
 
-  // 0. Layout: the editor toolbar is one non-wrapping row, so on a phone the Save, Undo and Clear
-  // buttons sit off-screen. Let the row scroll sideways here (Chrome keeps its own layout).
-  var layoutStyle = document.createElement('style');
-  layoutStyle.textContent =
-    '#toolbar { overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }' +
-    '#toolbar::-webkit-scrollbar { display: none; }' +
-    '#toolbar > * { flex-shrink: 0; }';
-  (document.head || document.documentElement).appendChild(layoutStyle);
+  // 0. Layout: the editor toolbar is one desktop row. On Android, android/mobile.css turns it into
+  // a bottom dock for phones (Chrome and Electron never load that file). It must come after
+  // editor.css in the cascade, so it is linked now and moved to the end of <head> once parsed.
+  var mobileCss = document.createElement('link');
+  mobileCss.rel = 'stylesheet';
+  mobileCss.href = location.origin + '/assets/android/mobile.css';
+  (document.head || document.documentElement).appendChild(mobileCss);
+  document.addEventListener('DOMContentLoaded', function () {
+    if (document.head && document.head.lastElementChild !== mobileCss) document.head.appendChild(mobileCss);
+  });
 
   // 1. Initial screenshot: MainActivity opens editor.html?img=<file name in app storage>.
   var imageName = new URLSearchParams(location.search).get('img');

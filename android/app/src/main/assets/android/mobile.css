@@ -1,0 +1,154 @@
+/*
+ * FeatherShot for Android: phone layout for the shared editor (chrome-extension/editor.html).
+ *
+ * Loaded only on Android by feathershot-android.js, which moves this sheet to the end of <head>
+ * so it overrides chrome-extension/editor.css. Chrome and Electron never load it.
+ *
+ * Portrait: the toolbar becomes a bottom dock with three rows, built from the existing DOM
+ * with flex-wrap (no element is moved):
+ *   1. the tool strip (scrolls sideways inside itself)
+ *   2. colour, width slider, width label
+ *   3. Undo, Clear and a wide Save & Download (the existing .spacer is the row break)
+ * Landscape on a phone: one row, with the tool strip taking the free space and scrolling.
+ */
+
+html, body, #editor { height: 100%; }
+body { overscroll-behavior: none; }
+
+#canvas-container { min-height: 0; }
+
+/* The canvas fills its container instead of "100vh minus a 56px toolbar". */
+#canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* ---------- Dock (portrait default) ---------- */
+
+#toolbar {
+  flex: none;
+  height: auto;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 0;
+  padding: 8px 12px 10px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#toolbar button,
+#toolbar input {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Row 1: tool strip. Scrolls on its own; the page never scrolls sideways. */
+.tool-group {
+  flex: 0 0 100%;
+  min-width: 0;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  padding: 2px 0 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #333;
+}
+.tool-group::-webkit-scrollbar { display: none; }
+
+.tool-btn {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  font-size: 17px;
+  color: #ccc;
+}
+.tool-btn.active { font-weight: 700; }
+
+.sep { display: none; }
+
+/* Row 2: colour + width. */
+#color {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+#width {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  height: 44px;
+}
+
+#w-label {
+  flex: none;
+  min-width: 40px;
+  text-align: right;
+  font-size: 13px;
+  color: #888;
+}
+
+/* The spacer becomes the break between row 2 and row 3. */
+.spacer {
+  flex: 0 0 100%;
+  height: 8px;
+}
+
+/* Row 3: actions. */
+.act {
+  flex: none;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+#save {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Touch screens keep :hover after a tap; do not let it look like a second active tool. */
+@media (hover: none) {
+  .tool-btn:hover:not(.active) { background: transparent; color: #ccc; }
+  .act:hover:not(:disabled):not(.primary) { background: transparent; }
+  .act.primary:hover:not(:disabled) { background: #0a84ff; }
+  .tool-btn:active:not(.active), .act:active:not(:disabled):not(.primary) { background: #333; }
+  .act.primary:active:not(:disabled) { background: #0070e0; }
+}
+
+/* ---------- Phone landscape: one row, so the canvas keeps the height ---------- */
+
+@media (orientation: landscape) and (max-height: 560px) {
+  #toolbar {
+    flex-wrap: nowrap;
+    padding: 6px 10px;
+  }
+
+  .tool-group {
+    flex: 1 1 auto;
+    padding: 0;
+    margin: 0;
+    border-bottom: none;
+  }
+
+  .tool-btn { width: 44px; height: 44px; }
+
+  .sep { display: block; flex: none; height: 28px; }
+  .spacer { display: none; }
+
+  #width { flex: 0 0 96px; }
+
+  .act { height: 44px; padding: 0 14px; }
+  #save { flex: none; }
+}
