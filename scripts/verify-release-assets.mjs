@@ -27,6 +27,7 @@ const TARGETS = {
   deb: ['deb', 'deb'],
   AppImage: ['appImage', 'AppImage'],
   pacman: ['pacman', 'pacman'],
+  snap: ['snap', 'snap'],
 };
 
 function render(template, version, ext) {
