@@ -163,7 +163,10 @@ jobs:
 
       - name: Install Linux packaging tools
         if: matrix.platform == 'linux'
-        run: sudo apt-get update && sudo apt-get install -y libarchive-tools rpm
+        run: |
+          sudo apt-get update && sudo apt-get install -y libarchive-tools rpm
+          # electron-builder's snap target calls snapcraft; it is also the Snap Store upload tool.
+          sudo snap install snapcraft --classic
 
       - name: Generate Platform Icons
         working-directory: electron-app
@@ -192,6 +195,25 @@ jobs:
         run: npm run build:${{ matrix.platform }}
         env:
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
+
+      - name: Publish to Snap Store
+        if: matrix.platform == 'linux' && startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          # Created with: snapcraft export-login --snaps=feathershot --acls=package_access,package_push,package_update,package_release -
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]]; then
+            echo "::warning::SNAPCRAFT_STORE_CREDENTIALS not set — skipping Snap Store upload"
+            exit 0
+          fi
+          SNAP=$(find electron-app/dist -maxdepth 1 -name "*.snap" | head -1)
+          if [[ -z "$SNAP" ]]; then
+            echo "::warning::snap artifact not found — skipping Snap Store upload"
+            exit 0
+          fi
+          snapcraft upload --release=stable "$SNAP"
 
       - name: Build Chocolatey package
         if: matrix.platform == 'win' && startsWith(github.ref, 'refs/tags/v')
@@ -225,6 +247,7 @@ jobs:
             electron-app/dist/*.deb
             electron-app/dist/*.AppImage
             electron-app/dist/*.pacman
+            electron-app/dist/*.snap
             choco-pkg/*.nupkg
 
   # ─── Chrome Extension ──────────────────────────────────────────────
@@ -274,6 +297,7 @@ jobs:
             release-artifacts/**/*.deb
             release-artifacts/**/*.AppImage
             release-artifacts/**/*.pacman
+            release-artifacts/**/*.snap
             release-artifacts/**/*.zip
             release-artifacts/**/*.nupkg
 
