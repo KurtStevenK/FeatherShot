@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Android app (`.apk`), also for Huawei phones without Google services (Android 10 or later). It uses the same editor as the Chrome extension, with a phone layout. Each release builds a signed APK, attaches it to the GitHub release and the Firebase mirror, and the website has an Android download card.
+- Windows: an `.msi` package next to the `.exe` installer. It installs for all users and works with Group Policy and Intune; newer versions replace older ones. The website links to it below the download cards.
 
 ### Changed
 

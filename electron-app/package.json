@@ -50,6 +50,12 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "msi",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico"
@@ -63,6 +69,14 @@
     },
     "portable": {
       "artifactName": "FeatherShot-${version}-Windows-Portable.${ext}"
+    },
+    "msi": {
+      "artifactName": "FeatherShot-${version}-Windows.${ext}",
+      "oneClick": false,
+      "perMachine": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "upgradeCode": "BBF2A506-08D8-4BA8-AF93-ADA7485AB9C8"
     },
     "linux": {
       "target": [
