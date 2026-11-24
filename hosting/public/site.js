@@ -53,7 +53,7 @@
 
   const VT_FILE = (sha256) => `https://www.virustotal.com/gui/file/${sha256}`;
 
-  // The "Scanned by VirusTotal" line sits inside a card link, so it opens its own link by script.
+  // The "Checked by VirusTotal" line sits inside a card link, so it opens its own link by script.
   function applyVirusTotal(assets) {
     document.querySelectorAll('.vt-check[data-asset]').forEach((el) => {
       const sha = assets[el.dataset.asset]?.sha256;
