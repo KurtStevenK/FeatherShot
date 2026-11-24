@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Chrome extension: the editor now looks and works like the desktop editor. Tools sit in four groups with the same icons, there are seven color swatches plus a custom color, a zoom bar (zoom out/in, Fit, 1:1) and the same keyboard shortcuts (1–0, T, M, Ctrl+Z, Ctrl+S, Ctrl +/−/0/9). Save & Copy downloads the PNG and also copies it to the clipboard. The text box now opens where you click.
+
 ### Fixed
 
 - Chrome extension: removed the unused `downloads` permission. The editor saves through a normal download link and never called the downloads API; the Chrome Web Store rejected the listing for requesting it. `npm run verify:chrome` now fails if the manifest asks for a permission the scripts don't use.
