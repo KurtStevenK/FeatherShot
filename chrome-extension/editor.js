@@ -1,466 +1,815 @@
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-let img = null, tool = 'step', color = '#FF3B30', lw = 4, zoomLevel = 2.0;
-let drawings = [], current = null, dragging = false, stepN = 0, stepRN = 0, abcAN = 0, abcRN = 0;
-let editingTextId = null, draggingTextId = null, textPlaceStart = null, cachedRect = null, scaleX = 1, scaleY = 1;
+// Chrome extension copy of electron-app/renderer/app.js. Only the screenshot
+// handoff (chrome.storage) and Save & Copy (download + clipboard) differ.
+
+// --- State ---
+let screenshotImage = null;
+let tool = 'step-arrow'; // Default to counting arrows
+let color = '#FF3B30';
+let lineWidth = 4;
+let zoomLevel = 2.0; // Magnifier zoom (1.5–5×)
+let drawings = [];
+let currentDraw = null;
+let stepArrowCount = 0;
+let stepRectCount = 0;
+let abcArrowCount = 0;
+let abcRectCount = 0;
+let isDragging = false;
+let cachedRect = null;
+let cachedScaleX = 1;
+let cachedScaleY = 1;
 let renderRequested = false;
-const widthSlider = document.getElementById('width');
-const wLabel = document.getElementById('w-label');
+let editingTextId = null;
+let draggingTextId = null;
+let textDragStart = null;
+let textPlaceStart = null;
+
+// letterLabel from ../shared/letterLabel.js (synced via npm run sync:shared)
+
+// --- DOM ---
+const canvas = document.getElementById('canvas');
 const textEditor = document.getElementById('text-editor');
+const ctx = canvas.getContext('2d');
+const lineWidthSlider = document.getElementById('line-width');
+const widthLabel = document.getElementById('width-label');
 
-// letterLabel — loaded from letterLabel.js (synced from shared/letterLabel.js)
+// Tool buttons
+document.getElementById('tool-step-arrow').addEventListener('click', () => setTool('step-arrow'));
+document.getElementById('tool-step-rect').addEventListener('click', () => setTool('step-rect'));
+document.getElementById('tool-arrow').addEventListener('click', () => setTool('arrow'));
+document.getElementById('tool-rect').addEventListener('click', () => setTool('rect'));
+document.getElementById('tool-circle').addEventListener('click', () => setTool('circle'));
+document.getElementById('tool-line').addEventListener('click', () => setTool('line'));
+document.getElementById('tool-question-arrow').addEventListener('click', () => setTool('question-arrow'));
+document.getElementById('tool-question-rect').addEventListener('click', () => setTool('question-rect'));
+document.getElementById('tool-exclamation-arrow').addEventListener('click', () => setTool('exclamation-arrow'));
+document.getElementById('tool-exclamation-rect').addEventListener('click', () => setTool('exclamation-rect'));
+document.getElementById('tool-text').addEventListener('click', () => setTool('text'));
+document.getElementById('tool-abc-arrow').addEventListener('click', () => setTool('abc-arrow'));
+document.getElementById('tool-abc-rect').addEventListener('click', () => setTool('abc-rect'));
+document.getElementById('tool-magnifier').addEventListener('click', () => setTool('magnifier'));
 
-// Load screenshot and apply crop if available
-chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
-  if (!data.screenshotData) return;
-
-  const i = new Image();
-  i.onload = () => {
-    const crop = data.cropRegion;
-
-    if (crop) {
-      // Crop the image using the selection coordinates
-      // The capture is at device pixel ratio, but crop coords are CSS pixels
-      const dpr = crop.dpr || 1;
-      const sx = crop.x * dpr;
-      const sy = crop.y * dpr;
-      const sw = crop.width * dpr;
-      const sh = crop.height * dpr;
-
-      // Create a cropped canvas
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = sw;
-      tempCanvas.height = sh;
-      const tempCtx = tempCanvas.getContext('2d');
-      tempCtx.drawImage(i, sx, sy, sw, sh, 0, 0, sw, sh);
-
-      // Create cropped image
-      const croppedImg = new Image();
-      croppedImg.onload = () => {
-        img = croppedImg;
-        canvas.width = croppedImg.width;
-        canvas.height = croppedImg.height;
-        render();
-      };
-      croppedImg.src = tempCanvas.toDataURL('image/png');
-    } else {
-      img = i;
-      canvas.width = i.width;
-      canvas.height = i.height;
-      render();
-    }
-  };
-  i.src = data.screenshotData;
-
-  // Clean up stored data
-  chrome.storage.local.remove(['screenshotData', 'cropRegion']);
+// Controls
+const swatches = document.querySelectorAll('.swatch');
+const customSwatch = document.querySelector('.swatch.custom');
+function setColor(value, swatch) {
+  color = value;
+  swatches.forEach((s) => {
+    s.classList.toggle('active', s === swatch);
+    if (!s.classList.contains('custom')) s.setAttribute('aria-pressed', s === swatch);
+  });
+  if (swatch === customSwatch) customSwatch.style.setProperty('--swatch', value);
+}
+swatches.forEach((s) => {
+  if (s.dataset.color) s.addEventListener('click', () => setColor(s.dataset.color, s));
 });
-
-// Tools (reordered: step, step-rect, arrow, rect, circle, line, question-arrow, question-rect, abc-arrow, abc-rect, magnifier)
-document.getElementById('tool-step').onclick = () => setTool('step');
-document.getElementById('tool-step-rect').onclick = () => setTool('step-rect');
-document.getElementById('tool-arrow').onclick = () => setTool('arrow');
-document.getElementById('tool-rect').onclick = () => setTool('rect');
-document.getElementById('tool-circle').onclick = () => setTool('circle');
-document.getElementById('tool-line').onclick = () => setTool('line');
-document.getElementById('tool-question-arrow').onclick = () => setTool('question-arrow');
-document.getElementById('tool-question-rect').onclick = () => setTool('question-rect');
-document.getElementById('tool-exclamation-arrow').onclick = () => setTool('exclamation-arrow');
-document.getElementById('tool-exclamation-rect').onclick = () => setTool('exclamation-rect');
-document.getElementById('tool-text').onclick = () => setTool('text');
-document.getElementById('tool-abc-arrow').onclick = () => setTool('abc-arrow');
-document.getElementById('tool-abc-rect').onclick = () => setTool('abc-rect');
-document.getElementById('tool-magnifier').onclick = () => setTool('magnifier');
-
-document.getElementById('color').oninput = (e) => { color = e.target.value; };
-widthSlider.oninput = (e) => {
+document.getElementById('color-picker').addEventListener('input', (e) => setColor(e.target.value, customSwatch));
+lineWidthSlider.addEventListener('input', (e) => {
   if (tool === 'magnifier') {
     zoomLevel = parseFloat(e.target.value);
-    wLabel.textContent = zoomLevel.toFixed(1) + '×';
+    widthLabel.textContent = zoomLevel.toFixed(1) + '×';
   } else {
-    lw = +e.target.value;
-    wLabel.textContent = lw + 'px';
+    lineWidth = parseInt(e.target.value);
+    widthLabel.textContent = lineWidth + 'px';
   }
-};
-function updateActionStates() {
-  const hasDrawings = drawings.length > 0;
-  document.getElementById('undo').disabled = !hasDrawings;
-  document.getElementById('clear').disabled = !hasDrawings;
-}
+});
 
-document.getElementById('undo').onclick = () => {
-  if (drawings.length) {
-    const r = drawings.pop();
-    if (r.tool === 'step') stepN--;
-    if (r.tool === 'step-rect') stepRN--;
-    if (r.tool === 'abc-arrow') abcAN--;
-    if (r.tool === 'abc-rect') abcRN--;
-    render();
-    updateActionStates();
-  }
-};
-document.getElementById('clear').onclick = () => {
-  if (drawings.length === 0) return;
-  if (!confirm('Are you sure you want to clear all annotations?')) return;
-  drawings = []; stepN = 0; stepRN = 0; abcAN = 0; abcRN = 0;
-  render();
-  updateActionStates();
-};
-document.getElementById('save').onclick = saveAndDownload;
+// Actions
+document.getElementById('btn-undo').addEventListener('click', undo);
+document.getElementById('btn-clear').addEventListener('click', clearAll);
+document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
-function setTool(t) {
-  if (tool === 'text' && t !== 'text') commitTextEdit();
-  tool = t;
-  document.querySelectorAll('.tool-btn').forEach(b => {
-    b.classList.remove('active');
-    b.setAttribute('aria-pressed', 'false');
-  });
-  const idMap = {
-    'step': 'tool-step', 'step-rect': 'tool-step-rect',
-    'arrow': 'tool-arrow', 'rect': 'tool-rect', 'circle': 'tool-circle',
-    'line': 'tool-line',
-    'question-arrow': 'tool-question-arrow', 'question-rect': 'tool-question-rect',
-    'exclamation-arrow': 'tool-exclamation-arrow', 'exclamation-rect': 'tool-exclamation-rect',
-    'text': 'tool-text',
-    'abc-arrow': 'tool-abc-arrow', 'abc-rect': 'tool-abc-rect',
-    'magnifier': 'tool-magnifier'
+document.getElementById('zoom-in').addEventListener('click', zoomIn);
+document.getElementById('zoom-out').addEventListener('click', zoomOut);
+document.getElementById('zoom-fit').addEventListener('click', () => setZoom('fit'));
+document.getElementById('zoom-actual').addEventListener('click', () => setZoom(1));
+if (navigator.platform.startsWith('Mac')) document.querySelector('#btn-save kbd').textContent = '⌘S';
+
+// Keyboard shortcuts
+const ZOOM_KEYS = { '+': zoomIn, '=': zoomIn, '-': zoomOut, '0': () => setZoom(1), '9': () => setZoom('fit') };
+document.addEventListener('keydown', (e) => {
+  // Save & Copy commits the text first, so it also works while a text annotation is being edited.
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAndCopy(); return; }
+  // Ctrl/Cmd with + - 0 9 zooms the view; without the modifier those keys select tools.
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && ZOOM_KEYS[e.key]) { e.preventDefault(); ZOOM_KEYS[e.key](); return; }
+  // Otherwise the text box gets every key: tool keys are text there, and Ctrl+Z is its own undo.
+  if (editingTextId) return;
+  if (e.key === '1') setTool('step-arrow');
+  if (e.key === '2') setTool('step-rect');
+  if (e.key === '3' || e.key === 'a') setTool('arrow');
+  if (e.key === '4' || e.key === 'r') setTool('rect');
+  if (e.key === '5') setTool('circle');
+  if (e.key === '6' || e.key === 'l') setTool('line');
+  if (e.key === '7') setTool('question-arrow');
+  if (e.key === '8') setTool('question-rect');
+  if (e.key === '-' || e.key === '_') setTool('exclamation-arrow');
+  if (e.key === '=' || e.key === '+') setTool('exclamation-rect');
+  if (e.key === 't' || e.key === 'T') setTool('text');
+  if (e.key === '9') setTool('abc-arrow');
+  if (e.key === '0') setTool('abc-rect');
+  if (e.key === 'm' || e.key === 'M') setTool('magnifier');
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') undo();
+});
+
+// --- Screenshot handoff ---
+// background.js stores the capture (and the selected region, in CSS pixels) in
+// chrome.storage.local before opening this page.
+chrome.storage.local.get(['screenshotData', 'cropRegion'], (data) => {
+  if (!data.screenshotData) return;
+  chrome.storage.local.remove(['screenshotData', 'cropRegion']);
+  const crop = data.cropRegion;
+  if (!crop) { loadScreenshot(data.screenshotData); return; }
+  const full = new Image();
+  full.onload = () => {
+    // The capture is at device pixel ratio, the crop coordinates are CSS pixels.
+    const dpr = crop.dpr || 1;
+    const sw = Math.round(crop.width * dpr), sh = Math.round(crop.height * dpr);
+    const tmp = document.createElement('canvas');
+    tmp.width = sw;
+    tmp.height = sh;
+    tmp.getContext('2d').drawImage(full, Math.round(crop.x * dpr), Math.round(crop.y * dpr), sw, sh, 0, 0, sw, sh);
+    loadScreenshot(tmp.toDataURL('image/png'));
   };
-  const activeBtn = document.getElementById(idMap[t]);
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-    activeBtn.setAttribute('aria-pressed', 'true');
-  }
+  full.src = data.screenshotData;
+});
 
-  // Switch slider between line-width mode and zoom mode
-  if (t === 'magnifier') {
-    widthSlider.min = '1.5';
-    widthSlider.max = '5';
-    widthSlider.step = '0.5';
-    widthSlider.value = zoomLevel.toString();
-    widthSlider.title = 'Zoom Level';
-    widthSlider.setAttribute('aria-label', 'Zoom Level');
-    wLabel.textContent = zoomLevel.toFixed(1) + '×';
-  } else {
-    widthSlider.min = '2';
-    widthSlider.max = '15';
-    widthSlider.step = '1';
-    widthSlider.value = lw.toString();
-    widthSlider.title = 'Line Width';
-    widthSlider.setAttribute('aria-label', 'Line Width');
-    wLabel.textContent = lw + 'px';
+function loadScreenshot(dataUrl) {
+  const img = new Image();
+  img.onload = () => {
+    screenshotImage = img;
+    canvas.width = img.width;
+    canvas.height = img.height;
+    render();
+    applyZoom();
+  };
+  img.src = dataUrl;
+}
+
+// --- Zoom ---
+// The same levels and rules as the macOS editor (Sources/EditorZoom.swift). 'fit' shows the
+// screenshot at 1:1, shrunk to fit the window when it is bigger. Exports are always 1:1.
+const ZOOM_LEVELS = [0.1, 0.25, 0.33, 0.5, 0.67, 0.75, 1, 1.25, 1.5, 2, 3, 4, 6, 8];
+const container = document.getElementById('canvas-container');
+let zoomMode = 'fit';
+let displayScale = 1;
+
+function fitScale() {
+  const margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--canvas-margin')) || 0;
+  const w = canvas.width / devicePixelRatio, h = canvas.height / devicePixelRatio;
+  const availW = container.clientWidth - 2 * margin, availH = container.clientHeight - 2 * margin;
+  if (w <= 0 || h <= 0 || availW <= 0 || availH <= 0) return 1;
+  return Math.max(ZOOM_LEVELS[0], Math.min(1, availW / w, availH / h));
+}
+
+// Sizes the canvas for the zoom: 100% shows one screenshot pixel per screen pixel.
+function applyZoom() {
+  const previous = displayScale;
+  displayScale = zoomMode === 'fit' ? fitScale() : zoomMode;
+  canvas.style.width = `${canvas.width / devicePixelRatio * displayScale}px`;
+  canvas.style.height = `${canvas.height / devicePixelRatio * displayScale}px`;
+  document.getElementById('zoom-label').textContent = `${Math.round(displayScale * 100)}%`;
+  document.getElementById('zoom-in').disabled = !ZOOM_LEVELS.some((l) => l > displayScale + 0.001);
+  document.getElementById('zoom-out').disabled = !ZOOM_LEVELS.some((l) => l < displayScale - 0.001);
+  for (const [id, active] of [['zoom-fit', zoomMode === 'fit'], ['zoom-actual', zoomMode === 1]]) {
+    const btn = document.getElementById(id);
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-pressed', active);
+  }
+  // Keep the middle of the view in place.
+  if (previous !== displayScale) {
+    const ratio = displayScale / previous;
+    container.scrollLeft = (container.scrollLeft + container.clientWidth / 2) * ratio - container.clientWidth / 2;
+    container.scrollTop = (container.scrollTop + container.clientHeight / 2) * ratio - container.clientHeight / 2;
+  }
+  if (editingTextId) {
+    cachedRect = canvas.getBoundingClientRect();
+    cachedScaleX = canvas.width / cachedRect.width;
+    cachedScaleY = canvas.height / cachedRect.height;
+    const d = drawings.find((item) => item.id === editingTextId);
+    if (d) positionTextEditor(d);
   }
 }
 
-canvas.onmousedown = (e) => {
+function setZoom(mode) {
+  zoomMode = mode === 'fit' ? 'fit' : Math.min(8, Math.max(0.1, mode));
+  applyZoom();
+}
+
+function zoomIn() {
+  const next = ZOOM_LEVELS.find((l) => l > displayScale + 0.001);
+  if (next) setZoom(next);
+}
+
+function zoomOut() {
+  const next = [...ZOOM_LEVELS].reverse().find((l) => l < displayScale - 0.001);
+  if (next) setZoom(next);
+}
+
+window.addEventListener('resize', () => { if (zoomMode === 'fit') applyZoom(); });
+// Ctrl+wheel and touchpad pinch zoom the screenshot, not the page.
+container.addEventListener('wheel', (e) => {
+  if (!e.ctrlKey && !e.metaKey) return;
+  e.preventDefault();
+  setZoom(displayScale * Math.exp(-e.deltaY * 0.01));
+}, { passive: false });
+
+// --- Drawing ---
+canvas.addEventListener('mousedown', (e) => {
   if (tool === 'text') {
     commitTextEdit();
-    const r = canvas.getBoundingClientRect();
-    scaleX = canvas.width / r.width; scaleY = canvas.height / r.height;
-    cachedRect = r;
-    const x = (e.clientX - r.left) * scaleX, y = (e.clientY - r.top) * scaleY;
+    cachedRect = canvas.getBoundingClientRect();
+    cachedScaleX = canvas.width / cachedRect.width;
+    cachedScaleY = canvas.height / cachedRect.height;
+    const x = (e.clientX - cachedRect.left) * cachedScaleX;
+    const y = (e.clientY - cachedRect.top) * cachedScaleY;
     textPlaceStart = { x, y };
     const hit = textHitAt(x, y);
-    draggingTextId = hit ? hit.id : null;
-    dragging = !!hit;
-    return;
-  }
-  dragging = true;
-  // Performance: Cache bounding rectangle and scale factors on mousedown to prevent layout thrashing during mousemove
-  cachedRect = canvas.getBoundingClientRect();
-  scaleX = canvas.width / cachedRect.width;
-  scaleY = canvas.height / cachedRect.height;
-  current = { tool, color, lw, x1: (e.clientX - cachedRect.left) * scaleX, y1: (e.clientY - cachedRect.top) * scaleY, x2: 0, y2: 0 };
-  if (tool === 'magnifier') current.zoom = zoomLevel;
-};
-canvas.onmousemove = (e) => {
-  if (tool === 'text' && draggingTextId) {
-    const r = cachedRect || canvas.getBoundingClientRect();
-    const x = (e.clientX - r.left) * scaleX, y = (e.clientY - r.top) * scaleY;
-    const d = drawings.find(item => item.id === draggingTextId);
-    if (d) {
-      d.x1 = x; d.y1 = y;
-      if (editingTextId === d.id) positionTextEditor(d);
-      if (!renderRequested) {
-        renderRequested = true;
-        requestAnimationFrame(() => {
-          render();
-          renderRequested = false;
-        });
-      }
+    if (hit) {
+      draggingTextId = hit.id;
+      isDragging = true;
+    } else {
+      isDragging = false;
     }
     return;
   }
-  if (!dragging || !current) return;
-  // Performance: Use cachedRect, scaleX, scaleY to avoid layout thrashing (forced reflow) on every mouse movement
-  current.x2 = (e.clientX - cachedRect.left) * scaleX;
-  current.y2 = (e.clientY - cachedRect.top) * scaleY;
+  isDragging = true;
+  cachedRect = canvas.getBoundingClientRect();
+  cachedScaleX = canvas.width / cachedRect.width;
+  cachedScaleY = canvas.height / cachedRect.height;
 
-  // Performance: Throttle render calls to requestAnimationFrame to prevent "frame piling"
-  if (!renderRequested) {
-    renderRequested = true;
-    requestAnimationFrame(() => {
-      render();
-      renderRequested = false;
-    });
+  const x = (e.clientX - cachedRect.left) * cachedScaleX;
+  const y = (e.clientY - cachedRect.top) * cachedScaleY;
+  currentDraw = { tool, color, lineWidth, startX: x, startY: y, endX: x, endY: y };
+  if (tool === 'magnifier') {
+    currentDraw.zoom = zoomLevel;
   }
-};
-canvas.onmouseup = (e) => {
+});
+
+canvas.addEventListener('mousemove', (e) => {
+  // Measured again on each move: zooming or scrolling mid-drag moves the canvas.
+  if (cachedRect) {
+    cachedRect = canvas.getBoundingClientRect();
+    cachedScaleX = canvas.width / cachedRect.width;
+    cachedScaleY = canvas.height / cachedRect.height;
+  }
+  if (tool === 'text' && draggingTextId) {
+    const x = (e.clientX - cachedRect.left) * cachedScaleX;
+    const y = (e.clientY - cachedRect.top) * cachedScaleY;
+    const d = drawings.find((item) => item.id === draggingTextId);
+    if (d) {
+      d.startX = x;
+      d.startY = y;
+      if (editingTextId === draggingTextId) positionTextEditor(d);
+      scheduleRender();
+    }
+    return;
+  }
+  if (!isDragging || !currentDraw) return;
+
+  currentDraw.endX = (e.clientX - cachedRect.left) * cachedScaleX;
+  currentDraw.endY = (e.clientY - cachedRect.top) * cachedScaleY;
+
+  scheduleRender();
+});
+
+canvas.addEventListener('mouseup', (e) => {
   if (tool === 'text') {
-    if (draggingTextId) { draggingTextId = null; dragging = false; textPlaceStart = null; render(); return; }
+    if (draggingTextId) {
+      draggingTextId = null;
+      textPlaceStart = null;
+      isDragging = false;
+      render();
+      return;
+    }
     if (textPlaceStart) {
-      const r = canvas.getBoundingClientRect();
-      scaleX = canvas.width / r.width; scaleY = canvas.height / r.height;
-      const x = (e.clientX - r.left) * scaleX, y = (e.clientY - r.top) * scaleY;
+      cachedRect = canvas.getBoundingClientRect();
+      cachedScaleX = canvas.width / cachedRect.width;
+      cachedScaleY = canvas.height / cachedRect.height;
+      const x = (e.clientX - cachedRect.left) * cachedScaleX;
+      const y = (e.clientY - cachedRect.top) * cachedScaleY;
       const dist = Math.hypot(x - textPlaceStart.x, y - textPlaceStart.y);
       const hit = textHitAt(textPlaceStart.x, textPlaceStart.y);
-      if (dist < 6 && hit) beginTextEdit(hit);
-      else if (dist < 6) {
-        const entry = { id: 'text-' + Date.now(), tool: 'text', color, lw, x1: x, y1: y, x2: x, y2: y, text: 'Text', fontSize: Math.max(18, lw * 5) };
+      if (dist < 6 && hit) {
+        beginTextEdit(hit);
+      } else if (dist < 6) {
+        const id = `text-${Date.now()}`;
+        const fontSize = Math.max(18, lineWidth * 5);
+        const entry = { id, tool: 'text', color, lineWidth, startX: x, startY: y, endX: x, endY: y, text: 'Text', fontSize };
         drawings.push(entry);
         beginTextEdit(entry);
         render();
-        updateActionStates();
       }
       textPlaceStart = null;
     }
     return;
   }
-  if (current) {
-    if (current.tool === 'step') { stepN++; current.n = stepN; }
-    if (current.tool === 'step-rect') { stepRN++; current.n = stepRN; }
-    if (current.tool === 'abc-arrow') { abcAN++; current.n = abcAN; }
-    if (current.tool === 'abc-rect') { abcRN++; current.n = abcRN; }
-    drawings.push(current);
-    current = null;
+  if (currentDraw) {
+    if (currentDraw.tool === 'step-arrow') {
+      stepArrowCount++;
+      currentDraw.stepNumber = stepArrowCount;
+    } else if (currentDraw.tool === 'step-rect') {
+      stepRectCount++;
+      currentDraw.stepNumber = stepRectCount;
+    } else if (currentDraw.tool === 'abc-arrow') {
+      abcArrowCount++;
+      currentDraw.stepNumber = abcArrowCount;
+    } else if (currentDraw.tool === 'abc-rect') {
+      abcRectCount++;
+      currentDraw.stepNumber = abcRectCount;
+    }
+    drawings.push(currentDraw);
+    currentDraw = null;
   }
-  dragging = false;
+  isDragging = false;
   render();
   updateActionStates();
-};
+});
 
-function render() {
-  if (!img) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(img, 0, 0);
-  let sA = 0, sR = 0, aA = 0, aR = 0;
-  drawings.forEach(d => {
-    if (d.tool === 'step') { sA++; drawStep(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,sA); }
-    else if (d.tool === 'step-rect') { sR++; drawStepR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,sR); }
-    else if (d.tool === 'arrow') drawArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'line') drawLine(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'question-arrow') drawQArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'question-rect') drawQRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'exclamation-arrow') drawExArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'exclamation-rect') drawExRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'text') drawTextAnn(d);
-    else if (d.tool === 'abc-arrow') { aA++; drawAbcArrow(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aA); }
-    else if (d.tool === 'abc-rect') { aR++; drawAbcRect(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,aR); }
-    else if (d.tool === 'circle') drawEllipse(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
-    else if (d.tool === 'magnifier') drawMagnifier(d.x1,d.y1,d.x2,d.y2,d.color,d.lw,d.zoom||2.0);
-    else drawR(d.x1,d.y1,d.x2,d.y2,d.color,d.lw);
+function scheduleRender() {
+  if (renderRequested) return;
+  renderRequested = true;
+  requestAnimationFrame(() => {
+    render();
+    renderRequested = false;
   });
-  if (current) {
-    if (current.tool === 'step') drawStep(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,stepN+1);
-    else if (current.tool === 'step-rect') drawStepR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,stepRN+1);
-    else if (current.tool === 'arrow') drawArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'line') drawLine(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'question-arrow') drawQArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'question-rect') drawQRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'exclamation-arrow') drawExArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'exclamation-rect') drawExRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'abc-arrow') drawAbcArrow(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcAN+1);
-    else if (current.tool === 'abc-rect') drawAbcRect(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,abcRN+1);
-    else if (current.tool === 'circle') drawEllipse(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
-    else if (current.tool === 'magnifier') drawMagnifier(current.x1,current.y1,current.x2,current.y2,current.color,current.lw,current.zoom||2.0);
-    else drawR(current.x1,current.y1,current.x2,current.y2,current.color,current.lw);
+}
+
+// --- Render ---
+function render() {
+  if (!screenshotImage) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(screenshotImage, 0, 0);
+
+  // Draw completed
+  let stepA = 0, stepR = 0, abcA = 0, abcR = 0;
+  drawings.forEach(d => {
+    if (d.tool === 'step-arrow') {
+      stepA++;
+      drawStepArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepA);
+    } else if (d.tool === 'step-rect') {
+      stepR++;
+      drawStepRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, stepR);
+    } else if (d.tool === 'arrow') {
+      drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'line') {
+      drawLine(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'question-arrow') {
+      drawQuestionArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'question-rect') {
+      drawQuestionRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'exclamation-arrow') {
+      drawExclamationArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'exclamation-rect') {
+      drawExclamationRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'text') {
+      drawTextAnnotation(ctx, d);
+    } else if (d.tool === 'abc-arrow') {
+      abcA++;
+      drawAbcArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcA);
+    } else if (d.tool === 'abc-rect') {
+      abcR++;
+      drawAbcRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, abcR);
+    } else if (d.tool === 'circle') {
+      drawEllipse(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'magnifier') {
+      drawMagnifier(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth, d.zoom || 2.0);
+    } else {
+      drawRect(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    }
+  });
+
+  // Draw active
+  if (currentDraw) {
+    if (currentDraw.tool === 'step-arrow') {
+      drawStepArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepArrowCount + 1);
+    } else if (currentDraw.tool === 'step-rect') {
+      drawStepRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, stepRectCount + 1);
+    } else if (currentDraw.tool === 'arrow') {
+      drawArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'line') {
+      drawLine(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'question-arrow') {
+      drawQuestionArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'question-rect') {
+      drawQuestionRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'exclamation-arrow') {
+      drawExclamationArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'exclamation-rect') {
+      drawExclamationRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'abc-arrow') {
+      drawAbcArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcArrowCount + 1);
+    } else if (currentDraw.tool === 'abc-rect') {
+      drawAbcRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, abcRectCount + 1);
+    } else if (currentDraw.tool === 'circle') {
+      drawEllipse(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'magnifier') {
+      drawMagnifier(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth, currentDraw.zoom || 2.0);
+    } else {
+      drawRect(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    }
   }
 }
 
-function drawArrow(x1,y1,x2,y2,c,w) {
-  const hl=12+w*1.5, ha=Math.PI/9, a=Math.atan2(y2-y1,x2-x1);
-  const bx=x2-hl*.8*Math.cos(a), by=y2-hl*.8*Math.sin(a);
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(bx,by);
-  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
-  const p1x=x2-hl*Math.cos(a+ha), p1y=y2-hl*Math.sin(a+ha);
-  const p2x=x2-hl*Math.cos(a-ha), p2y=y2-hl*Math.sin(a-ha);
-  ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(p1x,p1y); ctx.lineTo(bx,by); ctx.lineTo(p2x,p2y);
-  ctx.closePath(); ctx.fillStyle=c; ctx.fill();
+// --- Drawing Functions ---
+
+function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+  const headLength = 12 + lw * 1.5;
+  const headAngle = Math.PI / 9; // 20 degrees
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+
+  // Barb point
+  const barbX = x2 - headLength * 0.8 * Math.cos(angle);
+  const barbY = y2 - headLength * 0.8 * Math.sin(angle);
+
+  // Shaft
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(barbX, barbY);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // Arrowhead
+  const p1x = x2 - headLength * Math.cos(angle + headAngle);
+  const p1y = y2 - headLength * Math.sin(angle + headAngle);
+  const p2x = x2 - headLength * Math.cos(angle - headAngle);
+  const p2y = y2 - headLength * Math.sin(angle - headAngle);
+
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(p1x, p1y);
+  ctx.lineTo(barbX, barbY);
+  ctx.lineTo(p2x, p2y);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
-function drawLine(x1,y1,x2,y2,c,w) {
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
-  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+function drawLine(ctx, x1, y1, x2, y2, color, lw) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.stroke();
 }
 
-function circleLabel(x,y,c,w,label) {
-  const r=Math.max(12,w*3);
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fillStyle=c; ctx.fill();
-  const fs = label.length > 1 ? r*0.9 : r*1.2;
-  ctx.fillStyle='#fff'; ctx.font=`bold ${fs}px sans-serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(label,x,y);
+function drawStepArrow(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, num.toString());
 }
 
-function drawStep(x1,y1,x2,y2,c,w,n) {
-  drawArrow(x1,y1,x2,y2,c,w);
-  circleLabel(x1,y1,c,w,n+'');
+function drawRect(ctx, x1, y1, x2, y2, color, lw) {
+  ctx.beginPath();
+  ctx.rect(Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1));
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.stroke();
 }
 
-function drawR(x1,y1,x2,y2,c,w) {
-  ctx.beginPath(); ctx.rect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1));
-  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.stroke();
+function drawStepRect(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, num.toString());
 }
 
-function drawStepR(x1,y1,x2,y2,c,w,n) {
-  drawR(x1,y1,x2,y2,c,w);
-  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,n+'');
+function drawQuestionArrow(ctx, x1, y1, x2, y2, color, lw) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, '?');
 }
 
-function drawQArrow(x1,y1,x2,y2,c,w) {
-  drawArrow(x1,y1,x2,y2,c,w);
-  circleLabel(x1,y1,c,w,'?');
+function drawQuestionRect(ctx, x1, y1, x2, y2, color, lw) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, '?');
 }
 
-function drawQRect(x1,y1,x2,y2,c,w) {
-  drawR(x1,y1,x2,y2,c,w);
-  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,'?');
+function drawExclamationArrow(ctx, x1, y1, x2, y2, color, lw) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, '!');
 }
 
-function drawExArrow(x1,y1,x2,y2,c,w) {
-  drawArrow(x1,y1,x2,y2,c,w);
-  circleLabel(x1,y1,c,w,'!');
+function drawExclamationRect(ctx, x1, y1, x2, y2, color, lw) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, '!');
 }
-function drawExRect(x1,y1,x2,y2,c,w) {
-  drawR(x1,y1,x2,y2,c,w);
-  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,'!');
-}
-function drawTextAnn(d) {
+
+function drawTextAnnotation(ctx, d) {
   if (editingTextId === d.id) return;
-  const fs = d.fontSize || 24;
+  ctx.font = `600 ${d.fontSize || 24}px -apple-system, BlinkMacSystemFont, sans-serif`;
   ctx.fillStyle = d.color;
-  ctx.font = `600 ${fs}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(d.text || '', d.x1, d.y1);
+  ctx.fillText(d.text || '', d.startX, d.startY);
 }
-function textHitAt(x,y) {
+
+function textHitAt(x, y) {
   for (let i = drawings.length - 1; i >= 0; i--) {
     const d = drawings[i];
     if (d.tool !== 'text') continue;
     const fs = d.fontSize || 24;
     const w = Math.max(80, (d.text || '').length * fs * 0.55);
     const h = fs * 1.4;
-    if (x >= d.x1 - w/2 && x <= d.x1 + w/2 && y >= d.y1 - h/2 && y <= d.y1 + h/2) return d;
+    if (x >= d.startX - w / 2 && x <= d.startX + w / 2 && y >= d.startY - h / 2 && y <= d.startY + h / 2) {
+      return d;
+    }
   }
   return null;
 }
+
 function positionTextEditor(d) {
   if (!textEditor || !cachedRect) return;
-  const left = cachedRect.left + d.x1 / scaleX;
-  const top = cachedRect.top + d.y1 / scaleY;
-  textEditor.style.left = left + 'px';
-  textEditor.style.top = top + 'px';
+  // Relative to #canvas-wrap, which scrolls with the canvas.
+  const left = d.startX / cachedScaleX;
+  const top = d.startY / cachedScaleY;
+  textEditor.style.left = `${left}px`;
+  textEditor.style.top = `${top}px`;
   textEditor.style.transform = 'translate(-50%, -50%)';
   textEditor.style.color = d.color;
+  textEditor.style.fontSize = `${(d.fontSize || 24) / cachedScaleX}px`;
 }
+
 function beginTextEdit(d) {
   editingTextId = d.id;
-  cachedRect = canvas.getBoundingClientRect();
-  scaleX = canvas.width / cachedRect.width;
-  scaleY = canvas.height / cachedRect.height;
   textEditor.classList.remove('text-editor-hidden');
   textEditor.value = d.text || '';
   positionTextEditor(d);
   textEditor.focus();
   textEditor.select();
 }
+
 function commitTextEdit() {
   if (!editingTextId) return;
-  const idx = drawings.findIndex(d => d.id === editingTextId);
-  if (idx < 0) { hideTextEditor(); return; }
+  const idx = drawings.findIndex((d) => d.id === editingTextId);
+  if (idx === -1) {
+    hideTextEditor();
+    return;
+  }
   const trimmed = (textEditor.value || '').trim();
-  if (!trimmed) drawings.splice(idx, 1);
-  else drawings[idx].text = trimmed;
+  if (!trimmed) {
+    drawings.splice(idx, 1);
+  } else {
+    drawings[idx].text = trimmed;
+  }
   hideTextEditor();
   render();
-  updateActionStates();
 }
+
 function hideTextEditor() {
   editingTextId = null;
-  if (textEditor) { textEditor.classList.add('text-editor-hidden'); textEditor.blur(); }
-}
-if (textEditor) {
-  textEditor.addEventListener('blur', () => commitTextEdit());
-  textEditor.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commitTextEdit(); }
-  });
+  if (textEditor) {
+    textEditor.classList.add('text-editor-hidden');
+    textEditor.blur();
+  }
 }
 
-function drawAbcArrow(x1,y1,x2,y2,c,w,n) {
-  drawArrow(x1,y1,x2,y2,c,w);
-  circleLabel(x1,y1,c,w,letterLabel(n));
+textEditor.addEventListener('blur', () => commitTextEdit());
+textEditor.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    commitTextEdit();
+  }
+});
+
+function drawAbcArrow(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawArrow(ctx, x1, y1, x2, y2, color, lw);
+  drawCircleLabel(ctx, x1, y1, color, lw, letterLabel(num));
 }
 
-function drawAbcRect(x1,y1,x2,y2,c,w,n) {
-  drawR(x1,y1,x2,y2,c,w);
-  circleLabel(Math.min(x1,x2),Math.min(y1,y2),c,w,letterLabel(n));
+function drawAbcRect(ctx, x1, y1, x2, y2, color, lw, num) {
+  drawRect(ctx, x1, y1, x2, y2, color, lw);
+  const cx = Math.min(x1, x2);
+  const cy = Math.min(y1, y2);
+  drawCircleLabel(ctx, cx, cy, color, lw, letterLabel(num));
 }
 
-function drawEllipse(x1,y1,x2,y2,c,w) {
-  const cx=(x1+x2)/2, cy=(y1+y2)/2;
-  const rx=Math.abs(x2-x1)/2, ry=Math.abs(y2-y1)/2;
-  if (rx<1||ry<1) return;
-  ctx.beginPath(); ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
-  ctx.strokeStyle=c; ctx.lineWidth=w; ctx.lineCap='round'; ctx.stroke();
+function drawEllipse(ctx, x1, y1, x2, y2, color, lw) {
+  const cx = (x1 + x2) / 2;
+  const cy = (y1 + y2) / 2;
+  const rx = Math.abs(x2 - x1) / 2;
+  const ry = Math.abs(y2 - y1) / 2;
+  if (rx < 1 || ry < 1) return;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.stroke();
 }
 
 // Magnifier tool — draws a circular zoom lens showing magnified screenshot content
-function drawMagnifier(x1,y1,x2,y2,c,w,zoom) {
-  if (!img) return;
-  const dx = x2 - x1, dy = y2 - y1;
-  const radius = Math.sqrt(dx*dx + dy*dy);
+function drawMagnifier(ctx, x1, y1, x2, y2, color, lw, zoom) {
+  if (!screenshotImage) return;
+  
+  // Center is start point, radius is distance to end point
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const radius = Math.sqrt(dx * dx + dy * dy);
   if (radius < 5) return;
 
-  const centerX = x1, centerY = y1;
-  // Account for image vs canvas size difference
-  const scaleX = img.width / canvas.width;
-  const scaleY = img.height / canvas.height;
-  const imgCX = centerX * scaleX, imgCY = centerY * scaleY;
-  const srcRX = (radius / zoom) * scaleX, srcRY = (radius / zoom) * scaleY;
-  const srcX = Math.round(imgCX - srcRX), srcY = Math.round(imgCY - srcRY);
-  const srcW = Math.round(srcRX * 2), srcH = Math.round(srcRY * 2);
+  const centerX = x1;
+  const centerY = y1;
+
+  // Source region from the original screenshot (before any annotations)
+  // Account for possible difference between canvas size and image size
+  const imgW = screenshotImage.width || screenshotImage.naturalWidth;
+  const imgH = screenshotImage.height || screenshotImage.naturalHeight;
+  const scaleImgX = imgW / canvas.width;
+  const scaleImgY = imgH / canvas.height;
+  
+  // Map center from canvas coordinates to image coordinates
+  const imgCenterX = centerX * scaleImgX;
+  const imgCenterY = centerY * scaleImgY;
+  
+  // Source sample region in image coordinates
+  const srcRadiusX = (radius / zoom) * scaleImgX;
+  const srcRadiusY = (radius / zoom) * scaleImgY;
+  const srcX = Math.round(imgCenterX - srcRadiusX);
+  const srcY = Math.round(imgCenterY - srcRadiusY);
+  const srcW = Math.round(srcRadiusX * 2);
+  const srcH = Math.round(srcRadiusY * 2);
 
   ctx.save();
+
+  // Clip to circle
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.clip();
-  ctx.drawImage(img, srcX, srcY, srcW, srcH, centerX - radius, centerY - radius, radius * 2, radius * 2);
+
+  // Draw the magnified portion of the ORIGINAL screenshot
+  ctx.drawImage(
+    screenshotImage,
+    srcX, srcY, srcW, srcH,              // source rect from screenshot (image coords)
+    centerX - radius, centerY - radius,  // dest position (canvas coords)
+    radius * 2, radius * 2              // dest size (fills the circle)
+  );
+
   ctx.restore();
 
-  // Border ring
+  // Draw border ring
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-  ctx.strokeStyle = c;
-  ctx.lineWidth = Math.max(3, w);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(3, lw);
   ctx.stroke();
 
-  // Crosshair
-  const cs = 6;
+  // Draw crosshair at center
+  const crossSize = 6;
   ctx.beginPath();
-  ctx.moveTo(centerX - cs, centerY); ctx.lineTo(centerX + cs, centerY);
-  ctx.moveTo(centerX, centerY - cs); ctx.lineTo(centerX, centerY + cs);
-  ctx.strokeStyle = c; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.moveTo(centerX - crossSize, centerY);
+  ctx.lineTo(centerX + crossSize, centerY);
+  ctx.moveTo(centerX, centerY - crossSize);
+  ctx.lineTo(centerX, centerY + crossSize);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
 }
 
-function saveAndDownload() {
+// Shared helper: draw a filled circle with a text label at (x, y)
+function drawCircleLabel(ctx, x, y, color, lw, label) {
+  const radius = Math.max(12, lw * 3);
+
+  // Circle
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // Label text — shrink font for multi-char labels
+  const fontSize = label.length > 1 ? radius * 0.9 : radius * 1.2;
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${fontSize}px -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x, y);
+}
+
+// --- Actions ---
+function setTool(t) {
+  if (tool === 'text' && t !== 'text') commitTextEdit();
+  tool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    const isActive = b.id === 'tool-' + t;
+    b.classList.toggle('active', isActive);
+    b.setAttribute('aria-pressed', isActive);
+  });
+
+  // Switch slider between line-width mode and zoom mode
+  if (t === 'magnifier') {
+    lineWidthSlider.min = '1.5';
+    lineWidthSlider.max = '5';
+    lineWidthSlider.step = '0.5';
+    lineWidthSlider.value = zoomLevel.toString();
+    lineWidthSlider.title = 'Zoom Level';
+    lineWidthSlider.setAttribute('aria-label', 'Zoom Level');
+    widthLabel.textContent = zoomLevel.toFixed(1) + '×';
+  } else {
+    lineWidthSlider.min = '2';
+    lineWidthSlider.max = '15';
+    lineWidthSlider.step = '1';
+    lineWidthSlider.value = lineWidth.toString();
+    lineWidthSlider.title = 'Line Width';
+    lineWidthSlider.setAttribute('aria-label', 'Line Width');
+    widthLabel.textContent = lineWidth + 'px';
+  }
+}
+
+function undo() {
+  if (drawings.length > 0) {
+    const removed = drawings.pop();
+    if (removed.tool === 'step-arrow') stepArrowCount = Math.max(0, stepArrowCount - 1);
+    if (removed.tool === 'step-rect') stepRectCount = Math.max(0, stepRectCount - 1);
+    if (removed.tool === 'abc-arrow') abcArrowCount = Math.max(0, abcArrowCount - 1);
+    if (removed.tool === 'abc-rect') abcRectCount = Math.max(0, abcRectCount - 1);
+    render();
+    updateActionStates();
+  }
+}
+
+function clearAll() {
+  if (drawings.length === 0) return;
+  if (!confirm('Are you sure you want to clear all annotations?')) return;
+
+  drawings = [];
+  stepArrowCount = 0;
+  stepRectCount = 0;
+  abcArrowCount = 0;
+  abcRectCount = 0;
+  render();
+  updateActionStates();
+}
+
+function updateActionStates() {
+  const hasDrawings = drawings.length > 0;
+  document.getElementById('btn-undo').disabled = !hasDrawings;
+  document.getElementById('btn-clear').disabled = !hasDrawings;
+}
+
+function saveAndCopy() {
+  const btn = document.getElementById('btn-save');
+  const label = btn.querySelector('.label');
+  const originalText = label.textContent;
+
+  commitTextEdit();
+  render();
+
+  btn.disabled = true;
+  label.textContent = 'Saving…';
+
+  canvas.toBlob(async (blob) => {
+    try {
+      if (!blob) {
+        throw new Error('Failed to export screenshot');
+      }
+      downloadBlob(blob);
+      let copied = true;
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      } catch (clipErr) {
+        // The download already happened; a blocked clipboard is not a failure.
+        console.warn('Copy to clipboard failed:', clipErr);
+        copied = false;
+      }
+      showSaveStatus('', false);
+      label.textContent = copied ? '✓ Saved & Copied' : '✓ Saved';
+      btn.classList.add('saved');
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        btn.disabled = false;
+        label.textContent = originalText;
+      }, 1500);
+    } catch (err) {
+      console.error('Save & Copy failed:', err);
+      // Never fail silently: the toolbar shows why, and the button is usable again.
+      showSaveStatus(err && err.message ? err.message : String(err), true);
+      btn.disabled = false;
+      label.textContent = originalText;
+    }
+  }, 'image/png');
+}
+
+function downloadBlob(blob) {
+  const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `FeatherShot_${new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.download = `FeatherShot_${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.png`;
+  link.href = url;
   link.click();
-  const btn = document.getElementById('save');
-  btn.textContent = '✓ Downloaded!';
-  btn.style.background = '#30d158';
-  setTimeout(() => { btn.textContent = '💾 Save & Download'; btn.style.background = ''; }, 1500);
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
-// Initial action states
+function showSaveStatus(message, isError) {
+  const status = document.getElementById('save-status');
+  if (!status) return;
+  status.textContent = message;
+  status.title = message;
+  status.classList.toggle('error', Boolean(isError));
+  status.hidden = !message;
+}
+
+// Initial state
 updateActionStates();
