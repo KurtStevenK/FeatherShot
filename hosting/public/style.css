@@ -553,15 +553,6 @@ body {
   color: #4285f4;
 }
 
-.cws-badge {
-  display: block;
-  width: 206px;
-  max-width: 100%;
-  height: auto;
-  margin-top: 18px;
-  border-radius: 6px;
-}
-
 .hero-stores {
   display: flex;
   flex-wrap: wrap;
@@ -803,10 +794,6 @@ body {
   background: rgba(48, 209, 88, 0.1);
   border: 1px solid rgba(48, 209, 88, 0.25);
   cursor: pointer;
-}
-
-.download-card .cws-badge + .vt-check {
-  margin-top: 12px;
 }
 
 .vt-check:hover,
