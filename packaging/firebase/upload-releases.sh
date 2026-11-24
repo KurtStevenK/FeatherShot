@@ -49,6 +49,7 @@ MSI=$(find_first "*.msi")
 DEB=$(find_first "*.deb")
 APPIMAGE=$(find_first "*.AppImage")
 PACMAN=$(find_first "*.pacman")
+SNAP=$(find_first "*.snap")
 ZIP=$(find "$ARTIFACTS_DIR" -type f -name "*Chrome*.zip" 2>/dev/null | head -1)
 if [[ -z "$ZIP" ]]; then
   ZIP=$(find_first "*.zip")
@@ -79,6 +80,7 @@ add_asset windows_msi "$MSI"
 add_asset linux_deb "$DEB"
 add_asset linux_appimage "$APPIMAGE"
 add_asset linux_pacman "$PACMAN"
+add_asset linux_snap "$SNAP"
 add_asset chrome_zip "$ZIP"
 add_asset android_apk "$APK"
 

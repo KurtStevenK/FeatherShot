@@ -83,6 +83,7 @@
     linux_deb: 'Linux, Debian/Ubuntu (.deb)',
     linux_appimage: 'Linux (.AppImage)',
     linux_pacman: 'Arch Linux (.pacman)',
+    linux_snap: 'Linux snap (.snap)',
     android_apk: 'Android (.apk)',
     chrome_zip: 'Chrome extension (.zip)',
   };

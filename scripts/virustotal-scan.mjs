@@ -22,8 +22,8 @@ const POLL_DEADLINE_MS = Number(process.env.VIRUSTOTAL_WAIT_MINUTES || 45) * 60_
 const QUOTA_RETRIES = 5;
 const QUOTA_WAIT_MS = 65_000;
 
-// Installers and the Chrome extension zip; latest.yml, blockmaps and the .nupkg are not executables.
-const PATTERNS = [/\.dmg$/i, /\.exe$/i, /\.deb$/i, /\.AppImage$/i, /\.pacman$/i, /\.zip$/i];
+// Installers, the MSI, the snap, the Android APK and the Chrome extension zip; latest.yml, blockmaps and the .nupkg are not executables.
+const PATTERNS = [/\.dmg$/i, /\.exe$/i, /\.msi$/i, /\.deb$/i, /\.AppImage$/i, /\.pacman$/i, /\.snap$/i, /\.apk$/i, /\.zip$/i];
 
 function parseEnvFile(envPath) {
   const vars = {};

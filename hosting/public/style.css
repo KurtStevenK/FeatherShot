@@ -470,6 +470,11 @@ body {
   color: var(--text);
 }
 
+.extra-text .vt-check {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
 .extra-action {
   flex: none;
   padding: 9px 14px;
