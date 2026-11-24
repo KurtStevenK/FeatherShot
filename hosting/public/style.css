@@ -894,6 +894,10 @@ body {
   color: #e8ecf5;
 }
 
+.verify-pick select option:disabled {
+  color: #7d86a3;
+}
+
 .verify-pick select option:checked {
   background: #0066ff;
   color: #fff;

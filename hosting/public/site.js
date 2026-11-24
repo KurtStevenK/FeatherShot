@@ -120,6 +120,15 @@
       opt.textContent = `${VERIFY_LABELS[k]}: ${assets[k].filename}`;
       select.appendChild(opt);
     });
+    // Files the current release does not have yet (new formats come with the next release):
+    // listed, but greyed out, so visitors can see they are on the way.
+    Object.keys(VERIFY_LABELS).filter((k) => !keys.includes(k)).forEach((k) => {
+      const opt = document.createElement('option');
+      opt.value = k;
+      opt.disabled = true;
+      opt.textContent = `${VERIFY_LABELS[k]}: from the next release`;
+      select.appendChild(opt);
+    });
     const os = userOs();
     const preferred = { windows: 'windows_exe', macos: 'macos_dmg', linux: 'linux_deb', android: 'android_apk' }[os];
     if (keys.includes(preferred)) select.value = preferred;
