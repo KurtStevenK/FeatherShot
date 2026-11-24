@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Chrome extension: removed the unused `downloads` permission. The editor saves through a normal download link and never called the downloads API; the Chrome Web Store rejected the listing for requesting it. `npm run verify:chrome` now fails if the manifest asks for a permission the scripts don't use.
 
+## [1.3.48] - 2026-11-21
+
+### Added
+
+- Linux: FeatherShot is built as a snap and published to the Snap Store (`snap install feathershot` once Canonical has reviewed the store name). Snap installs update through the store; the update check suggests `sudo snap refresh feathershot`. The `.snap` file is also attached to each GitHub release.
+
 ## [1.3.47] - 2026-11-07
 
 ### Fixed
