@@ -5,7 +5,7 @@
     macos_dmg: 0,
     windows_exe: 1,
     linux_deb: 2,
-    chrome_zip: 3,
+    // The Chrome card links to the Chrome Web Store listing, not the ZIP.
   };
 
   function applyManifest(data) {

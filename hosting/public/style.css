@@ -466,6 +466,71 @@ body {
   color: #4285f4;
 }
 
+.cws-badge {
+  display: block;
+  width: 206px;
+  max-width: 100%;
+  height: auto;
+  margin-top: 18px;
+  border-radius: 6px;
+}
+
+.hero-stores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  animation: fadeInUp 0.6s ease 0.5s both;
+}
+
+.hero-cws {
+  display: inline-block;
+  border-radius: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-cws img {
+  display: block;
+  width: auto;
+  height: 62px;
+  border-radius: 8px;
+}
+
+.hero-snap:hover {
+  box-shadow: 0 10px 30px rgba(250, 100, 65, 0.25);
+}
+
+.download-stores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.download-stores a {
+  display: inline-block;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.download-stores a:hover {
+  transform: translateY(-2px);
+}
+
+.download-stores img {
+  display: block;
+}
+
+.hero-cws:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(66, 133, 244, 0.25);
+}
+
 /* ═══════════════════ FOOTER ═══════════════════ */
 .footer {
   padding: 48px 0;
