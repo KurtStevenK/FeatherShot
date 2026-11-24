@@ -53,6 +53,8 @@ if [[ -z "$ZIP" ]]; then
   ZIP=$(find_first "*.zip")
 fi
 
+APK=$(find_first "*Android.apk")
+
 PUBLISHED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 json_assets=""
 
@@ -76,6 +78,7 @@ add_asset linux_deb "$DEB"
 add_asset linux_appimage "$APPIMAGE"
 add_asset linux_pacman "$PACMAN"
 add_asset chrome_zip "$ZIP"
+add_asset android_apk "$APK"
 
 mkdir -p "$(dirname "$MANIFEST_PATH")"
 cat >"$MANIFEST_PATH" <<EOF

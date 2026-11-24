@@ -269,9 +269,52 @@ jobs:
           name: chrome-extension
           path: FeatherShot-Chrome-Extension.zip
 
+  # ─── Android APK (also for Huawei phones without Google services) ───
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Build release APK
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm run sync:shared
+          if [[ -n "${ANDROID_KEYSTORE_BASE64:-}" ]]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          else
+            echo "::warning::ANDROID_KEYSTORE_BASE64 not set: the APK is not signed and Android will not install it."
+          fi
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon :app:assembleRelease -PappVersion="$VERSION"
+          APK=app/build/outputs/apk/release/app-release.apk
+          [[ -f "$APK" ]] || APK=app/build/outputs/apk/release/app-release-unsigned.apk
+          cp "$APK" "../FeatherShot-${VERSION}-Android.apk"
+          rm -f "$RUNNER_TEMP/release.jks"
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: FeatherShot-*-Android.apk
+
   # ─── Create GitHub Release ─────────────────────────────────────────
   release:
-    needs: [build-macos, build-electron, build-chrome]
+    needs: [build-macos, build-electron, build-chrome, build-android]
     if: always() && !cancelled()
     runs-on: ubuntu-latest
     steps:
@@ -299,6 +342,7 @@ jobs:
             release-artifacts/**/*.pacman
             release-artifacts/**/*.snap
             release-artifacts/**/*.zip
+            release-artifacts/**/*.apk
             release-artifacts/**/*.nupkg
 
       - name: Check Firebase publish secrets

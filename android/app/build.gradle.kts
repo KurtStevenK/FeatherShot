@@ -12,14 +12,31 @@ android {
         applicationId = "xyz.kainzmayer.feathershot"
         minSdk = 29 // Android 10: MediaStore RELATIVE_PATH and IS_PENDING for saving to Pictures
         targetSdk = 36
-        versionCode = 1347
-        versionName = "1.3.47"
+        // CI passes -PappVersion=1.3.49 from the release tag; versionCode is 1.3.49 -> 10349.
+        val appVersion = (project.findProperty("appVersion") as String?) ?: "1.3.49"
+        val (major, minor, patch) = appVersion.split(".").map { it.toInt() }
+        versionCode = major * 10000 + minor * 100 + patch
+        versionName = appVersion
+    }
+
+    // Release signing comes from the environment (GitHub Actions secrets), never from the repo.
+    // Without ANDROID_KEYSTORE_FILE the release APK is built unsigned.
+    val keystoreFile = System.getenv("ANDROID_KEYSTORE_FILE")?.let { file(it) }
+    signingConfigs {
+        if (keystoreFile != null && keystoreFile.exists()) {
+            create("release") {
+                storeFile = keystoreFile
+                storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Unsigned on purpose: a real release keystore is needed for Huawei AppGallery.
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 
@@ -49,7 +66,10 @@ android {
     sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/editor-assets"))
 }
 
-tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+// Every task that reads the assets (asset merging and the release lint check) needs the copy first.
+tasks.matching {
+    (it.name.startsWith("merge") && it.name.endsWith("Assets")) || it.name.contains("lint", ignoreCase = true)
+}.configureEach {
     dependsOn(syncEditorAssets)
 }
 

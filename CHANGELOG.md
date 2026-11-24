@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Android app (`.apk`), also for Huawei phones without Google services (Android 10 or later). It uses the same editor as the Chrome extension, with a phone layout. Each release builds a signed APK, attaches it to the GitHub release and the Firebase mirror, and the website has an Android download card.
+
 ### Changed
 
 - Chrome extension: the editor now looks and works like the desktop editor. Tools sit in four groups with the same icons, there are seven color swatches plus a custom color, a zoom bar (zoom out/in, Fit, 1:1) and the same keyboard shortcuts (1–0, T, M, Ctrl+Z, Ctrl+S, Ctrl +/−/0/9). Save & Copy downloads the PNG and also copies it to the clipboard. The text box now opens where you click.
