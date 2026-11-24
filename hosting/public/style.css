@@ -885,6 +885,18 @@ body {
   color: var(--text);
   font: inherit;
   font-weight: 400;
+  color-scheme: dark;
+}
+
+/* The open list is drawn by the browser: give it the page's dark colours so the text stays readable. */
+.verify-pick select option {
+  background: #141a2e;
+  color: #e8ecf5;
+}
+
+.verify-pick select option:checked {
+  background: #0066ff;
+  color: #fff;
 }
 
 .verify-cmd {
