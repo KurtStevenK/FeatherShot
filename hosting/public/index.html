@@ -323,6 +323,13 @@
           <h3>macOS</h3>
           <span class="download-format">.dmg — Native Swift App</span>
           <span class="download-req">macOS 14 (Sonoma) or later</span>
+          <span class="vt-check" role="link" tabindex="0" data-asset="macos_dmg"
+            data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
+              <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Scanned by VirusTotal
+          </span>
         </a>
 
         <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
@@ -335,6 +342,13 @@
           <h3>Windows</h3>
           <span class="download-format">.exe — Installer or Portable, or .msi</span>
           <span class="download-req">Windows 10 or later</span>
+          <span class="vt-check" role="link" tabindex="0" data-asset="windows_exe"
+            data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
+              <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Scanned by VirusTotal
+          </span>
         </a>
 
         <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
@@ -347,6 +361,13 @@
           <h3>Linux</h3>
           <span class="download-format">.deb / .AppImage / pacman (Arch)</span>
           <span class="download-req">Debian, Ubuntu, Arch, Fedora</span>
+          <span class="vt-check" role="link" tabindex="0" data-asset="linux_deb"
+            data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
+              <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Scanned by VirusTotal
+          </span>
         </a>
 
         <a href="https://chromewebstore.google.com/detail/feathershot/agchndmchfimblcabbenpaicoopfdmlc" class="download-card chrome" target="_blank" rel="noopener">
@@ -361,6 +382,13 @@
           <span class="download-req">Chrome, Edge, Brave, Arc</span>
           <img class="cws-badge" src="chrome-web-store-badge.png" width="206" height="62"
             alt="Available in the Chrome Web Store">
+          <span class="vt-check" role="link" tabindex="0" data-asset="chrome_zip"
+            data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
+              <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            ZIP scanned by VirusTotal
+          </span>
         </a>
 
         <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" class="download-card">
@@ -373,6 +401,13 @@
           <h3>Android</h3>
           <span class="download-format">.apk — also for Huawei phones</span>
           <span class="download-req">Android 10 or later, no Google services needed</span>
+          <span class="vt-check" role="link" tabindex="0" data-asset="android_apk"
+            data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
+              <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            Scanned by VirusTotal
+          </span>
         </a>
       </div>
 
@@ -387,6 +422,168 @@
           <img src="snap-store-badge.svg" width="182" height="56" alt="Get it from the Snap Store">
         </a>
       </p>
+
+      <details class="verify" id="verify">
+        <summary>
+          <span class="verify-shield" aria-hidden="true">🛡️</span>
+          How to check that your download really comes from us
+        </summary>
+        <div class="verify-body">
+          <p>
+            Every FeatherShot release is built by GitHub Actions from the public source code. The files on GitHub
+            and on our download mirror are exactly the same, so they have the same <strong>SHA-256 fingerprint</strong>.
+            After each release, GitHub Actions also uploads every file to <strong>VirusTotal</strong>, where more than
+            60 antivirus engines check it. The results are added to the
+            <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest">release notes</a>.
+          </p>
+
+          <label class="verify-pick">
+            Which file did you download?
+            <select id="verify-file"></select>
+          </label>
+
+          <h4>Step 1: the official fingerprint</h4>
+          <p class="verify-cmd-label">The SHA-256 fingerprint of <code class="v-file">the file</code> from our release:</p>
+          <div class="install-command-row">
+            <code id="verify-hash">Loading…</code>
+            <button type="button" class="copy-btn" id="verify-hash-copy" data-copy="" aria-label="Copy fingerprint"></button>
+          </div>
+          <p class="verify-links">
+            <a id="verify-vt" href="https://github.com/KurtStevenK/FeatherShot/releases/latest" target="_blank" rel="noopener">VirusTotal report for this file</a>
+            ·
+            <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" target="_blank" rel="noopener">the same fingerprint on GitHub</a>
+            (shown as <code>sha256:</code> next to each file)
+          </p>
+
+          <h4>Step 2: the fingerprint of your file</h4>
+          <p>Run these commands one after the other. Each line has its own copy button.</p>
+          <div class="verify-tabs" role="tablist" aria-label="Operating system">
+            <button type="button" role="tab" data-os="windows">Windows</button>
+            <button type="button" role="tab" data-os="macos">macOS</button>
+            <button type="button" role="tab" data-os="linux">Linux</button>
+          </div>
+          <div class="verify-os" data-os="windows">
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Open PowerShell (Start menu, type <em>PowerShell</em>) and go to your Downloads folder:</p>
+              <div class="install-command-row">
+                <code data-tpl="cd $HOME\Downloads">cd $HOME\Downloads</code>
+                <button type="button" class="copy-btn" data-copy="cd $HOME\Downloads" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <div class="install-command-row">
+                <code data-tpl="(Get-FileHash .\{file} -Algorithm SHA256).Hash">(Get-FileHash .\{file} -Algorithm SHA256).Hash</code>
+                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Or let PowerShell compare it for you. It prints <strong>True</strong> when the file is ours:</p>
+              <div class="install-command-row">
+                <code data-tpl="(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;">(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;</code>
+                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;" aria-label="Copy command"></button>
+              </div>
+            </div>
+          </div>
+          <div class="verify-os" data-os="macos">
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Open Terminal (Spotlight, type <em>Terminal</em>) and go to your Downloads folder:</p>
+              <div class="install-command-row">
+                <code data-tpl="cd ~/Downloads">cd ~/Downloads</code>
+                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <div class="install-command-row">
+                <code data-tpl="shasum -a 256 {file}">shasum -a 256 {file}</code>
+                <button type="button" class="copy-btn" data-copy="shasum -a 256 {file}" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Or let Terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
+              <div class="install-command-row">
+                <code data-tpl="echo &quot;{hash}  {file}&quot; | shasum -a 256 -c">echo &quot;{hash}  {file}&quot; | shasum -a 256 -c</code>
+                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | shasum -a 256 -c" aria-label="Copy command"></button>
+              </div>
+            </div>
+          </div>
+          <div class="verify-os" data-os="linux">
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Open a terminal and go to your Downloads folder:</p>
+              <div class="install-command-row">
+                <code data-tpl="cd ~/Downloads">cd ~/Downloads</code>
+                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <div class="install-command-row">
+                <code data-tpl="sha256sum {file}">sha256sum {file}</code>
+                <button type="button" class="copy-btn" data-copy="sha256sum {file}" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Or let the terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
+              <div class="install-command-row">
+                <code data-tpl="echo &quot;{hash}  {file}&quot; | sha256sum -c">echo &quot;{hash}  {file}&quot; | sha256sum -c</code>
+                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | sha256sum -c" aria-label="Copy command"></button>
+              </div>
+            </div>
+          </div>
+          <p>If the two fingerprints are different, do not open the file. Delete it and download it again from this page.</p>
+
+          <h4>Step 3 (optional): proof that GitHub built it from our code</h4>
+          <p>
+            From version 1.3.49 on, GitHub signs every release file with a build attestation. It proves that the file
+            was built by the FeatherShot workflow in
+            <a href="https://github.com/KurtStevenK/FeatherShot">github.com/KurtStevenK/FeatherShot</a> and was not
+            changed afterwards, whether you downloaded it from GitHub or from our mirror.
+          </p>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Windows: install the GitHub CLI:</p>
+              <div class="install-command-row">
+                <code data-tpl="winget install --id GitHub.cli">winget install --id GitHub.cli</code>
+                <button type="button" class="copy-btn" data-copy="winget install --id GitHub.cli" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">macOS: install the GitHub CLI:</p>
+              <div class="install-command-row">
+                <code data-tpl="brew install gh">brew install gh</code>
+                <button type="button" class="copy-btn" data-copy="brew install gh" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Debian or Ubuntu: install the GitHub CLI:</p>
+              <div class="install-command-row">
+                <code data-tpl="sudo apt install gh">sudo apt install gh</code>
+                <button type="button" class="copy-btn" data-copy="sudo apt install gh" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">Sign in to GitHub once (a free account is enough):</p>
+              <div class="install-command-row">
+                <code data-tpl="gh auth login">gh auth login</code>
+                <button type="button" class="copy-btn" data-copy="gh auth login" aria-label="Copy command"></button>
+              </div>
+            </div>
+            <div class="verify-cmd">
+              <p class="verify-cmd-label">In your Downloads folder, check the file. It prints <strong>Verification succeeded!</strong> when GitHub built it from our code:</p>
+              <div class="install-command-row">
+                <code data-tpl="gh attestation verify {file} --repo KurtStevenK/FeatherShot">gh attestation verify {file} --repo KurtStevenK/FeatherShot</code>
+                <button type="button" class="copy-btn" data-copy="gh attestation verify {file} --repo KurtStevenK/FeatherShot" aria-label="Copy command"></button>
+              </div>
+            </div>
+
+          <h4>Step 4 (optional): look it up on VirusTotal yourself</h4>
+          <p>
+            Open <a href="https://www.virustotal.com/" target="_blank" rel="noopener">virustotal.com</a>, choose
+            <em>Search</em> and paste the fingerprint from step 1. You see the scan results for our file without
+            uploading anything.
+          </p>
+        </div>
+      </details>
     </div>
   </section>
 

@@ -317,6 +317,10 @@ jobs:
   release:
     needs: [build-macos, build-electron, build-chrome, build-android]
     if: always() && !cancelled()
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -328,6 +332,22 @@ jobs:
 
       - name: List artifacts
         run: find release-artifacts -type f | head -50
+
+      # Signed build provenance for every file people download, from GitHub or the Firebase mirror
+      # (same bytes). Users check it with: gh attestation verify <file> --repo KurtStevenK/FeatherShot
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.msi
+            release-artifacts/**/*.deb
+            release-artifacts/**/*.AppImage
+            release-artifacts/**/*.pacman
+            release-artifacts/**/*.snap
+            release-artifacts/**/*.zip
+            release-artifacts/**/*.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
