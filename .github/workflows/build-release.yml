@@ -242,6 +242,7 @@ jobs:
           # latest.yml and the blockmap are the Windows in-app update feed (electron-updater).
           path: |
             electron-app/dist/*.exe
+            electron-app/dist/*.msi
             electron-app/dist/latest.yml
             electron-app/dist/*.exe.blockmap
             electron-app/dist/*.deb
@@ -292,6 +293,7 @@ jobs:
           files: |
             release-artifacts/**/*.dmg
             release-artifacts/**/*.exe
+            release-artifacts/**/*.msi
             release-artifacts/**/latest.yml
             release-artifacts/**/*.blockmap
             release-artifacts/**/*.deb

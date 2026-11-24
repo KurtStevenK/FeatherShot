@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Windows: an `.msi` package next to the `.exe` installer. It installs for all users and works with Group Policy and Intune; newer versions replace older ones. The website links to it below the download cards.
+
 ## [1.3.48] - 2026-11-21
 
 ### Added

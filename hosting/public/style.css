@@ -412,6 +412,17 @@ body {
   gap: 20px;
 }
 
+.download-note {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.download-note a {
+  color: var(--blue);
+}
+
 .download-card {
   display: flex;
   flex-direction: column;

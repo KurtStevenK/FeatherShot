@@ -45,6 +45,7 @@ EXE=$(find "$ARTIFACTS_DIR" -type f -name "*Setup*.exe" 2>/dev/null | head -1)
 if [[ -z "$EXE" ]]; then
   EXE=$(find_first "*.exe")
 fi
+MSI=$(find_first "*.msi")
 DEB=$(find_first "*.deb")
 APPIMAGE=$(find_first "*.AppImage")
 PACMAN=$(find_first "*.pacman")
@@ -72,6 +73,7 @@ add_asset() {
 
 add_asset macos_dmg "$DMG"
 add_asset windows_exe "$EXE"
+add_asset windows_msi "$MSI"
 add_asset linux_deb "$DEB"
 add_asset linux_appimage "$APPIMAGE"
 add_asset linux_pacman "$PACMAN"

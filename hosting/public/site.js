@@ -29,6 +29,12 @@
       }
     });
 
+    const msiLink = document.getElementById('msi-link');
+    if (msiLink && assets.windows_msi?.url) {
+      msiLink.href = assets.windows_msi.url;
+      msiLink.setAttribute('download', assets.windows_msi.filename || '');
+    }
+
     if (assets.linux_deb?.url || assets.linux_appimage?.url || assets.linux_pacman?.url) {
       const linuxCard = cards[2];
       if (linuxCard) {
