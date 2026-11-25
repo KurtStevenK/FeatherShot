@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.49] - 2026-11-25
+
 ### Added
 
 - Android app (`.apk`), also for Huawei phones without Google services (Android 10 or later). It uses the same editor as the Chrome extension, with a phone layout. Each release builds a signed APK, attaches it to the GitHub release and the Firebase mirror, and the website has an Android download card.
 - Windows: an `.msi` package next to the `.exe` installer. It installs for all users and works with Group Policy and Intune; newer versions replace older ones. The website links to it below the download cards.
-- Website: every download card shows that the file was scanned by VirusTotal and links to its report. A guide below the cards shows, one command per line with a copy button, how to check a download's SHA-256 fingerprint on Windows, macOS and Linux, and how to verify GitHub's build attestation.
-- Releases: GitHub build attestations for every download file (`gh attestation verify <file> --repo KurtStevenK/FeatherShot`). VirusTotal now also scans the MSI and the APK.
+- Website: every download card, the MSI tile and the Snap Store tile show "Checked by VirusTotal" and link to the file's report. A guide below the cards shows, one command per line with a copy button, how to check a download's SHA-256 fingerprint on Windows, macOS and Linux, and how to verify GitHub's build attestation.
+- Releases: GitHub build attestations for every download file (`gh attestation verify <file> --repo KurtStevenK/FeatherShot`). VirusTotal now also scans the MSI, the APK and the snap (`virustotal-scan.mjs` skipped the MSI and APK before), and the Firebase mirror lists the snap.
+- Website: "Download on the App Store" and "Download on the Mac App Store" badges in the hero, next to the Chrome Web Store and Snap Store badges.
 
 ### Changed
 
