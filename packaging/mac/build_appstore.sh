@@ -5,8 +5,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-VERSION="${FEATHERSHOT_VERSION:-1.3.44}"
-BUILD="${FEATHERSHOT_BUILD:-1344}"
+# Defaults: the version in Info.plist, and a build number derived from it
+# (1.3.51 → 1351, 1.4.0 → 1400) that must be higher than the last upload.
+VERSION="${FEATHERSHOT_VERSION:-$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$ROOT/Info.plist")}"
+IFS=. read -r _MAJ _MIN _PATCH <<< "$VERSION"
+BUILD="${FEATHERSHOT_BUILD:-$(( _MAJ * 1000 + _MIN * 100 + ${_PATCH:-0} ))}"
 TEAM_ID="${APPLE_TEAM_ID:-XPPUZJDN56}"
 BUNDLE_ID="xyz.kainzmayer.feathershot"
 ENTITLEMENTS="${ROOT}/packaging/mac/FeatherShot-AppStore.entitlements"
@@ -126,23 +129,26 @@ find_provisioning_profile() {
     return
   fi
   local dir="$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"
-  local f profile app_id
+  local f app_id expires plist
   if [[ ! -d "$dir" ]]; then
     return 1
   fi
+  plist=$(mktemp "${TMPDIR:-/tmp}/feathershot-profile.XXXXXX")
   while IFS= read -r -d '' f; do
-    app_id=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Entitlements.'com.apple.application-identifier' raw -o - - 2>/dev/null || true)
-    if [[ -z "$app_id" ]]; then
-      app_id=$(security cms -D -i "$f" 2>/dev/null | plutil -extract Entitlements.'application-identifier' raw -o - - 2>/dev/null || true)
-    fi
-    if [[ "$app_id" == *"${BUNDLE_ID}"* ]]; then
-      profile=$(security cms -D -i "$f" 2>/dev/null | plutil -extract ProvisionedDevices raw -o - - 2>/dev/null || echo "store")
-      if [[ "$profile" == "store" || -z "$profile" ]]; then
-        echo "$f"
-        return 0
-      fi
-    fi
+    security cms -D -i "$f" > "$plist" 2>/dev/null || continue
+    # plutil key paths split on dots, so the dots inside the key must be escaped.
+    app_id=$(plutil -extract 'Entitlements.com\.apple\.application-identifier' raw -o - "$plist" 2>/dev/null || true)
+    # The exact App ID only: not the Watch app's or a wildcard.
+    [[ "$app_id" == "${TEAM_ID}.${BUNDLE_ID}" ]] || continue
+    # A store profile lists no devices (development and ad hoc profiles do).
+    plutil -extract ProvisionedDevices xml1 -o /dev/null "$plist" 2>/dev/null && continue
+    expires=$(plutil -extract ExpirationDate raw -o - "$plist" 2>/dev/null || true)
+    [[ -n "$expires" && "$expires" > "$(date -u +%Y-%m-%dT%H:%M:%SZ)" ]] || continue
+    rm -f "$plist"
+    echo "$f"
+    return 0
   done < <(find "$dir" -name '*.provisionprofile' -print0 2>/dev/null)
+  rm -f "$plist"
   return 1
 }
 
@@ -158,9 +164,10 @@ if PROFILE_PATH=$(find_provisioning_profile); then
   echo "==> Using provisioning profile: $PROFILE_PATH"
   cp "$PROFILE_PATH" "$APP_NAME/Contents/embedded.provisionprofile"
 else
-  echo "==> WARNING: No Mac App Store provisioning profile found for ${BUNDLE_ID}."
-  echo "    Create one at https://developer.apple.com/account/resources/profiles/add"
-  echo "    or set PROVISIONING_PROFILE_PATH. Attempting sign without embedded profile..."
+  echo "==> No valid Mac App Store provisioning profile found for ${TEAM_ID}.${BUNDLE_ID}." >&2
+  echo "    TestFlight rejects a pkg without one. Create one at" >&2
+  echo "    https://developer.apple.com/account/resources/profiles/add or set PROVISIONING_PROFILE_PATH." >&2
+  exit 1
 fi
 
 echo "==> Code signing app (App Store sandbox)"
