@@ -137,6 +137,8 @@ struct AnnotationView: View {
                     StepRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
                 } else if drawing.tool == .line {
                     LineView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .dashedLine {
+                    DashedLineView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .questionArrow {
                     QuestionArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .questionRectangle {
@@ -178,6 +180,8 @@ struct AnnotationView: View {
                     StepRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
                 } else if selectedTool == .line {
                     LineView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .dashedLine {
+                    DashedLineView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .questionArrow {
                     QuestionArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .questionRectangle {
@@ -228,6 +232,7 @@ struct AnnotationView: View {
             ToolItem(tool: .rectangle, icon: "square", name: "Rectangle", key: "4"),
             ToolItem(tool: .circle, icon: "circle", name: "Circle", key: "5"),
             ToolItem(tool: .line, icon: "line.diagonal", name: "Line", key: "6"),
+            ToolItem(tool: .dashedLine, icon: "ellipsis", name: "Dashed Line", key: "D"),
         ],
         [
             ToolItem(tool: .questionArrow, icon: "questionmark.circle", name: "Question Arrow", key: "7"),

@@ -12,8 +12,8 @@ android {
         applicationId = "xyz.kainzmayer.feathershot"
         minSdk = 29 // Android 10: MediaStore RELATIVE_PATH and IS_PENDING for saving to Pictures
         targetSdk = 36
-        // CI passes -PappVersion=1.3.49 from the release tag; versionCode is 1.3.49 -> 10349.
-        val appVersion = (project.findProperty("appVersion") as String?) ?: "1.3.49"
+        // CI passes -PappVersion=1.3.50 from the release tag; versionCode is 1.3.50 -> 10350.
+        val appVersion = (project.findProperty("appVersion") as String?) ?: "1.3.50"
         val (major, minor, patch) = appVersion.split(".").map { it.toInt() }
         versionCode = major * 10000 + minor * 100 + patch
         versionName = appVersion

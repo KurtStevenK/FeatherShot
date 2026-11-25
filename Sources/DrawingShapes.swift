@@ -9,7 +9,7 @@ typealias PlatformImage = UIImage
 #endif
 
 enum Tool {
-    case stepArrow, stepRectangle, arrow, rectangle, circle, line
+    case stepArrow, stepRectangle, arrow, rectangle, circle, line, dashedLine
     case questionArrow, questionRectangle, abcArrow, abcRectangle
     case exclamationArrow, exclamationRectangle
     case magnifier, text
@@ -123,6 +123,22 @@ struct LineView: View {
             path.addLine(to: end)
         }
         .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+    }
+}
+
+// Dashed line tool — a straight line like LineView, drawn in dashes (dash 3× and gap 2× the width)
+struct DashedLineView: View {
+    var start: CGPoint
+    var end: CGPoint
+    var color: Color
+    var lineWidth: CGFloat
+    
+    var body: some View {
+        Path { path in
+            path.move(to: start)
+            path.addLine(to: end)
+        }
+        .stroke(color, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, dash: [lineWidth * 3, lineWidth * 2]))
     }
 }
 

@@ -38,6 +38,7 @@ document.getElementById('tool-arrow').addEventListener('click', () => setTool('a
 document.getElementById('tool-rect').addEventListener('click', () => setTool('rect'));
 document.getElementById('tool-circle').addEventListener('click', () => setTool('circle'));
 document.getElementById('tool-line').addEventListener('click', () => setTool('line'));
+document.getElementById('tool-dashed-line').addEventListener('click', () => setTool('dashed-line'));
 document.getElementById('tool-question-arrow').addEventListener('click', () => setTool('question-arrow'));
 document.getElementById('tool-question-rect').addEventListener('click', () => setTool('question-rect'));
 document.getElementById('tool-exclamation-arrow').addEventListener('click', () => setTool('exclamation-arrow'));
@@ -98,6 +99,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '4' || e.key === 'r') setTool('rect');
   if (e.key === '5') setTool('circle');
   if (e.key === '6' || e.key === 'l') setTool('line');
+  if (e.key === 'd' || e.key === 'D') setTool('dashed-line');
   if (e.key === '7') setTool('question-arrow');
   if (e.key === '8') setTool('question-rect');
   if (e.key === '-' || e.key === '_') setTool('exclamation-arrow');
@@ -359,6 +361,8 @@ function render() {
       drawArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'line') {
       drawLine(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
+    } else if (d.tool === 'dashed-line') {
+      drawDashedLine(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'question-arrow') {
       drawQuestionArrow(ctx, d.startX, d.startY, d.endX, d.endY, d.color, d.lineWidth);
     } else if (d.tool === 'question-rect') {
@@ -394,6 +398,8 @@ function render() {
       drawArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     } else if (currentDraw.tool === 'line') {
       drawLine(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
+    } else if (currentDraw.tool === 'dashed-line') {
+      drawDashedLine(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     } else if (currentDraw.tool === 'question-arrow') {
       drawQuestionArrow(ctx, currentDraw.startX, currentDraw.startY, currentDraw.endX, currentDraw.endY, currentDraw.color, currentDraw.lineWidth);
     } else if (currentDraw.tool === 'question-rect') {
@@ -460,6 +466,14 @@ function drawLine(ctx, x1, y1, x2, y2, color, lw) {
   ctx.lineWidth = lw;
   ctx.lineCap = 'round';
   ctx.stroke();
+}
+
+// Dashes 3× and gaps 2× the line width, the same pattern as the macOS and iPhone editors.
+function drawDashedLine(ctx, x1, y1, x2, y2, color, lw) {
+  ctx.save();
+  ctx.setLineDash([lw * 3, lw * 2]);
+  drawLine(ctx, x1, y1, x2, y2, color, lw);
+  ctx.restore();
 }
 
 function drawStepArrow(ctx, x1, y1, x2, y2, color, lw, num) {

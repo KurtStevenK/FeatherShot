@@ -114,6 +114,7 @@ struct EditorView: View {
             ToolItem(tool: .rectangle, icon: "square", name: "Rectangle"),
             ToolItem(tool: .circle, icon: "circle", name: "Circle"),
             ToolItem(tool: .line, icon: "line.diagonal", name: "Line"),
+            ToolItem(tool: .dashedLine, icon: "ellipsis", name: "Dashed Line"),
         ],
         [
             ToolItem(tool: .questionArrow, icon: "questionmark.circle", name: "Question Arrow"),

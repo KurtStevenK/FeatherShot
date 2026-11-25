@@ -53,6 +53,8 @@ struct AnnotationShape: View {
             StepRectangleView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth, stepNumber: number)
         case .line:
             LineView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
+        case .dashedLine:
+            DashedLineView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
         case .questionArrow:
             QuestionArrowView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
         case .questionRectangle:

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.50] - 2026-11-25
+
+### Added
+
+- **Dashed Line** tool on every platform (macOS, iPhone, Windows, Linux, Chrome extension, Android): a straight line in dashes three times and gaps twice the line width, next to Line in the shapes group. Shortcut `D`.
+- CI: an `ios` job builds the iPhone app (with the Watch app) for the simulator, so changes to the shared drawing code are compiled for iOS too.
+
 ## [1.3.49] - 2026-11-25
 
 ### Added
