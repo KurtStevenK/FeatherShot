@@ -77,6 +77,9 @@ lineWidthSlider.addEventListener('input', (e) => {
 
 // Actions
 document.getElementById('btn-undo').addEventListener('click', undo);
+// Keep the text box focused until the click runs undo(), which ends the edit itself; otherwise the
+// blur would drop an empty text first and Undo would then remove one annotation too many.
+document.getElementById('btn-undo').addEventListener('mousedown', (e) => e.preventDefault());
 document.getElementById('btn-clear').addEventListener('click', clearAll);
 document.getElementById('btn-save').addEventListener('click', saveAndCopy);
 
@@ -308,6 +311,7 @@ canvas.addEventListener('mouseup', (e) => {
         drawings.push(entry);
         beginTextEdit(entry);
         render();
+        updateActionStates();
       }
       textPlaceStart = null;
     }
@@ -603,23 +607,32 @@ function beginTextEdit(d) {
   textEditor.setSelectionRange(textEditor.value.length, textEditor.value.length);
 }
 
+// Ends the open text edit. Returns 'removed' when an empty text was dropped, so Undo can stop there.
 function commitTextEdit() {
-  if (!editingTextId) return;
+  if (!editingTextId) return null;
   const idx = drawings.findIndex((d) => d.id === editingTextId);
   if (idx === -1) {
     hideTextEditor();
-    return;
+    return null;
   }
-  // Keep inner line breaks; drop trailing spaces and blank lines at the start and end.
-  const raw = (textEditor.value || '').replace(/[ \t]+$/gm, '').replace(/^\n+|\n+$/g, '');
-  const trimmed = raw.trim() ? raw : '';
+  // Keep inner line breaks; drop trailing spaces and blank lines at the end. Blank lines at the
+  // start move the text down instead, so it stays where it was typed.
+  const value = (textEditor.value || '').replace(/[ \t]+$/gm, '').replace(/\n+$/, '');
+  const leading = (value.match(/^\n*/) || [''])[0].length;
+  const trimmed = value.trim() ? value.slice(leading) : '';
+  let outcome = 'kept';
   if (!trimmed) {
     drawings.splice(idx, 1);
+    outcome = 'removed';
   } else {
-    drawings[idx].text = trimmed;
+    const d = drawings[idx];
+    d.text = trimmed;
+    d.startY += leading * (d.fontSize || 24) * TEXT_LINE_HEIGHT;
   }
   hideTextEditor();
   render();
+  updateActionStates();
+  return outcome;
 }
 
 function hideTextEditor() {
@@ -632,7 +645,8 @@ function hideTextEditor() {
 
 textEditor.addEventListener('blur', () => commitTextEdit());
 textEditor.addEventListener('keydown', (e) => {
-  // Enter finishes, Shift+Enter adds a line, Esc finishes too.
+  // Enter finishes, Shift+Enter adds a line, Esc finishes too (not while an IME is composing).
+  if (e.isComposing) return;
   if ((e.key === 'Enter' && !e.shiftKey) || e.key === 'Escape') {
     e.preventDefault();
     commitTextEdit();
@@ -787,6 +801,8 @@ function setTool(t) {
 }
 
 function undo() {
+  // With a text box open, Undo first ends it; an empty one being dropped is the whole undo.
+  if (commitTextEdit() === 'removed') return;
   if (drawings.length > 0) {
     const removed = drawings.pop();
     if (removed.tool === 'step-arrow') stepArrowCount = Math.max(0, stepArrowCount - 1);

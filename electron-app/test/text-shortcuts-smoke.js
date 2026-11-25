@@ -55,9 +55,9 @@ app.whenReady().then(async () => {
     document.getElementById('canvas').width === 400 ? resolve() : setTimeout(wait, 50);
   })())`);
 
-  const [x, y] = await page(`(() => {
+  const [x, y, w, h] = await page(`(() => {
     const r = document.getElementById('canvas').getBoundingClientRect();
-    return [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2)];
+    return [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2), r.width, r.height];
   })()`);
   const click = (cx, cy) => {
     editor.webContents.sendInputEvent({ type: 'mouseDown', x: cx, y: cy, button: 'left', clickCount: 1 });
@@ -91,7 +91,7 @@ app.whenReady().then(async () => {
   // Clicking somewhere else keeps the typed text and starts the next one in the same click.
   await openTextBox();
   for (const ch of 'one') await press(ch);
-  click(x - 120, y + 80);
+  click(Math.round(x - w * 0.3), Math.round(y + h * 0.25));
   await expect((s) => s.editing && s.focused && s.typed === '' && s.texts.join() === 'one,',
     'a click elsewhere to keep "one" and open a second text box');
   for (const ch of 'two') await press(ch);

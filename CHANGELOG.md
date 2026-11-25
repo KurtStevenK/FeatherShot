@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - macOS: a text could get lost. Undo removed the text still being typed, Esc did nothing, and switching tools or clicking beside the screenshot left the field open. Now switching tools, Save & Copy (⌘S, which also works while typing), Undo, Clear and clicks anywhere finish the text first.
 - Windows, Linux, Chrome and Android: clicking an existing text did not open it for editing (the click was taken as a drag).
+- Windows, Linux, Chrome and Android: Undo and Clear now turn on as soon as a text is added; Undo with an empty text box open only closes that box; Enter and Esc no longer end a text while an input method (Chinese, Japanese, …) is still composing.
 
 ## [1.3.50] - 2026-11-25
 

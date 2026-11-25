@@ -566,6 +566,9 @@ struct AnnotationView: View {
                     }
                     if let hit = draggingTextId, drawings.contains(where: { $0.id == hit }) {
                         editingTextId = hit
+                        // Clicking the open text (or beside it) keeps typing going into its field:
+                        // `.task(id: openTextId)` does not run again for the same text.
+                        focus = .text(hit)
                         return
                     }
                     addText(at: startLocation)
