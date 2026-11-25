@@ -51,10 +51,11 @@ jobs:
             echo "::notice::VIRUSTOTAL_API_KEY not set — skipping VirusTotal"
             exit 0
           fi
-          # The files users download: installers, the portable .exe and the Chrome extension.
+          # The files users download: installers, the portable .exe, the MSI, the snap, the Android APK and the Chrome extension.
           gh release download "$TAG" --dir release-files \
             --pattern '*.dmg' --pattern '*.exe' --pattern '*.deb' \
-            --pattern '*.AppImage' --pattern '*.pacman' --pattern '*.zip'
+            --pattern '*.AppImage' --pattern '*.pacman' --pattern '*.zip' \
+            --pattern '*.msi' --pattern '*.apk' --pattern '*.snap'
           node scripts/virustotal-scan.mjs --artifacts-dir release-files --report virustotal-report.md
           cat virustotal-report.md >> "$GITHUB_STEP_SUMMARY"
 

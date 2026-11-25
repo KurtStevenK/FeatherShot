@@ -23,6 +23,18 @@ jobs:
       - name: Test
         run: swift test
 
+  # iPhone app (with the embedded Watch app) for the simulator, unsigned: compiles the shared
+  # drawing code (Sources/DrawingShapes.swift, EditorTheme.swift, EditorZoom.swift) for iOS too.
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build iPhone app (simulator, no signing)
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/FeatherShot.xcodeproj -scheme FeatherShot -destination 'generic/platform=iOS Simulator' -configuration Debug CODE_SIGNING_ALLOWED=NO build | tail -50
+
   shared:
     runs-on: ubuntu-latest
     steps:

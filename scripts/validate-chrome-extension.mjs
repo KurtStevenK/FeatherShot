@@ -47,6 +47,28 @@ for (const size of ['16', '48', '128']) {
   }
 }
 
+// The Chrome Web Store rejects permissions the code never uses, so each one
+// must map to an API call found in the extension's scripts.
+const permissionUse = {
+  activeTab: /chrome\.tabs\.captureVisibleTab/,
+  scripting: /chrome\.scripting\./,
+  storage: /chrome\.storage\./,
+  downloads: /chrome\.downloads\./,
+  tabs: /chrome\.tabs\.(query|get|update)/,
+};
+const allScripts = requiredScripts
+  .filter((rel) => rel && rel.endsWith('.js') && existsSync(join(extDir, rel)))
+  .map((rel) => readFileSync(join(extDir, rel), 'utf8'))
+  .join('\n');
+for (const perm of manifest.permissions ?? []) {
+  const pattern = permissionUse[perm];
+  if (!pattern) {
+    errors.push(`permission "${perm}" has no usage check in validate-chrome-extension.mjs; add one`);
+  } else if (!pattern.test(allScripts)) {
+    errors.push(`permission "${perm}" is requested but never used; remove it from manifest.json`);
+  }
+}
+
 const editorHtml = readFileSync(join(extDir, 'editor.html'), 'utf8');
 if (!editorHtml.includes('letterLabel.js')) {
   errors.push('editor.html must load letterLabel.js before editor.js');

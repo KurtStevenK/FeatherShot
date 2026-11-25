@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.51] - 2026-11-25
+
+### Changed
+
+- **Text tool**, on every platform: a click starts an empty text right where you clicked, and while you type it looks exactly like the result (same font, size and color, no input box, only a thin dashed outline), so the text is no longer shown twice. Clicking somewhere else keeps the text and starts the next one in the same click. **Enter** or **Esc** finishes; empty texts are dropped. Click a text to edit it (the cursor goes to the end), drag it to move it from where you grabbed it. In the Windows, Linux, Chrome and Android editors **Shift+Enter** adds a line.
+
+### Fixed
+
+- macOS: a text could get lost. Undo removed the text still being typed, Esc did nothing, and switching tools or clicking beside the screenshot left the field open. Now switching tools, Save & Copy (⌘S, which also works while typing), Undo, Clear and clicks anywhere finish the text first.
+- Windows, Linux, Chrome and Android: clicking an existing text did not open it for editing (the click was taken as a drag).
+- Windows, Linux, Chrome and Android: Undo and Clear now turn on as soon as a text is added; Undo with an empty text box open only closes that box; Enter and Esc no longer end a text while an input method (Chinese, Japanese, …) is still composing.
+
+## [1.3.50] - 2026-11-25
+
+### Added
+
+- **Dashed Line** tool on every platform (macOS, iPhone, Windows, Linux, Chrome extension, Android): a straight line in dashes three times and gaps twice the line width, next to Line in the shapes group. Shortcut `D`.
+- CI: an `ios` job builds the iPhone app (with the Watch app) for the simulator, so changes to the shared drawing code are compiled for iOS too.
+
+## [1.3.49] - 2026-11-25
+
+### Added
+
+- Android app (`.apk`), also for Huawei phones without Google services (Android 10 or later). It uses the same editor as the Chrome extension, with a phone layout. Each release builds a signed APK, attaches it to the GitHub release and the Firebase mirror, and the website has an Android download card.
+- Windows: an `.msi` package next to the `.exe` installer. It installs for all users and works with Group Policy and Intune; newer versions replace older ones. The website links to it below the download cards.
+- Website: every download card, the MSI tile and the Snap Store tile show "Checked by VirusTotal" and link to the file's report. A guide below the cards shows, one command per line with a copy button, how to check a download's SHA-256 fingerprint on Windows, macOS and Linux, and how to verify GitHub's build attestation.
+- Releases: GitHub build attestations for every download file (`gh attestation verify <file> --repo KurtStevenK/FeatherShot`). VirusTotal now also scans the MSI, the APK and the snap (`virustotal-scan.mjs` skipped the MSI and APK before), and the Firebase mirror lists the snap.
+- Website: "Download on the App Store" and "Download on the Mac App Store" badges in the hero, next to the Chrome Web Store and Snap Store badges.
+
+### Changed
+
+- Chrome extension: the editor now looks and works like the desktop editor. Tools sit in four groups with the same icons, there are seven color swatches plus a custom color, a zoom bar (zoom out/in, Fit, 1:1) and the same keyboard shortcuts (1–0, T, M, Ctrl+Z, Ctrl+S, Ctrl +/−/0/9). Save & Copy downloads the PNG and also copies it to the clipboard. The text box now opens where you click.
+
+### Fixed
+
+- Chrome extension: removed the unused `downloads` permission. The editor saves through a normal download link and never called the downloads API; the Chrome Web Store rejected the listing for requesting it. `npm run verify:chrome` now fails if the manifest asks for a permission the scripts don't use.
+
 ## [1.3.48] - 2026-11-21
 
 ### Added

@@ -22,9 +22,11 @@ struct AnnotationView: View {
     @State private var lineWidth: CGFloat = 4.0
     @State private var zoomLevel: CGFloat = 2.0
     @State private var isSaved = false
+    /// The text annotation being typed. Its field shows the text, so the canvas leaves it out.
     @State private var editingTextId: UUID?
-    @State private var editingTextBuffer: String = ""
     @State private var draggingTextId: UUID?
+    /// From the pointer to the grabbed text's center, so a dragged text does not jump.
+    @State private var textGrabOffset: CGSize = .zero
     @State private var textGestureStart: CGPoint?
     @State private var zoom: EditorZoom = .fit
     /// The canvas area minus its margins, where `.fit` has to fit the screenshot.
@@ -49,6 +51,9 @@ struct AnnotationView: View {
         // after the update that adds or removes the field, so focus lands on a view that exists.
         .task(id: openTextId) {
             focus = openTextId.map(EditorFocus.text) ?? .canvas
+            if let id = openTextId, let text = drawings.first(where: { $0.id == id })?.text, !text.isEmpty {
+                await placeCaretAtEnd(of: text)
+            }
         }
         #if DEBUG
         .onReceive(NotificationCenter.default.publisher(for: .featherShotPressSaveForTesting)) { _ in
@@ -81,6 +86,13 @@ struct AnnotationView: View {
                 stage(scale: scale)
                     .padding(margin)
                     .frame(minWidth: geo.size.width, minHeight: geo.size.height)
+                    // A click beside the screenshot ends text editing too. Behind the stage, so
+                    // clicks on the screenshot only reach the drawing gesture.
+                    .background {
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture { commitTextEdit() }
+                    }
             }
             .onAppear { viewport = available }
             .onChange(of: available) { _, newValue in viewport = newValue }
@@ -106,7 +118,7 @@ struct AnnotationView: View {
     /// The annotated screenshot drawn at `scale`. Drawing happens in image points, so the
     /// gesture converts from the scaled view back to the image.
     private func stage(scale: CGFloat) -> some View {
-        drawingContent
+        drawingContent(hidingText: openTextId)
             .scaleEffect(scale, anchor: .topLeading)
             .frame(width: image.size.width * scale, height: image.size.height * scale, alignment: .topLeading)
             .overlay(Rectangle().strokeBorder(Color.white.opacity(0.14), lineWidth: 1))
@@ -119,7 +131,8 @@ struct AnnotationView: View {
 
     // This view is used for BOTH the UI and the ImageRenderer
     // It is always oriented at (0,0) points to ensure 1:1 pixel mapping
-    private var drawingContent: some View {
+    /// `hidingText` is the text being typed: its field draws it on screen, so it is not drawn twice.
+    private func drawingContent(hidingText: UUID? = nil) -> some View {
         ZStack(alignment: .topLeading) {
             Image(nsImage: image)
                 .resizable()
@@ -137,6 +150,8 @@ struct AnnotationView: View {
                     StepRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
                 } else if drawing.tool == .line {
                     LineView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
+                } else if drawing.tool == .dashedLine {
+                    DashedLineView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .questionArrow {
                     QuestionArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .questionRectangle {
@@ -146,10 +161,12 @@ struct AnnotationView: View {
                 } else if drawing.tool == .exclamationRectangle {
                     ExclamationRectangleView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth)
                 } else if drawing.tool == .text {
-                    Text(drawing.text)
-                        .font(.system(size: drawing.fontSize, weight: .semibold))
-                        .foregroundColor(drawing.color)
-                        .position(x: drawing.start.x, y: drawing.start.y)
+                    if drawing.id != hidingText {
+                        Text(drawing.text)
+                            .font(.system(size: drawing.fontSize, weight: .semibold))
+                            .foregroundColor(drawing.color)
+                            .position(x: drawing.start.x, y: drawing.start.y)
+                    }
                 } else if drawing.tool == .abcArrow {
                     let stepNum = drawings[0...index].filter { $0.tool == .abcArrow }.count
                     ABCArrowView(start: drawing.start, end: drawing.end, color: drawing.color, lineWidth: drawing.lineWidth, stepNumber: stepNum)
@@ -178,6 +195,8 @@ struct AnnotationView: View {
                     StepRectangleView(start: start, end: end, color: selectedColor, lineWidth: lineWidth, stepNumber: stepNum)
                 } else if selectedTool == .line {
                     LineView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
+                } else if selectedTool == .dashedLine {
+                    DashedLineView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .questionArrow {
                     QuestionArrowView(start: start, end: end, color: selectedColor, lineWidth: lineWidth)
                 } else if selectedTool == .questionRectangle {
@@ -228,6 +247,7 @@ struct AnnotationView: View {
             ToolItem(tool: .rectangle, icon: "square", name: "Rectangle", key: "4"),
             ToolItem(tool: .circle, icon: "circle", name: "Circle", key: "5"),
             ToolItem(tool: .line, icon: "line.diagonal", name: "Line", key: "6"),
+            ToolItem(tool: .dashedLine, icon: "ellipsis", name: "Dashed Line", key: "D"),
         ],
         [
             ToolItem(tool: .questionArrow, icon: "questionmark.circle", name: "Question Arrow", key: "7"),
@@ -319,7 +339,10 @@ struct AnnotationView: View {
             .disabled(drawings.isEmpty)
             .help("Undo (⌘Z)")
 
-            Button { drawings.removeAll() } label: {
+            Button {
+                editingTextId = nil
+                drawings.removeAll()
+            } label: {
                 Label("Clear", systemImage: "trash")
             }
             .buttonStyle(EditorPillButtonStyle(kind: .danger))
@@ -423,6 +446,8 @@ struct AnnotationView: View {
     private func selectTool(_ tool: Tool) {
         // Mid-drag, the gesture would end under the new tool and leave its preview behind.
         if currentStart == nil && textGestureStart == nil {
+            // Another tool ends the text being typed; the field must not stay open behind it.
+            commitTextEdit()
             selectedTool = tool
         }
     }
@@ -435,27 +460,59 @@ struct AnnotationView: View {
         if let next = EditorZoom.zoomedOut(from: displayScale) { zoom = .scale(next) }
     }
 
+    // MARK: - Text editing
+
+    /// The open text's input field, styled as the text itself (same font, size and color at the
+    /// current zoom, centered on the same point), so the text does not move when editing ends.
     @ViewBuilder
     private func textEditingOverlay(scale: CGFloat) -> some View {
-        if let id = editingTextId,
-           let idx = drawings.firstIndex(where: { $0.id == id }) {
-            TextField("Text", text: $editingTextBuffer)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: min(280, max(140, image.size.width * scale * 0.4)))
-                .position(x: drawings[idx].start.x * scale, y: drawings[idx].start.y * scale)
+        if let id = openTextId,
+           let drawing = drawings.first(where: { $0.id == id }) {
+            let fontSize = drawing.fontSize * scale
+            TextField(TextAnnotation.placeholder, text: textBinding(for: id))
+                .textFieldStyle(.plain)
+                .font(.system(size: fontSize, weight: .semibold))
+                .foregroundStyle(drawing.color)
+                .multilineTextAlignment(.center)
                 .focused($focus, equals: .text(id))
                 .onSubmit { commitTextEdit() }
                 // Tab and ⇧Tab (U+0019) end the edit like Return, instead of moving focus to the
-                // canvas and leaving the field open.
-                .onKeyPress(keys: [.tab, KeyEquivalent("\u{19}")]) { _ in
+                // canvas and leaving the field open; Esc ends it too.
+                .onKeyPress(keys: [.tab, KeyEquivalent("\u{19}"), .escape]) { _ in
                     commitTextEdit()
                     return .handled
                 }
-                .onChange(of: editingTextBuffer) { _, newValue in
-                    if let i = drawings.firstIndex(where: { $0.id == id }) {
-                        drawings[i].text = newValue
-                    }
-                }
+                // ⌘S and the ⌘ zoom keys while typing; the field gets every other key.
+                .onKeyPress(phases: [.down, .repeat]) { press in handleKeyPress(press) }
+                .onExitCommand { commitTextEdit() }
+                .textAnnotationEditingFrame(text: drawing.text, fontSize: fontSize)
+                .position(x: drawing.start.x * scale, y: drawing.start.y * scale)
+        }
+    }
+
+    /// Typing goes straight into the annotation, so a save at any moment has the latest text.
+    private func textBinding(for id: UUID) -> Binding<String> {
+        Binding(
+            get: { drawings.first(where: { $0.id == id })?.text ?? "" },
+            set: { newValue in
+                guard let index = drawings.firstIndex(where: { $0.id == id }) else { return }
+                drawings[index].text = newValue
+            }
+        )
+    }
+
+    /// AppKit selects a field's whole text when it gains focus; a click on a text continues it
+    /// instead. The field editor becomes first responder a moment after `focus` is set.
+    @MainActor
+    private func placeCaretAtEnd(of text: String) async {
+        for _ in 0..<10 {
+            if let editor = NSApp.keyWindow?.firstResponder as? NSTextView,
+               editor.isFieldEditor, editor.string == text {
+                editor.moveToEndOfDocument(nil)
+                return
+            }
+            try? await Task.sleep(for: .milliseconds(20))
+            if Task.isCancelled { return }
         }
     }
 
@@ -473,25 +530,23 @@ struct AnnotationView: View {
             .onChanged { value in
                 let startLocation = toImage(value.startLocation)
                 let location = toImage(value.location)
-                // Clicking the canvas ends text editing, as in the Electron editor; otherwise
-                // the open text field would keep blocking the shortcuts.
-                if isEditingText && currentStart == nil && textGestureStart == nil {
-                    commitTextEdit()
-                }
                 if selectedTool == .text {
-                    if draggingTextId == nil, textGestureStart == nil {
-                        textGestureStart = startLocation
-                        if let hit = textHit(at: startLocation) {
-                            draggingTextId = hit
-                        }
+                    if textGestureStart == nil {
+                        beginTextGesture(at: startLocation)
                     }
                     if let id = draggingTextId,
                        let idx = drawings.firstIndex(where: { $0.id == id }) {
-                        drawings[idx].start = location
+                        drawings[idx].start = CGPoint(
+                            x: location.x + textGrabOffset.width,
+                            y: location.y + textGrabOffset.height
+                        )
                     }
                     return
                 }
                 if currentStart == nil {
+                    // Drawing ends text editing, as in the Electron editor; otherwise the open
+                    // text field would keep blocking the shortcuts.
+                    commitTextEdit()
                     currentStart = startLocation
                 }
                 currentEnd = location
@@ -504,27 +559,19 @@ struct AnnotationView: View {
                         draggingTextId = nil
                         textGestureStart = nil
                     }
+                    // A drag moved a text (or nothing); only a click edits or adds one.
                     let dist = hypot(value.translation.width, value.translation.height)
                     if dist > 6 {
                         return
                     }
-                    if let hit = textHit(at: startLocation) {
+                    if let hit = draggingTextId, drawings.contains(where: { $0.id == hit }) {
                         editingTextId = hit
-                        editingTextBuffer = drawings.first(where: { $0.id == hit })?.text ?? ""
+                        // Clicking the open text (or beside it) keeps typing going into its field:
+                        // `.task(id: openTextId)` does not run again for the same text.
+                        focus = .text(hit)
                         return
                     }
-                    let element = DrawingElement(
-                        tool: .text,
-                        start: location,
-                        end: location,
-                        color: selectedColor,
-                        lineWidth: lineWidth,
-                        text: "Text",
-                        fontSize: max(18, lineWidth * 5)
-                    )
-                    drawings.append(element)
-                    editingTextId = element.id
-                    editingTextBuffer = "Text"
+                    addText(at: startLocation)
                     return
                 }
                 if let start = currentStart {
@@ -543,37 +590,42 @@ struct AnnotationView: View {
             }
     }
 
-    private func textHit(at point: CGPoint) -> UUID? {
-        for drawing in drawings.reversed() where drawing.tool == .text {
-            let w = CGFloat(max(80, Double(drawing.text.count) * Double(drawing.fontSize) * 0.55))
-            let h = drawing.fontSize * 1.4
-            let rect = CGRect(
-                x: drawing.start.x - w / 2,
-                y: drawing.start.y - h / 2,
-                width: w,
-                height: h
-            )
-            if rect.contains(point) {
-                return drawing.id
-            }
+    /// The press of a Text tool click or drag. A press anywhere but on the open text ends that
+    /// edit (keeping or dropping it), so the same click can start the next text; a press on a
+    /// text grabs it.
+    private func beginTextGesture(at point: CGPoint) {
+        textGestureStart = point
+        let hit = TextAnnotation.hit(in: drawings, at: point, editing: openTextId)
+        if hit != openTextId {
+            commitTextEdit()
         }
-        return nil
+        guard let hit, let text = drawings.first(where: { $0.id == hit }) else { return }
+        draggingTextId = hit
+        textGrabOffset = CGSize(width: text.start.x - point.x, height: text.start.y - point.y)
     }
 
+    /// A new, empty text at `point`, open for typing (the field shows "Type here" until then).
+    private func addText(at point: CGPoint) {
+        let element = DrawingElement(
+            tool: .text,
+            start: point,
+            end: point,
+            color: selectedColor,
+            lineWidth: lineWidth,
+            text: "",
+            fontSize: TextAnnotation.fontSize(lineWidth: lineWidth)
+        )
+        drawings.append(element)
+        editingTextId = element.id
+    }
+
+    /// Ends text editing: the text stays (trimmed), or goes away if nothing was typed.
+    /// Everything that leaves the field (Return, Esc, a click, another tool, Undo, Save & Copy)
+    /// goes through here, so a typed text is never left behind in an open field.
     private func commitTextEdit() {
-        guard let id = editingTextId,
-              let idx = drawings.firstIndex(where: { $0.id == id }) else {
-            editingTextId = nil
-            return
-        }
-        let trimmed = editingTextBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            drawings.remove(at: idx)
-        } else {
-            drawings[idx].text = trimmed
-        }
+        guard let id = editingTextId else { return }
         editingTextId = nil
-        editingTextBuffer = ""
+        TextAnnotation.commit(id, in: &drawings)
     }
 
     private func handleKeyPress(_ press: KeyPress) -> KeyPress.Result {
@@ -605,6 +657,11 @@ struct AnnotationView: View {
     }
 
     private func undo() {
+        if let id = editingTextId {
+            editingTextId = nil
+            // A text that was started but not typed into is what Undo takes back.
+            if TextAnnotation.commit(id, in: &drawings) == .removed { return }
+        }
         if !drawings.isEmpty { drawings.removeLast() }
     }
 
@@ -641,7 +698,8 @@ struct AnnotationView: View {
     /// Renders the annotated image at the capture's own pixel density (1:1 with the screenshot).
     @MainActor
     func renderBitmap() -> NSBitmapImageRep? {
-        let renderer = ImageRenderer(content: drawingContent)
+        // Every text drawn: `finish` has closed the field, and the export never shows one.
+        let renderer = ImageRenderer(content: drawingContent(hidingText: nil))
         renderer.scale = ScreenshotExport.pixelScale(of: image) ?? NSScreen.main?.backingScaleFactor ?? 2.0
         // Not opaque: window captures (Space during selection) keep their transparent shadow.
         guard let cgImage = renderer.cgImage else { return nil }

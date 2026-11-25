@@ -1,0 +1,24 @@
+# Gradle / Android build output
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Machine-specific SDK location (written by Android Studio or the setup script)
+local.properties
+
+# IDE files
+.idea/
+*.iml
+
+# Generated from ../chrome-extension at build time
+app/src/main/assets/editor/
+
+# Signing material (never commit)
+*.jks
+*.keystore
+keystore.properties

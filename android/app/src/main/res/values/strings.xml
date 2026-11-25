@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FeatherShot</string>
+    <string name="open_image">Open image</string>
+    <string name="empty_message">Open a screenshot to annotate it, or share an image to FeatherShot from another app.</string>
+    <string name="saved_to_gallery">Saved to Pictures/FeatherShot</string>
+    <string name="save_failed">Could not save the image</string>
+    <string name="open_failed">Could not open that image</string>
+    <string name="webview_too_old">Update Android System WebView to use FeatherShot.</string>
+</resources>

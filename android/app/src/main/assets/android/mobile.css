@@ -1,0 +1,134 @@
+/*
+ * FeatherShot for Android: phone layout for the shared editor (chrome-extension/editor.html).
+ *
+ * Loaded only on Android by feathershot-android.js, which moves this sheet to the end of <head>
+ * so it overrides chrome-extension/editor.css. Chrome and Electron never load it.
+ *
+ * The editor has two bars, like the desktop app:
+ *   #toolbar (top)      tool groups and colours. On a phone it is one row that scrolls sideways.
+ *   #actionbar (bottom) zoom, line width, Undo, Clear, Save & Copy. In portrait it wraps into
+ *                       two rows: zoom + width, then the actions with a wide Save button.
+ * Landscape on a phone: both bars stay one row each and are a little lower.
+ */
+
+html, body, #editor { height: 100%; }
+body { overscroll-behavior: none; }
+
+.bar button,
+.bar input,
+.bar label {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ---------- Top bar: one scrolling row ---------- */
+
+#toolbar {
+  height: auto;
+  min-height: 60px;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+#toolbar::-webkit-scrollbar { display: none; }
+
+/* Room to scroll past the last group. */
+#toolbar::after {
+  content: '';
+  flex: 0 0 2px;
+}
+
+#toolbar .tool-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+}
+#toolbar .tool-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.colors .swatch {
+  width: 30px;
+  height: 30px;
+  margin: 0 3px;
+}
+
+/* ---------- Bottom bar ---------- */
+
+#actionbar {
+  height: auto;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  column-gap: 8px;
+  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+}
+
+#actionbar .zoom .tool-btn {
+  width: 40px;
+  height: 40px;
+}
+#actionbar .zoom .tool-btn.text {
+  width: auto;
+  min-width: 40px;
+  padding: 0 8px;
+}
+
+#actionbar .stroke {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+#line-width {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  height: 40px;
+}
+
+/* The spacer becomes the break between the two rows. */
+#actionbar .spacer {
+  flex: 0 0 100%;
+  height: 0;
+  min-width: 0;
+}
+
+#save-status { order: 1; flex: 0 0 100%; }
+
+.action-btn {
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+#btn-save {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+}
+
+/* No hardware keyboard on a phone. */
+#btn-save kbd { display: none; }
+
+/* Touch screens keep :hover after a tap; do not let it look like a second active tool. */
+@media (hover: none) {
+  .tool-btn:hover:not(.active) { background: transparent; }
+}
+
+/* ---------- Phone landscape: one row per bar, so the canvas keeps the height ---------- */
+
+@media (orientation: landscape) and (max-height: 560px) {
+  #toolbar { min-height: 52px; padding: 4px 10px; }
+  #toolbar .tool-btn { width: 38px; height: 38px; }
+
+  #actionbar { flex-wrap: nowrap; padding: 4px 10px; }
+  #actionbar .spacer { flex: 1; }
+  #actionbar .stroke { flex: 0 1 160px; }
+  .action-btn { height: 40px; }
+  #btn-save { flex: none; }
+}

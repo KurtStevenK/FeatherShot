@@ -8,6 +8,16 @@ struct AnnotationLayer: View {
     let drawings: [DrawingElement]
     /// The shape being dragged out right now, numbered after the finished ones.
     var active: DrawingElement?
+    /// The text being typed, drawn as its input field instead of as text (never in the export).
+    var textEditing: TextEditing?
+
+    /// The text annotation open for typing on the canvas.
+    struct TextEditing {
+        let id: UUID
+        let text: Binding<String>
+        /// Return on the keyboard.
+        let onDone: () -> Void
+    }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -16,11 +26,15 @@ struct AnnotationLayer: View {
                 .frame(width: image.size.width, height: image.size.height)
 
             ForEach(Array(drawings.enumerated()), id: \.element.id) { index, drawing in
-                AnnotationShape(
-                    element: drawing,
-                    number: drawings[0...index].filter { $0.tool == drawing.tool }.count,
-                    image: image
-                )
+                if let textEditing, textEditing.id == drawing.id {
+                    AnnotationTextField(element: drawing, editing: textEditing)
+                } else {
+                    AnnotationShape(
+                        element: drawing,
+                        number: drawings[0...index].filter { $0.tool == drawing.tool }.count,
+                        image: image
+                    )
+                }
             }
 
             if let active {
@@ -33,6 +47,38 @@ struct AnnotationLayer: View {
         }
         .frame(width: image.size.width, height: image.size.height, alignment: .topLeading)
         .clipped()
+    }
+}
+
+/// The text being typed: an input field that looks like the finished text (same font, color
+/// and center), so nothing moves when typing ends. It lives in the zoomed content, so it scales
+/// with the canvas like the text does.
+private struct AnnotationTextField: View {
+    let element: DrawingElement
+    let editing: AnnotationLayer.TextEditing
+    // Owned here: the canvas content is hosted apart from the editor, so the editor's focus
+    // state would not reach this field.
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        TextField(TextAnnotation.placeholder, text: editing.text)
+            .textFieldStyle(.plain)
+            .font(.system(size: element.fontSize, weight: .semibold))
+            .foregroundStyle(element.color)
+            .tint(element.color)
+            .multilineTextAlignment(.center)
+            .submitLabel(.done)
+            .focused($focused)
+            .onSubmit { editing.onDone() }
+            .textAnnotationEditingFrame(text: element.text, fontSize: element.fontSize)
+            .position(x: element.start.x, y: element.start.y)
+            // Typing starts without another tap. Right after the field appears UIKit can still
+            // refuse first responder, so ask once more after a moment.
+            .task {
+                focused = true
+                try? await Task.sleep(for: .milliseconds(100))
+                if !Task.isCancelled && !focused { focused = true }
+            }
     }
 }
 
@@ -53,6 +99,8 @@ struct AnnotationShape: View {
             StepRectangleView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth, stepNumber: number)
         case .line:
             LineView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
+        case .dashedLine:
+            DashedLineView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
         case .questionArrow:
             QuestionArrowView(start: e.start, end: e.end, color: e.color, lineWidth: e.lineWidth)
         case .questionRectangle:

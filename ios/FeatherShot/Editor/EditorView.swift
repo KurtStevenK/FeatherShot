@@ -12,7 +12,10 @@ struct EditorView: View {
     @State private var lineWidth: CGFloat = 4
     @State private var zoomLevel: CGFloat = 2
     @State private var movingTextId: UUID?
-    @State private var textEdit: TextEdit?
+    /// From the finger to the grabbed text's center, so a dragged text does not jump.
+    @State private var textGrabOffset: CGSize = .zero
+    /// The text annotation being typed on the canvas. Its field shows the text.
+    @State private var editingTextId: UUID?
     @State private var isSaving = false
     @State private var errorMessage: String?
     @State private var errorOffersSettings = false
@@ -24,20 +27,13 @@ struct EditorView: View {
         _selectedTool = State(initialValue: initialTool)
     }
 
-    /// The text alert: a new annotation at `location`, or the existing one `id`.
-    private struct TextEdit {
-        var id: UUID?
-        var location: CGPoint
-        var text: String
-    }
-
     var body: some View {
         VStack(spacing: 0) {
             topBar
             toolBar
             EditorCanvas(
                 contentSize: image.size,
-                content: AnyView(AnnotationLayer(image: image, drawings: drawings, active: active)),
+                content: AnyView(AnnotationLayer(image: image, drawings: drawings, active: active, textEditing: textEditing)),
                 onTap: handleTap,
                 onDrag: handleDrag
             )
@@ -45,11 +41,6 @@ struct EditorView: View {
             .clipped()
             .accessibilityLabel("Screenshot canvas")
             bottomBar
-        }
-        .alert(textEdit?.id == nil ? "Add Text" : "Edit Text", isPresented: textAlertShown) {
-            TextField("Text", text: textBinding)
-            Button("Cancel", role: .cancel) { textEdit = nil }
-            Button("Done") { commitText() }
         }
     }
 
@@ -70,7 +61,10 @@ struct EditorView: View {
                 .disabled(drawings.isEmpty)
                 .accessibilityLabel("Undo")
 
-            Button { drawings.removeAll() } label: { Image(systemName: "trash") }
+            Button {
+                editingTextId = nil
+                drawings.removeAll()
+            } label: { Image(systemName: "trash") }
                 .buttonStyle(EditorIconButtonStyle(size: 36))
                 .disabled(drawings.isEmpty)
                 .accessibilityLabel("Remove all annotations")
@@ -114,6 +108,7 @@ struct EditorView: View {
             ToolItem(tool: .rectangle, icon: "square", name: "Rectangle"),
             ToolItem(tool: .circle, icon: "circle", name: "Circle"),
             ToolItem(tool: .line, icon: "line.diagonal", name: "Line"),
+            ToolItem(tool: .dashedLine, icon: "ellipsis", name: "Dashed Line"),
         ],
         [
             ToolItem(tool: .questionArrow, icon: "questionmark.circle", name: "Question Arrow"),
@@ -228,16 +223,19 @@ struct EditorView: View {
 
     private func selectTool(_ tool: Tool) {
         // Mid-drag the gesture would end under the new tool.
-        if active == nil && movingTextId == nil { selectedTool = tool }
+        guard active == nil && movingTextId == nil else { return }
+        // Another tool ends the text being typed; the field must not stay open behind it.
+        finishTextEdit()
+        selectedTool = tool
     }
 
     private func handleDrag(_ drag: EditorCanvas.Drag) {
         switch drag {
         case .changed(let start, let location):
             if selectedTool == .text {
-                if movingTextId == nil { movingTextId = textHit(at: start) }
+                if movingTextId == nil { grabText(at: start) }
                 if let id = movingTextId, let i = drawings.firstIndex(where: { $0.id == id }) {
-                    drawings[i].start = location
+                    drawings[i].start = CGPoint(x: location.x + textGrabOffset.width, y: location.y + textGrabOffset.height)
                 }
                 return
             }
@@ -262,53 +260,72 @@ struct EditorView: View {
         )
     }
 
-    /// With the text tool, a tap edits the text under the finger or adds one.
+    // MARK: - Text
+
+    /// With the text tool, a tap edits the text under the finger or starts a new one right there.
+    /// A tap anywhere else first ends the text being typed (kept, or dropped if it is empty).
     private func handleTap(_ location: CGPoint) {
         guard selectedTool == .text else { return }
-        if let id = textHit(at: location), let existing = drawings.first(where: { $0.id == id }) {
-            textEdit = TextEdit(id: id, location: existing.start, text: existing.text)
-        } else {
-            textEdit = TextEdit(id: nil, location: location, text: "")
-        }
-    }
-
-    private func textHit(at point: CGPoint) -> UUID? {
-        for drawing in drawings.reversed() where drawing.tool == .text {
-            let w = CGFloat(max(80, Double(drawing.text.count) * Double(drawing.fontSize) * 0.55))
-            let h = drawing.fontSize * 1.4
-            // A finger is less precise than a pointer: a little extra reach.
-            let rect = CGRect(x: drawing.start.x - w / 2, y: drawing.start.y - h / 2, width: w, height: h)
-                .insetBy(dx: -10, dy: -10)
-            if rect.contains(point) { return drawing.id }
-        }
-        return nil
-    }
-
-    private var textAlertShown: Binding<Bool> {
-        Binding(get: { textEdit != nil }, set: { if !$0 { textEdit = nil } })
-    }
-
-    private var textBinding: Binding<String> {
-        Binding(get: { textEdit?.text ?? "" }, set: { textEdit?.text = $0 })
-    }
-
-    private func commitText() {
-        guard let edit = textEdit else { return }
-        textEdit = nil
-        let text = edit.text.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let id = edit.id, let i = drawings.firstIndex(where: { $0.id == id }) {
-            if text.isEmpty { drawings.remove(at: i) } else { drawings[i].text = text }
+        let hit = TextAnnotation.hit(in: drawings, at: location, slop: Self.fingerSlop, editing: editingTextId)
+        if let hit, hit == editingTextId { return }
+        finishTextEdit()
+        if let hit, drawings.contains(where: { $0.id == hit }) {
+            editingTextId = hit
             return
         }
-        guard !text.isEmpty else { return }
-        drawings.append(DrawingElement(
-            tool: .text, start: edit.location, end: edit.location,
+        let text = DrawingElement(
+            tool: .text, start: location, end: location,
             color: selectedColor, lineWidth: lineWidth,
-            text: text, fontSize: max(18, lineWidth * 5)
-        ))
+            text: "", fontSize: TextAnnotation.fontSize(lineWidth: lineWidth)
+        )
+        drawings.append(text)
+        editingTextId = text.id
+    }
+
+    /// The start of a text tool drag: a drag that does not start on the open text ends it, and a
+    /// drag on a text moves it, keeping where the finger grabbed it.
+    private func grabText(at point: CGPoint) {
+        let hit = TextAnnotation.hit(in: drawings, at: point, slop: Self.fingerSlop, editing: editingTextId)
+        if hit != editingTextId { finishTextEdit() }
+        guard let hit, let text = drawings.first(where: { $0.id == hit }) else { return }
+        movingTextId = hit
+        textGrabOffset = CGSize(width: text.start.x - point.x, height: text.start.y - point.y)
+    }
+
+    /// A finger is less precise than a pointer: a little extra reach around texts.
+    private static let fingerSlop: CGFloat = 10
+
+    /// The open text for the canvas, which shows it as an input field.
+    private var textEditing: AnnotationLayer.TextEditing? {
+        guard let id = editingTextId, drawings.contains(where: { $0.id == id }) else { return nil }
+        return AnnotationLayer.TextEditing(
+            id: id,
+            text: Binding(
+                get: { drawings.first(where: { $0.id == id })?.text ?? "" },
+                set: { newValue in
+                    guard let i = drawings.firstIndex(where: { $0.id == id }) else { return }
+                    drawings[i].text = newValue
+                }
+            ),
+            onDone: { finishTextEdit() }
+        )
+    }
+
+    /// Ends text editing: the text stays (trimmed), or goes away if nothing was typed.
+    /// Return, a tap elsewhere, another tool, Undo and Save & Copy all go through here, so a
+    /// typed text is never lost in an open field.
+    private func finishTextEdit() {
+        guard let id = editingTextId else { return }
+        editingTextId = nil
+        TextAnnotation.commit(id, in: &drawings)
     }
 
     private func undo() {
+        if let id = editingTextId {
+            editingTextId = nil
+            // A text that was started but not typed into is what Undo takes back.
+            if TextAnnotation.commit(id, in: &drawings) == .removed { return }
+        }
         if !drawings.isEmpty { drawings.removeLast() }
     }
 
@@ -325,6 +342,7 @@ struct EditorView: View {
 
     @MainActor
     private func saveAndCopy() async {
+        finishTextEdit()
         errorMessage = nil
         errorOffersSettings = false
         guard let png = renderPNG() else {
