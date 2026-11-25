@@ -39,10 +39,12 @@ struct EditorCanvas: UIViewRepresentable {
 
         let pan = UIPanGestureRecognizer(target: coordinator, action: #selector(Coordinator.handlePan(_:)))
         pan.maximumNumberOfTouches = 1
+        pan.delegate = coordinator
         host.view.addGestureRecognizer(pan)
         coordinator.pan = pan
 
         let tap = UITapGestureRecognizer(target: coordinator, action: #selector(Coordinator.handleTap(_:)))
+        tap.delegate = coordinator
         host.view.addGestureRecognizer(tap)
         return scrollView
     }
@@ -56,7 +58,7 @@ struct EditorCanvas: UIViewRepresentable {
     }
 
     @MainActor
-    final class Coordinator: NSObject, UIScrollViewDelegate {
+    final class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
         var parent: EditorCanvas
         let host: UIHostingController<AnyView>
         weak var pan: UIPanGestureRecognizer?
@@ -116,6 +118,17 @@ struct EditorCanvas: UIViewRepresentable {
 
         @objc func handleTap(_ recognizer: UITapGestureRecognizer) {
             parent.onTap(recognizer.location(in: host.view))
+        }
+
+        /// Touches on the text being typed belong to its field (caret, selection), not to drawing:
+        /// otherwise the canvas tap would take them and the field could not be tapped into.
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+            var view = touch.view
+            while let current = view, current !== host.view {
+                if current is UITextInput { return false }
+                view = current.superview
+            }
+            return true
         }
     }
 }

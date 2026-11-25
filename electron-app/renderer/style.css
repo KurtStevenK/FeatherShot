@@ -115,19 +115,26 @@ body {
   cursor: crosshair;
 }
 
+/* The text being typed looks like the saved text: same font, size and color, no box.
+   A thin dashed outline shows where it is; the size follows the text (app.js). */
 #text-editor {
   position: absolute;
   z-index: 10;
-  min-width: 120px;
-  max-width: 320px;
-  padding: 4px 8px;
+  box-sizing: content-box;
+  min-width: 1ch;
+  padding: 0;
+  margin: 0;
   font: 600 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  line-height: 1.3;
-  border: 2px solid var(--blue);
-  border-radius: 8px;
-  box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.2);
+  line-height: 1.25;
+  background: transparent;
+  border: none;
+  outline: 1px dashed rgba(255, 255, 255, 0.55);
+  outline-offset: 4px;
+  border-radius: 2px;
+  caret-color: currentColor;
+  white-space: pre;
+  overflow: hidden;
   resize: none;
-  outline: none;
 }
 
 .text-editor-hidden {

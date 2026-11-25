@@ -22,6 +22,7 @@ let editingTextId = null;
 let draggingTextId = null;
 let textDragStart = null;
 let textPlaceStart = null;
+let textDragOffset = { x: 0, y: 0 };
 
 // letterLabel from ../shared/letterLabel.js (synced via npm run sync:shared)
 
@@ -227,6 +228,7 @@ canvas.addEventListener('mousedown', (e) => {
     const hit = textHitAt(x, y);
     if (hit) {
       draggingTextId = hit.id;
+      textDragOffset = { x: x - hit.startX, y: y - hit.startY };
       isDragging = true;
     } else {
       isDragging = false;
@@ -258,8 +260,8 @@ canvas.addEventListener('mousemove', (e) => {
     const y = (e.clientY - cachedRect.top) * cachedScaleY;
     const d = drawings.find((item) => item.id === draggingTextId);
     if (d) {
-      d.startX = x;
-      d.startY = y;
+      d.startX = x - textDragOffset.x;
+      d.startY = y - textDragOffset.y;
       if (editingTextId === draggingTextId) positionTextEditor(d);
       scheduleRender();
     }
@@ -276,10 +278,16 @@ canvas.addEventListener('mousemove', (e) => {
 canvas.addEventListener('mouseup', (e) => {
   if (tool === 'text') {
     if (draggingTextId) {
+      // A click without moving edits the text; a drag only moves it.
+      const d = drawings.find((item) => item.id === draggingTextId);
+      const moved = d && textPlaceStart
+        ? Math.hypot(d.startX + textDragOffset.x - textPlaceStart.x, d.startY + textDragOffset.y - textPlaceStart.y)
+        : Infinity;
       draggingTextId = null;
       textPlaceStart = null;
       isDragging = false;
-      render();
+      if (d && moved < 6) beginTextEdit(d);
+      else render();
       return;
     }
     if (textPlaceStart) {
@@ -295,7 +303,8 @@ canvas.addEventListener('mouseup', (e) => {
       } else if (dist < 6) {
         const id = `text-${Date.now()}`;
         const fontSize = Math.max(18, lineWidth * 5);
-        const entry = { id, tool: 'text', color, lineWidth, startX: x, startY: y, endX: x, endY: y, text: 'Text', fontSize };
+        const top = y - (fontSize * TEXT_LINE_HEIGHT) / 2;
+        const entry = { id, tool: 'text', color, lineWidth, startX: x, startY: top, endX: x, endY: top, text: '', fontSize };
         drawings.push(entry);
         beginTextEdit(entry);
         render();
@@ -513,23 +522,47 @@ function drawExclamationRect(ctx, x1, y1, x2, y2, color, lw) {
   drawCircleLabel(ctx, cx, cy, color, lw, '!');
 }
 
+// Text annotations: (startX, startY) is the top-left corner; lines are TEXT_LINE_HEIGHT × fontSize apart.
+// The text box uses the same font and line height, so typing looks like the saved result.
+const TEXT_LINE_HEIGHT = 1.25;
+const TEXT_FONT = `-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+
+function textFont(d) {
+  return `600 ${d.fontSize || 24}px ${TEXT_FONT}`;
+}
+
+function textLines(d) {
+  return (d.text || '').split('\n');
+}
+
+function textBounds(d) {
+  const fs = d.fontSize || 24;
+  ctx.save();
+  ctx.font = textFont(d);
+  const width = Math.max(fs, ...textLines(d).map((line) => ctx.measureText(line).width));
+  ctx.restore();
+  return { x: d.startX, y: d.startY, w: width, h: textLines(d).length * fs * TEXT_LINE_HEIGHT };
+}
+
 function drawTextAnnotation(ctx, d) {
   if (editingTextId === d.id) return;
-  ctx.font = `600 ${d.fontSize || 24}px -apple-system, BlinkMacSystemFont, sans-serif`;
+  const fs = d.fontSize || 24;
+  ctx.font = textFont(d);
   ctx.fillStyle = d.color;
-  ctx.textAlign = 'center';
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(d.text || '', d.startX, d.startY);
+  textLines(d).forEach((line, i) => {
+    ctx.fillText(line, d.startX, d.startY + (i + 0.5) * fs * TEXT_LINE_HEIGHT);
+  });
 }
 
 function textHitAt(x, y) {
   for (let i = drawings.length - 1; i >= 0; i--) {
     const d = drawings[i];
     if (d.tool !== 'text') continue;
-    const fs = d.fontSize || 24;
-    const w = Math.max(80, (d.text || '').length * fs * 0.55);
-    const h = fs * 1.4;
-    if (x >= d.startX - w / 2 && x <= d.startX + w / 2 && y >= d.startY - h / 2 && y <= d.startY + h / 2) {
+    const b = textBounds(d);
+    const pad = (d.fontSize || 24) * 0.3;
+    if (x >= b.x - pad && x <= b.x + b.w + pad && y >= b.y - pad && y <= b.y + b.h + pad) {
       return d;
     }
   }
@@ -539,13 +572,24 @@ function textHitAt(x, y) {
 function positionTextEditor(d) {
   if (!textEditor || !cachedRect) return;
   // Relative to #canvas-wrap, which scrolls with the canvas.
-  const left = d.startX / cachedScaleX;
-  const top = d.startY / cachedScaleY;
-  textEditor.style.left = `${left}px`;
-  textEditor.style.top = `${top}px`;
-  textEditor.style.transform = 'translate(-50%, -50%)';
+  const fs = (d.fontSize || 24) / cachedScaleX;
+  textEditor.style.left = `${d.startX / cachedScaleX}px`;
+  textEditor.style.top = `${d.startY / cachedScaleY}px`;
   textEditor.style.color = d.color;
-  textEditor.style.fontSize = `${(d.fontSize || 24) / cachedScaleX}px`;
+  textEditor.style.font = `600 ${fs}px ${TEXT_FONT}`;
+  textEditor.style.lineHeight = String(TEXT_LINE_HEIGHT);
+  sizeTextEditor(fs);
+}
+
+// The box grows with the text: one row per line, as wide as the longest line.
+function sizeTextEditor(fs) {
+  const lines = (textEditor.value || '').split('\n');
+  ctx.save();
+  ctx.font = `600 ${fs}px ${TEXT_FONT}`;
+  const width = Math.max(...lines.map((line) => ctx.measureText(line).width));
+  ctx.restore();
+  textEditor.style.width = `${Math.ceil(width + fs * 1.2)}px`;
+  textEditor.style.height = `${Math.ceil(lines.length * fs * TEXT_LINE_HEIGHT)}px`;
 }
 
 function beginTextEdit(d) {
@@ -553,8 +597,10 @@ function beginTextEdit(d) {
   textEditor.classList.remove('text-editor-hidden');
   textEditor.value = d.text || '';
   positionTextEditor(d);
+  render();
   textEditor.focus();
-  textEditor.select();
+  // Editing an existing text puts the cursor at its end; a new text starts empty.
+  textEditor.setSelectionRange(textEditor.value.length, textEditor.value.length);
 }
 
 function commitTextEdit() {
@@ -564,7 +610,9 @@ function commitTextEdit() {
     hideTextEditor();
     return;
   }
-  const trimmed = (textEditor.value || '').trim();
+  // Keep inner line breaks; drop trailing spaces and blank lines at the start and end.
+  const raw = (textEditor.value || '').replace(/[ \t]+$/gm, '').replace(/^\n+|\n+$/g, '');
+  const trimmed = raw.trim() ? raw : '';
   if (!trimmed) {
     drawings.splice(idx, 1);
   } else {
@@ -584,10 +632,15 @@ function hideTextEditor() {
 
 textEditor.addEventListener('blur', () => commitTextEdit());
 textEditor.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  // Enter finishes, Shift+Enter adds a line, Esc finishes too.
+  if ((e.key === 'Enter' && !e.shiftKey) || e.key === 'Escape') {
     e.preventDefault();
     commitTextEdit();
   }
+});
+textEditor.addEventListener('input', () => {
+  const d = drawings.find((item) => item.id === editingTextId);
+  if (d) sizeTextEditor((d.fontSize || 24) / cachedScaleX);
 });
 
 function drawAbcArrow(ctx, x1, y1, x2, y2, color, lw, num) {

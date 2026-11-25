@@ -27,6 +27,79 @@ struct DrawingElement: Identifiable {
     var fontSize: CGFloat = 24
 }
 
+// MARK: - Text annotations
+
+/// Rules of the Text tool, shared by the Mac and iPhone editors.
+enum TextAnnotation {
+    /// Faint prompt of a new, empty text; it is never part of the annotation.
+    static let placeholder = "Type here"
+
+    static func fontSize(lineWidth: CGFloat) -> CGFloat { max(18, lineWidth * 5) }
+
+    /// What ending an edit did to the text.
+    enum Outcome: Equatable { case kept, removed, notFound }
+
+    /// Ends editing text `id`: it keeps its trimmed text, or is removed when nothing is left,
+    /// so a click that was never typed into does not leave an invisible annotation behind.
+    @discardableResult
+    static func commit(_ id: UUID, in drawings: inout [DrawingElement]) -> Outcome {
+        guard let index = drawings.firstIndex(where: { $0.id == id }) else { return .notFound }
+        let trimmed = drawings[index].text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            drawings.remove(at: index)
+            return .removed
+        }
+        drawings[index].text = trimmed
+        return .kept
+    }
+
+    /// Roughly the area of a text, which is drawn centered at its `start`. An empty text is
+    /// one being typed, which shows the placeholder.
+    static func bounds(of drawing: DrawingElement) -> CGRect {
+        let characters = drawing.text.isEmpty ? placeholder.count : drawing.text.count
+        let width = max(80, CGFloat(characters) * drawing.fontSize * 0.55)
+        let height = drawing.fontSize * 1.4
+        return CGRect(x: drawing.start.x - width / 2, y: drawing.start.y - height / 2, width: width, height: height)
+    }
+
+    /// The text at `point`: the one being typed (`editing`) when the press is on its field,
+    /// otherwise the topmost one. `slop` widens the target (a finger is less precise than a pointer).
+    static func hit(in drawings: [DrawingElement], at point: CGPoint, slop: CGFloat = 0, editing: UUID? = nil) -> UUID? {
+        // The open field is wider than its text (room for the caret); a press there stays in it.
+        if let editing, let open = drawings.first(where: { $0.id == editing }),
+           bounds(of: open).insetBy(dx: -(caretRoom(fontSize: open.fontSize) + slop), dy: -slop).contains(point) {
+            return editing
+        }
+        return drawings.last { drawing in
+            drawing.tool == .text && bounds(of: drawing).insetBy(dx: -slop, dy: -slop).contains(point)
+        }?.id
+    }
+
+    /// Room on each side of the input field: the text is centered, so a new character grows
+    /// it by half its width per side, and the field must not scroll before it widens.
+    static func caretRoom(fontSize: CGFloat) -> CGFloat { fontSize * 0.35 + 2 }
+}
+
+extension View {
+    /// Lays out a text annotation's input field exactly where its `Text` is drawn: an invisible
+    /// copy of the text in the same font sizes it, with room for the caret, and a thin dashed
+    /// outline shows where it is. Apply to a plain, center-aligned field in that font.
+    func textAnnotationEditingFrame(text: String, fontSize: CGFloat) -> some View {
+        Text(text.isEmpty ? TextAnnotation.placeholder : text)
+            .font(.system(size: fontSize, weight: .semibold))
+            .fixedSize()
+            .opacity(0)
+            .overlay {
+                RoundedRectangle(cornerRadius: 2)
+                    .stroke(style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    .foregroundStyle(Color.white.opacity(0.55))
+                    .padding(-4)
+            }
+            .padding(.horizontal, TextAnnotation.caretRoom(fontSize: fontSize))
+            .overlay { self }
+    }
+}
+
 // Convert a 1-based step number into a letter label: 1→a, 2→b, …, 26→z, 27→aa, 28→ab, …
 // JS copies live in shared/letterLabel.js; cases in shared/letterLabel.cases.json.
 func letterLabel(_ n: Int) -> String {

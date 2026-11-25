@@ -59,11 +59,14 @@ app.whenReady().then(async () => {
     const r = document.getElementById('canvas').getBoundingClientRect();
     return [Math.round(r.left + r.width / 2), Math.round(r.top + r.height / 2)];
   })()`);
-  const openTextBox = async () => {
+  const click = (cx, cy) => {
+    editor.webContents.sendInputEvent({ type: 'mouseDown', x: cx, y: cy, button: 'left', clickCount: 1 });
+    editor.webContents.sendInputEvent({ type: 'mouseUp', x: cx, y: cy, button: 'left', clickCount: 1 });
+  };
+  const openTextBox = async (cx = x, cy = y) => {
     await press('t');
     await expect((s) => s.tool === 'text', 'T to pick the Text tool');
-    editor.webContents.sendInputEvent({ type: 'mouseDown', x, y, button: 'left', clickCount: 1 });
-    editor.webContents.sendInputEvent({ type: 'mouseUp', x, y, button: 'left', clickCount: 1 });
+    click(cx, cy);
     await expect((s) => s.editing && s.focused, 'a click to open a focused text box');
   };
 
@@ -79,11 +82,29 @@ app.whenReady().then(async () => {
   await press('z', [UNDO]);
   await expect((s) => s.texts.length === 0, 'Ctrl+Z to undo the text annotation');
 
-  // Input events are handled in order, so once Enter has closed the box, Ctrl+Z was handled too.
+  // A new text box starts empty; Enter on an empty box drops it.
   await openTextBox();
+  await expect((s) => s.typed === '', 'a new text box to start empty');
+  await press('Enter');
+  await expect((s) => !s.editing && s.texts.length === 0, 'Enter on an empty text box to add nothing');
+
+  // Clicking somewhere else keeps the typed text and starts the next one in the same click.
+  await openTextBox();
+  for (const ch of 'one') await press(ch);
+  click(x - 120, y + 80);
+  await expect((s) => s.editing && s.focused && s.typed === '' && s.texts.join() === 'one,',
+    'a click elsewhere to keep "one" and open a second text box');
+  for (const ch of 'two') await press(ch);
+  await press('Escape');
+  await expect((s) => !s.editing && s.texts.join() === 'one,two', 'Esc to commit the second text');
+
+  // Input events are handled in order, so once Enter has closed the box, Ctrl+Z was handled too.
+  // Clicking a text edits it; Ctrl+Z there is the text box's own undo, not the editor's.
+  click(x + 2, y);
+  await expect((s) => s.editing && s.focused && s.typed === 'one', 'a click on "one" to edit it');
   await press('z', [UNDO]);
   await press('Enter');
-  await expect((s) => !s.editing && s.texts.length === 1, 'Ctrl+Z in the text box to keep the annotation');
+  await expect((s) => !s.editing && s.texts.join() === 'one,two', 'Ctrl+Z in the text box to keep the annotations');
 
-  finish(0, `typed "${TYPED}" into a text annotation without switching tools; shortcuts work afterwards`);
+  finish(0, `typed "${TYPED}" into a text annotation without switching tools; shortcuts work afterwards; a click elsewhere keeps the text`);
 }).catch((e) => finish(1, e.message));

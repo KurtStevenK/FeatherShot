@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.51] - 2026-11-25
+
+### Changed
+
+- **Text tool**, on every platform: a click starts an empty text right where you clicked, and while you type it looks exactly like the result (same font, size and color, no input box, only a thin dashed outline), so the text is no longer shown twice. Clicking somewhere else keeps the text and starts the next one in the same click. **Enter** or **Esc** finishes; empty texts are dropped. Click a text to edit it (the cursor goes to the end), drag it to move it from where you grabbed it. In the Windows, Linux, Chrome and Android editors **Shift+Enter** adds a line.
+
+### Fixed
+
+- macOS: a text could get lost. Undo removed the text still being typed, Esc did nothing, and switching tools or clicking beside the screenshot left the field open. Now switching tools, Save & Copy (⌘S, which also works while typing), Undo, Clear and clicks anywhere finish the text first.
+- Windows, Linux, Chrome and Android: clicking an existing text did not open it for editing (the click was taken as a drag).
+
 ## [1.3.50] - 2026-11-25
 
 ### Added
