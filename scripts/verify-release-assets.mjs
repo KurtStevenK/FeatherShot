@@ -24,6 +24,7 @@ const GITHUB_SAFE = /^[A-Za-z0-9_-]([A-Za-z0-9._-]*[A-Za-z0-9_-])?$/;
 const TARGETS = {
   nsis: ['nsis', 'exe'],
   portable: ['portable', 'exe'],
+  msi: ['msi', 'msi'],
   deb: ['deb', 'deb'],
   AppImage: ['appImage', 'AppImage'],
   pacman: ['pacman', 'pacman'],
