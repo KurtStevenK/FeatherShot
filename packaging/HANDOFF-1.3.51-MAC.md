@@ -1,5 +1,20 @@
 # Handoff for the Mac: iOS and macOS 1.3.51 to the App Store
 
+## Status from the Mac (2026-11-25, evening)
+
+- TODO 1 done: `swift build -c release` and `swift test` (29 tests) pass.
+- TODO 4 done: macOS **1.3.51 (1351)** uploaded to App Store Connect. `build_appstore.sh` had built it
+  without `embedded.provisionprofile` (the profile lookup never matched); fixed in `76e62c1`, rebuilt
+  with the Mac Team Store profile (valid to 2027-08-28). The script now defaults to the Info.plist version.
+- TODO 5 done: iOS **1.3.51 (20261125.2030)** uploaded (Watch app 1.3.51 inside).
+- Both were "Verarbeitung läuft" (processing) in TestFlight at 21:31.
+- **Open:** TODO 2 and 3 (hands-on test of the Text tool and Dashed Line, best from the TestFlight
+  builds on the Mac and the iPhone), then TODO 6 (versions 1.3.51 in App Store Connect, What's New,
+  Mac screenshots, submit after the user confirms).
+- Website: feathershot.xyz served a 7-day-cached `style.css` from Nov 5, so the hero store badges
+  had no styles. Links are versioned now (`?v=1.3.51`, bump it when style.css or site.js change) and
+  CSS/JS are cached for an hour (`75a36c9`); needs a `firebase deploy --only hosting`.
+
 Written on 2026-11-25 by the Windows session for the Claude session on the Mac. Everything below
 is a TODO for the Mac: the Windows machine has no Xcode, so nothing here was built or run on Apple
 hardware yet. CI did compile it: `swift build -c release`, `swift test` (macOS) and the new `ios` job
