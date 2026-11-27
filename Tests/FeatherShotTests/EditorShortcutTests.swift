@@ -6,7 +6,7 @@ import Testing
 /// Tool ids of the Electron editor (`setTool('…')`) and the matching macOS tools.
 private let electronTools: [String: Tool] = [
     "step-arrow": .stepArrow, "step-rect": .stepRectangle, "arrow": .arrow, "rect": .rectangle,
-    "circle": .circle, "line": .line, "question-arrow": .questionArrow, "question-rect": .questionRectangle,
+    "circle": .circle, "line": .line, "dashed-line": .dashedLine, "question-arrow": .questionArrow, "question-rect": .questionRectangle,
     "exclamation-arrow": .exclamationArrow, "exclamation-rect": .exclamationRectangle, "text": .text,
     "abc-arrow": .abcArrow, "abc-rect": .abcRectangle, "magnifier": .magnifier,
 ]
@@ -46,6 +46,14 @@ private func electronToolKeys() throws -> [(key: String, tool: String)] {
     #expect(EditorShortcut.match("3", modifiers: .numericPad, isEditingText: false) == .select(.arrow))
     // Like Electron, only the lowercase letter is an alias.
     #expect(EditorShortcut.match("A", modifiers: .shift, isEditingText: false) == nil)
+}
+
+@Test func dashedLineKeys() {
+    // D is the Dashed Line key, in either case (like T and M).
+    #expect(EditorShortcut.match("d", modifiers: [], isEditingText: false) == .select(.dashedLine))
+    #expect(EditorShortcut.match("D", modifiers: .shift, isEditingText: false) == .select(.dashedLine))
+    #expect(EditorShortcut.match("d", modifiers: [], isEditingText: true) == nil)
+    #expect(EditorShortcut.match("d", modifiers: .command, isEditingText: false) == nil)
 }
 
 @Test func commandUndoAndSave() {

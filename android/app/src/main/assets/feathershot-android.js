@@ -7,7 +7,7 @@
  *   0. assets/android/mobile.css -> phone layout for the toolbar
  *   1. chrome.storage.local  -> the image opened from the app's storage
  *   2. touch -> mouse        -> the editor draws with mouse events only
- *   3. <a download> data URL -> saved to Pictures/FeatherShot via the native bridge
+ *   3. <a download> blob/data URL -> saved to Pictures/FeatherShot via the native bridge
  */
 (function () {
   'use strict';
@@ -85,15 +85,43 @@
   document.addEventListener('touchend', endTouch, touchOptions);
   document.addEventListener('touchcancel', endTouch, touchOptions);
 
-  // 3. Save: the editor creates <a download href="data:image/png;base64,..."> and clicks it.
+  // 3. Save: the editor creates <a download href="blob:..."> (or a PNG data URL) and clicks it.
   var PNG_PREFIX = 'data:image/png;base64,';
   var nativeClick = HTMLAnchorElement.prototype.click;
 
+  function saveDataUrl(dataUrl, fileName) {
+    if (dataUrl.indexOf(PNG_PREFIX) !== 0) return;
+    window.FeatherShotNative.saveImage(dataUrl.slice(PNG_PREFIX.length), fileName);
+  }
+
+  // The editor's CSP blocks fetch() on blob: URLs, so keep each PNG blob the editor creates.
+  var pngBlobs = {};
+  var nativeCreateObjectURL = URL.createObjectURL;
+  URL.createObjectURL = function (obj) {
+    var url = nativeCreateObjectURL.call(URL, obj);
+    if (obj && obj.type === 'image/png') pngBlobs[url] = obj;
+    return url;
+  };
+  var nativeRevokeObjectURL = URL.revokeObjectURL;
+  URL.revokeObjectURL = function (url) {
+    delete pngBlobs[url];
+    return nativeRevokeObjectURL.call(URL, url);
+  };
+
   HTMLAnchorElement.prototype.click = function () {
     var href = this.getAttribute('href') || '';
-    if (this.hasAttribute('download') && href.indexOf(PNG_PREFIX) === 0 && window.FeatherShotNative) {
-      window.FeatherShotNative.saveImage(href.slice(PNG_PREFIX.length), this.getAttribute('download'));
-      return;
+    var fileName = this.getAttribute('download');
+    if (this.hasAttribute('download') && window.FeatherShotNative) {
+      if (href.indexOf(PNG_PREFIX) === 0) {
+        saveDataUrl(href, fileName);
+        return;
+      }
+      if (pngBlobs[href]) {
+        var reader = new FileReader();
+        reader.onload = function () { saveDataUrl(String(reader.result), fileName); };
+        reader.readAsDataURL(pngBlobs[href]);
+        return;
+      }
     }
     return nativeClick.call(this);
   };

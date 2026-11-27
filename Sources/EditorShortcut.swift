@@ -17,6 +17,7 @@ enum EditorShortcut: Equatable {
         "4": .rectangle, "r": .rectangle,
         "5": .circle,
         "6": .line, "l": .line,
+        "d": .dashedLine, "D": .dashedLine,
         "7": .questionArrow,
         "8": .questionRectangle,
         "9": .abcArrow,

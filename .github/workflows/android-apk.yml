@@ -1,0 +1,101 @@
+name: Android APK for a release
+
+# Builds the signed Android APK for an existing release tag and adds it to that release, for when
+# the APK job of "Build & Release" failed but the other platforms were released. It attests the APK,
+# attaches it to the GitHub release and refreshes the Firebase mirror (files + latest.json + site).
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (e.g. v1.3.51)
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Build release APK
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          if [[ -z "${ANDROID_KEYSTORE_BASE64:-}" ]]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 not set: an unsigned APK would not install."
+            exit 1
+          fi
+          npm run sync:shared
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export ANDROID_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon :app:assembleRelease -PappVersion="$VERSION"
+          cp app/build/outputs/apk/release/app-release.apk "../FeatherShot-${VERSION}-Android.apk"
+          rm -f "$RUNNER_TEMP/release.jks"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: FeatherShot-*-Android.apk
+
+      - name: Attach the APK to the release
+        run: gh release upload "$TAG" FeatherShot-*-Android.apk --clobber
+
+      - name: Check Firebase publish secret
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [[ -z "${FIREBASE_SERVICE_ACCOUNT:-}" ]]; then
+            echo "::notice::FIREBASE_SERVICE_ACCOUNT not set — skipping Firebase mirror"
+            echo "SKIP_FIREBASE=true" >> "$GITHUB_ENV"
+          else
+            echo "SKIP_FIREBASE=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Authenticate to Google Cloud
+        if: env.SKIP_FIREBASE == 'false'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        if: env.SKIP_FIREBASE == 'false'
+        uses: google-github-actions/setup-gcloud@v2
+
+      # latest.json lists every file of the release, so the mirror is rebuilt from all of them.
+      - name: Refresh the Firebase mirror and site
+        if: env.SKIP_FIREBASE == 'false'
+        env:
+          FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-artifacts
+          gh release download "$TAG" --dir release-artifacts
+          export FIREBASE_STORAGE_BUCKET="${FIREBASE_STORAGE_BUCKET:-feathershot.firebasestorage.app}"
+          bash packaging/firebase/upload-releases.sh release-artifacts "${TAG#v}" "$GITHUB_WORKSPACE"
+          npm install -g firebase-tools
+          firebase deploy --only hosting --project feathershot --non-interactive
