@@ -137,3 +137,11 @@ FEATHERSHOT_UPLOAD=1 bash packaging/ios/build_testflight.sh
 Write the result (build numbers, review status, anything fixed or still open) into a commit on main or a
 short note for the user. The Windows session still has to send Chrome extension 1.3.51 to the Chrome
 Web Store. The ZIP is on the GitHub release, and 1.3.49 is pending review there.
+
+## Website (since 1.3.51, written 2026-11-28 by the Windows session)
+
+Nothing here changes the Mac TODOs above: TODO 2 and TODO 3 are still open.
+
+- The website (`hosting/public`) is in 44 languages. It has a Dashed Line card, animated neon feature icons, the stores' own localized badges, and a Black Friday / Cyber Monday badge that switches by the clock (27 Nov to 1 Dec 2026, Vienna time).
+- `hosting/public/releases/latest.json` in the repo now matches the live 1.3.51 manifest. It had been 1.3.46.
+- Details and the deploy steps: `docs/website.md`.

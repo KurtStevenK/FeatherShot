@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Website in 44 languages: the home, linktree, press, privacy and support pages, with a language picker (flags, browser language, remembered choice, right-to-left for Arabic, Persian, Pashto and Yiddish). The translations are machine-made and await native review.
+- Store badges in the visitor's language where the stores publish one: the App Store and Mac App Store badges from Apple, and the Snap Store badge. The Chrome Web Store badge stays English.
+- The home page lists every platform: iPhone, iPhone Duo, iPad, Apple Watch, macOS, Windows, Linux, Android and Chrome.
+- Dashed Line in the feature list, next to Line.
+- Black Friday badge from Friday 27 November 2026, switching to Cyber Monday from Monday 30 November 2026, hidden from Tuesday 1 December 2026, 00:01 (Vienna time).
+
+### Changed
+
+- The feature icons on the home page are SVG drawings. Each draws once when its card scrolls into view, and its colour cycles slowly through neon tones. Reduced-motion settings turn the animation off.
+
+### Fixed
+
+- The website's release manifest in the repository (`hosting/public/releases/latest.json`) was the 1.3.46 copy. It now matches the 1.3.51 release that the live site serves, so a deploy no longer rolls the download links back.
+
 ## [1.3.51] - 2026-11-25
 
 ### Changed
