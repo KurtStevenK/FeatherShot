@@ -45,6 +45,8 @@
   "feature.ellipse.text": "با کشیدن یک کادر، دایره و بیضی بکشید. فقط کناره، بدون رنگ داخل.",
   "feature.line.title": "خط",
   "feature.line.text": "خطوط راست ساده بدون نوک فلش بکشید.",
+  "feature.dashedLine.title": "خط چین‌دار",
+  "feature.dashedLine.text": "خط‌های راست چین‌دار بکش برای نشان دادن لبه‌ها، راهنماها و مرزها، درست کنار ابزار خط.",
   "feature.questionArrow.title": "فلش سؤال",
   "feature.questionArrow.text": "فلش‌هایی با دایره علامت سؤال برای نشانه‌گذاری بخش‌های مشکوک.",
   "feature.questionRectangle.title": "مستطیل سؤال",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Rajzolj köröket és ellipsziseket a befoglaló keret húzásával. Csak körvonal, kitöltés nélkül.",
   "feature.line.title": "Vonal",
   "feature.line.text": "Rajzolj egyszerű, nyílhegy nélküli egyenes vonalakat.",
+  "feature.dashedLine.title": "Szaggatott vonal",
+  "feature.dashedLine.text": "Egyenes szaggatott vonalakkal jelöljön szegélyeket, segédvonalakat és határokat, a vonal mellett.",
   "feature.questionArrow.title": "Kérdőjeles nyíl",
   "feature.questionArrow.text": "Kérdőjeles körrel ellátott nyilak a kérdéses területek jelölésére.",
   "feature.questionRectangle.title": "Kérdőjeles téglalap",

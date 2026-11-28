@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Vizato rrathë dhe elipse duke tërhequr kutinë kufizuese. Vetëm kontur, pa mbushje.",
   "feature.line.title": "Vijë",
   "feature.line.text": "Vizato vija të thjeshta të drejta pa maja shigjete.",
+  "feature.dashedLine.title": "Vijë me pika",
+  "feature.dashedLine.text": "Vizatoni vija të drejta me pika për kufij, udhëzues dhe kufizime, pranë mjetit të vijës.",
   "feature.questionArrow.title": "Shigjeta me pikëpyetje",
   "feature.questionArrow.text": "Shigjeta me një rreth pikëpyetjeje për të shënuar zonat e dyshimta.",
   "feature.questionRectangle.title": "Drejtkëndësh me pikëpyetje",

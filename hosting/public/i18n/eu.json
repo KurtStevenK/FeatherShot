@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Marraztu zirkuluak eta elipseak muga-koadro bat arrastatuz. Ertza bakarrik, betegarririk gabe.",
   "feature.line.title": "Marra",
   "feature.line.text": "Marraztu marra zuzen sinpleak gezi-punta gabe.",
+  "feature.dashedLine.title": "Marra etenduna",
+  "feature.dashedLine.text": "Marraztu marra zuzen etenduak ertzak, gidak eta mugak markatzeko, marra arruntaren ondoan.",
   "feature.questionArrow.title": "Galdera-gezia",
   "feature.questionArrow.text": "Galdera-ikurra duen zirkulua duten geziak, zalantzazko eremuak markatzeko.",
   "feature.questionRectangle.title": "Galdera-laukizuzena",

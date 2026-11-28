@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Iddisinja ċrieki u ellissi billi tkaxkar kaxxa. Kontorn biss, mingħajr mili.",
   "feature.line.title": "Linja",
   "feature.line.text": "Iddisinja linji dritti sempliċi mingħajr ponot ta' vleġġa.",
+  "feature.dashedLine.title": "Linja mitqugħda",
+  "feature.dashedLine.text": "Iġbed linji dritti mitqugħda biex timmarka xtut, gwidi u limiti, eżatt ħdejn il-linja.",
   "feature.questionArrow.title": "Vleġġa tal-mistoqsija",
   "feature.questionArrow.text": "Vleġeġ b'ċirku b'marka ta' mistoqsija biex timmarka żoni dubjużi.",
   "feature.questionRectangle.title": "Rettangolu tal-mistoqsija",

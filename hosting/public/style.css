@@ -1014,3 +1014,42 @@ body {
     transform: scale(1);
   }
 }
+
+/* ═══════════════════ FEATURE ICONS: NEON GLOW ═══════════════════ */
+/* The icon colour cycles slowly through neon tones; the stroke and the glow follow it (currentColor). */
+@keyframes fs-neon {
+  0%, 100% { color: #00f0ff; }
+  14% { color: #ff2bd6; }
+  28% { color: #39ff14; }
+  42% { color: #fff200; }
+  56% { color: #ff7a1a; }
+  70% { color: #b26bff; }
+  84% { color: #0096ff; }
+}
+
+.feature-icon {
+  animation: fs-neon 12s linear infinite;
+  box-shadow: 0 0 18px -4px currentColor;
+}
+
+.feature-icon svg {
+  filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 7px currentColor);
+}
+
+/* The cards do not all change colour at once. */
+.feature-card:nth-child(4n + 2) .feature-icon { animation-delay: -4s; }
+.feature-card:nth-child(4n + 3) .feature-icon { animation-delay: -8s; }
+.feature-card:nth-child(4n + 4) .feature-icon { animation-delay: -2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-icon {
+    animation: none;
+  }
+}
+
+/* With 19 feature cards the last one sits alone in its row on the desktop grid: centre it. */
+@media (min-width: 769px) {
+  .features-grid .feature-card:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+  }
+}

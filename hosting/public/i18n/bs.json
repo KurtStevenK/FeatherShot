@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Crtaj krugove i elipse povlačenjem okvira. Samo kontura, bez ispune.",
   "feature.line.title": "Linija",
   "feature.line.text": "Crtaj jednostavne ravne linije bez vrhova strelice.",
+  "feature.dashedLine.title": "Isprekidana linija",
+  "feature.dashedLine.text": "Crtajte prave isprekidane linije za rubove, vodilice i granice, odmah pored obične linije.",
   "feature.questionArrow.title": "Strelica s upitnikom",
   "feature.questionArrow.text": "Strelice s krugom s upitnikom za označavanje spornih područja.",
   "feature.questionRectangle.title": "Pravougaonik s upitnikom",

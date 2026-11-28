@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Piirrä ympyröitä ja ellipsejä vetämällä rajauslaatikko. Vain viiva, ei täyttöä.",
   "feature.line.title": "Viiva",
   "feature.line.text": "Piirrä yksinkertaisia suoria viivoja ilman nuolenkärkiä.",
+  "feature.dashedLine.title": "Katkoviiva",
+  "feature.dashedLine.text": "Piirrä suoria katkoviivoja reunojen, apuviivojen ja rajojen merkitsemiseen, heti viivatyökalun vieressä.",
   "feature.questionArrow.title": "Kysymysnuoli",
   "feature.questionArrow.text": "Nuolet, joissa on kysymysmerkkiympyrä epäselvien kohtien merkitsemiseen.",
   "feature.questionRectangle.title": "Kysymyssuorakulmio",

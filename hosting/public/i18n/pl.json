@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Rysuj okręgi i elipsy, przeciągając ramkę. Tylko obrys, bez wypełnienia.",
   "feature.line.title": "Linia",
   "feature.line.text": "Rysuj proste linie bez grotów.",
+  "feature.dashedLine.title": "Linia przerywana",
+  "feature.dashedLine.text": "Rysuj proste linie przerywane, by zaznaczyć krawędzie, prowadnice i granice, tuż obok linii.",
   "feature.questionArrow.title": "Strzałka z pytaniem",
   "feature.questionArrow.text": "Strzałki z kółkiem ze znakiem zapytania do oznaczania wątpliwych miejsc.",
   "feature.questionRectangle.title": "Prostokąt z pytaniem",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Kresli kruhy a elipsy tažením ohraničovacího rámečku. Jen obrys, bez výplně.",
   "feature.line.title": "Čára",
   "feature.line.text": "Kresli jednoduché rovné čáry bez hrotů.",
+  "feature.dashedLine.title": "Čárkovaná čára",
+  "feature.dashedLine.text": "Kreslete rovné čárkované čáry pro okraje, vodítka a hranice, hned vedle čáry.",
   "feature.questionArrow.title": "Šipka s otazníkem",
   "feature.questionArrow.text": "Šipky s kroužkem s otazníkem pro označení sporných míst.",
   "feature.questionRectangle.title": "Obdélník s otazníkem",

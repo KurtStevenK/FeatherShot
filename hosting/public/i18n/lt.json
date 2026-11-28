@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Braižyk apskritimus ir elipses tempdamas rėmelį. Tik kontūras, be užpildo.",
   "feature.line.title": "Linija",
   "feature.line.text": "Braižyk paprastas tiesias linijas be rodyklės antgalių.",
+  "feature.dashedLine.title": "Brūkšninė linija",
+  "feature.dashedLine.text": "Piešiekite tiesias brūkšnines linijas kraštams, pagalbinėms linijoms ir riboms, šalia linijos įrankio.",
   "feature.questionArrow.title": "Klausimo rodyklė",
   "feature.questionArrow.text": "Rodyklės su klaustuko apskritimu abejotinoms vietoms pažymėti.",
   "feature.questionRectangle.title": "Klausimo stačiakampis",

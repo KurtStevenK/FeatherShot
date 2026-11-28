@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Zeichne Kreise und Ellipsen, indem du einen Rahmen aufziehst. Nur Kontur, keine Füllung.",
   "feature.line.title": "Linie",
   "feature.line.text": "Zeichne einfache gerade Linien ohne Pfeilspitzen.",
+  "feature.dashedLine.title": "Gestrichelte Linie",
+  "feature.dashedLine.text": "Zeichne gerade gestrichelte Linien für Ränder, Hilfslinien und Grenzen, direkt neben der Linie.",
   "feature.questionArrow.title": "Fragepfeil",
   "feature.questionArrow.text": "Pfeile mit einem Fragezeichen-Kreis, um unklare Stellen zu markieren.",
   "feature.questionRectangle.title": "Fragerechteck",

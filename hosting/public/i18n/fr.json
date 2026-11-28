@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Tracez des cercles et des ellipses en faisant glisser un cadre. Contour uniquement, sans remplissage.",
   "feature.line.title": "Ligne",
   "feature.line.text": "Tracez de simples lignes droites sans pointe de flèche.",
+  "feature.dashedLine.title": "Ligne pointillée",
+  "feature.dashedLine.text": "Tracez des lignes droites en pointillés pour marquer des bordures, des repères et des limites, juste à côté de la ligne.",
   "feature.questionArrow.title": "Flèche d’interrogation",
   "feature.questionArrow.text": "Des flèches avec un cercle à point d’interrogation pour signaler les zones douteuses.",
   "feature.questionRectangle.title": "Rectangle d’interrogation",

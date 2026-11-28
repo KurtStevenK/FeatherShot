@@ -45,6 +45,8 @@
   "feature.ellipse.text": "ሳጹን ብምስሓብ ክቢታትን ኤሊፕሳትን ሰዕል። ዙርያ ጥራይ፡ ብዘይ መሊእካ።",
   "feature.line.title": "መስመር",
   "feature.line.text": "ቀሊል ቀጥታ መስመራት ብዘይ ርእሲ ፍላጻ ሰዕል።",
+  "feature.dashedLine.title": "ዝተበታተነ መስመር",
+  "feature.dashedLine.text": "ቀጥታዊ ዝተበታተኑ መስመራት ንወሰናትን ኣመራርሒ መስመራትን ኣብ ጎኒ መሳርሒ መስመር ስዕል።",
   "feature.questionArrow.title": "ናይ ሕቶ ፍላጻ",
   "feature.questionArrow.text": "ፍላጻታት ምስ ናይ ሕቶ ምልክት ክቢ፡ ዘጠራጥሩ ቦታታት ንምምልካት።",
   "feature.questionRectangle.title": "ናይ ሕቶ ኣርባዕተ-ማዕዘን",

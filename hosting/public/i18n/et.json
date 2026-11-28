@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Joonista ringe ja ellipse, lohistades piirdekasti. Ainult joon, ilma täiteta.",
   "feature.line.title": "Joon",
   "feature.line.text": "Joonista lihtsaid sirgjooni ilma nooleotsata.",
+  "feature.dashedLine.title": "Katkendjoon",
+  "feature.dashedLine.text": "Joonista sirgeid katkendjooni servade, abijoonte ja piiride tähistamiseks, otse joone kõrval.",
   "feature.questionArrow.title": "Küsimusnool",
   "feature.questionArrow.text": "Nooled küsimärgiga ringiga ebaselgete kohtade märkimiseks.",
   "feature.questionRectangle.title": "Küsimusristkülik",

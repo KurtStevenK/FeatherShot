@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Tekenje sirkels en ellipsen troch in seleksjekader te slepen. Allinnich line, gjin folling.",
   "feature.line.title": "Line",
   "feature.line.text": "Tekenje ienfâldige rjochte linen sûnder pylkpunten.",
+  "feature.dashedLine.title": "Stippellinen",
+  "feature.dashedLine.text": "Teken rjochte stippellinen foar rânen, helplinen en grinzen, direkt njonken de line.",
   "feature.questionArrow.title": "Fraachpylk",
   "feature.questionArrow.text": "Pylken mei in sirkel mei fraachteken om ûndúdlike plakken te markearjen.",
   "feature.questionRectangle.title": "Fraachrjochthoeke",

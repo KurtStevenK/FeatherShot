@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Tegn cirkler og ellipser ved at trække en afgrænsningsramme. Kun streg, ingen fyld.",
   "feature.line.title": "Linje",
   "feature.line.text": "Tegn enkle, lige linjer uden pilespidser.",
+  "feature.dashedLine.title": "Stiplet linje",
+  "feature.dashedLine.text": "Tegn lige stiplede linjer til kanter, hjælpelinjer og grænser, lige ved siden af linjen.",
   "feature.questionArrow.title": "Spørgsmålspil",
   "feature.questionArrow.text": "Pile med en cirkel med spørgsmålstegn, der markerer uklare steder.",
   "feature.questionRectangle.title": "Spørgsmålsrektangel",

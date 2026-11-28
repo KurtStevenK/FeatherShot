@@ -45,6 +45,8 @@
   "feature.ellipse.text": "د یو چوکاټ په کش کولو سره کړۍ او بیضوي رسم کړئ. یوازې کنار، بې ډکولو.",
   "feature.line.title": "کرښه",
   "feature.line.text": "ساده سیده کرښې د غشي سر پرته رسم کړئ.",
+  "feature.dashedLine.title": "ډشه کرښه",
+  "feature.dashedLine.text": "د پولو، لارښوونو او حدونو لپاره مستقیم ډش شوي کرښې ښکاره کړئ، د کرښې ابزار ترڅنګ.",
   "feature.questionArrow.title": "د پوښتنې غشی",
   "feature.questionArrow.text": "غشي د پوښتنې نښې له حلقې سره د شکمنو ځایونو نښه کولو لپاره.",
   "feature.questionRectangle.title": "د پوښتنې مستطیل",

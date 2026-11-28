@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Zīmē apļus un elipses, velkot ierobežojošo rāmi. Tikai kontūra, bez aizpildījuma.",
   "feature.line.title": "Līnija",
   "feature.line.text": "Zīmē vienkāršas taisnas līnijas bez bultiņas galvām.",
+  "feature.dashedLine.title": "Punktēta līnija",
+  "feature.dashedLine.text": "Zīmējiet taisnas punktētas līnijas malu, palīglīniju un robežu atzīmēšanai, blakus līnijai.",
   "feature.questionArrow.title": "Jautājuma bultiņa",
   "feature.questionArrow.text": "Bultiņas ar jautājuma zīmes apli, lai atzīmētu apšaubāmas vietas.",
   "feature.questionRectangle.title": "Jautājuma taisnstūris",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Sınırlayıcı kutuyu sürükleyerek daire ve elips çiz. Yalnızca çizgi, dolgu yok.",
   "feature.line.title": "Çizgi",
   "feature.line.text": "Ok ucu olmayan basit düz çizgiler çiz.",
+  "feature.dashedLine.title": "Kesikli çizgi",
+  "feature.dashedLine.text": "Kenarları, kılavuz çizgileri ve sınırları işaretlemek için düz kesikli çizgiler çizin; Çizgi aracının hemen yanında.",
   "feature.questionArrow.title": "Soru Oku",
   "feature.questionArrow.text": "Şüpheli alanları işaretlemek için soru işaretli daire içeren oklar.",
   "feature.questionRectangle.title": "Soru Dikdörtgeni",

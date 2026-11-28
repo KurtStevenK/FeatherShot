@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Dibuixa cercles i el·lipses arrossegant un requadre delimitador. Només traç, sense farciment.",
   "feature.line.title": "Línia",
   "feature.line.text": "Dibuixa línies rectes simples sense puntes de fletxa.",
+  "feature.dashedLine.title": "Línia de traços",
+  "feature.dashedLine.text": "Dibuixa línies rectes de traços per marcar vores, guies i límits, just al costat de la línia.",
   "feature.questionArrow.title": "Fletxa d’interrogació",
   "feature.questionArrow.text": "Fletxes amb un cercle de signe d’interrogació per marcar zones dubtoses.",
   "feature.questionRectangle.title": "Rectangle d’interrogació",

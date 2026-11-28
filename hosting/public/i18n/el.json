@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Σχεδίασε κύκλους και ελλείψεις σύροντας ένα πλαίσιο. Μόνο περίγραμμα, χωρίς γέμισμα.",
   "feature.line.title": "Γραμμή",
   "feature.line.text": "Σχεδίασε απλές ευθείες γραμμές χωρίς αιχμές βέλους.",
+  "feature.dashedLine.title": "Διακεκομμένη γραμμή",
+  "feature.dashedLine.text": "Σχεδιάστε ευθείες διακεκομμένες γραμμές για περιγράμματα, οδηγούς και όρια, δίπλα στη γραμμή.",
   "feature.questionArrow.title": "Βέλος ερώτησης",
   "feature.questionArrow.text": "Βέλη με κύκλο ερωτηματικού για να σημειώνεις αμφίβολα σημεία.",
   "feature.questionRectangle.title": "Ορθογώνιο ερώτησης",

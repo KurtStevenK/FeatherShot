@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Rita cirklar och ellipser genom att dra en markeringsram. Endast linje, ingen fyllning.",
   "feature.line.title": "Linje",
   "feature.line.text": "Rita enkla raka linjer utan pilspetsar.",
+  "feature.dashedLine.title": "Streckad linje",
+  "feature.dashedLine.text": "Rita raka streckade linjer för kanter, hjälplinjer och gränser, precis bredvid linjen.",
   "feature.questionArrow.title": "Frågepil",
   "feature.questionArrow.text": "Pilar med en cirkel med frågetecken för att markera oklara ställen.",
   "feature.questionRectangle.title": "Frågerektangel",

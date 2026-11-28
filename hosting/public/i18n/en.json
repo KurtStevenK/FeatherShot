@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Draw circles and ellipses by dragging a bounding box. Stroke only, no fill.",
   "feature.line.title": "Line",
   "feature.line.text": "Draw simple straight lines without arrowheads.",
+  "feature.dashedLine.title": "Dashed Line",
+  "feature.dashedLine.text": "Draw straight dashed lines to mark borders, guides and boundaries. Right next to Line.",
   "feature.questionArrow.title": "Question Arrow",
   "feature.questionArrow.text": "Arrows with a question mark circle to mark questionable areas.",
   "feature.questionRectangle.title": "Question Rectangle",

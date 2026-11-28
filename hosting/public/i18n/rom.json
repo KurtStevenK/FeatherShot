@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Ramo kruzhija thaj elipsi te kheres o okvir. Sade ivica, bi pherdipe.",
   "feature.line.title": "Linija",
   "feature.line.text": "Ramo sade chindi linije bi vrhoske e strelaqe.",
+  "feature.dashedLine.title": "Dashed Line",
+  "feature.dashedLine.text": "Draw straight dashed lines for borders, guides and boundaries, right next to the Line tool.",
   "feature.questionArrow.title": "Strela le pučhipnaşe",
   "feature.questionArrow.text": "Streli le kruzhikonenca le pučhipnaşe te markiris e thana so si pučhipe.",
   "feature.questionRectangle.title": "Pravougaonik le pučhipnaşe",

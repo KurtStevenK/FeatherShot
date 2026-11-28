@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Teken cirkels en ellipsen door een selectiekader te slepen. Alleen lijn, geen vulling.",
   "feature.line.title": "Lijn",
   "feature.line.text": "Teken eenvoudige rechte lijnen zonder pijlpunten.",
+  "feature.dashedLine.title": "Stippellijn",
+  "feature.dashedLine.text": "Teken rechte stippellijnen om randen, hulplijnen en grenzen aan te geven, naast de lijn.",
   "feature.questionArrow.title": "Vraagpijl",
   "feature.questionArrow.text": "Pijlen met een cirkel met vraagteken om onduidelijke plekken te markeren.",
   "feature.questionRectangle.title": "Vraagrechthoek",

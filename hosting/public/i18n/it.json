@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Disegna cerchi ed ellissi trascinando un riquadro di delimitazione. Solo contorno, senza riempimento.",
   "feature.line.title": "Linea",
   "feature.line.text": "Disegna semplici linee rette senza punte di freccia.",
+  "feature.dashedLine.title": "Linea tratteggiata",
+  "feature.dashedLine.text": "Disegna linee rette tratteggiate per segnare bordi, guide e confini, accanto alla linea.",
   "feature.questionArrow.title": "Freccia interrogativa",
   "feature.questionArrow.text": "Frecce con un cerchio con punto interrogativo per segnalare le aree dubbie.",
   "feature.questionRectangle.title": "Rettangolo interrogativo",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Dibuja círculos y elipses arrastrando un cuadro delimitador. Solo trazo, sin relleno.",
   "feature.line.title": "Línea",
   "feature.line.text": "Dibuja líneas rectas simples sin puntas de flecha.",
+  "feature.dashedLine.title": "Línea discontinua",
+  "feature.dashedLine.text": "Dibuja líneas rectas discontinuas para marcar bordes, guías y límites, justo al lado de la línea.",
   "feature.questionArrow.title": "Flecha de interrogación",
   "feature.questionArrow.text": "Flechas con un círculo de signo de interrogación para marcar zonas dudosas.",
   "feature.questionRectangle.title": "Rectángulo de interrogación",

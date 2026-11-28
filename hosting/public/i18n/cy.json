@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Tynnwch gylchoedd ac elipsau trwy lusgo blwch ffiniol. Llinell yn unig, dim llenwad.",
   "feature.line.title": "Llinell",
   "feature.line.text": "Tynnwch linellau syth syml heb bennau saeth.",
+  "feature.dashedLine.title": "Llinell doredig",
+  "feature.dashedLine.text": "Lluniwch linellau syth doredig i nodi ymylon, canllawiau a ffiniau, wrth ymyl y llinell.",
   "feature.questionArrow.title": "Saeth Cwestiwn",
   "feature.questionArrow.text": "Saethau gyda chylch marc cwestiwn i nodi mannau amheus.",
   "feature.questionRectangle.title": "Petryal Cwestiwn",

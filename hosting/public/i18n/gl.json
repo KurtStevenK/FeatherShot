@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Debuxa círculos e elipses arrastrando unha caixa delimitadora. Só contorno, sen énchedo.",
   "feature.line.title": "Liña",
   "feature.line.text": "Debuxa liñas rectas sinxelas sen puntas de frecha.",
+  "feature.dashedLine.title": "Liña a trazos",
+  "feature.dashedLine.text": "Debuxa liñas rectas a trazos para marcar bordos, guías e límites, xusto ao lado da liña.",
   "feature.questionArrow.title": "Frecha de interrogación",
   "feature.questionArrow.text": "Frechas cun círculo de signo de interrogación para marcar zonas dubidosas.",
   "feature.questionRectangle.title": "Rectángulo de interrogación",

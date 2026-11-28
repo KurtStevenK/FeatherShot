@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Rysuj kruhi a elipsy přez ćahanje wobrubneho ramika. Jenož wobrys, bjez wupjelnjenja.",
   "feature.line.title": "Linija",
   "feature.line.text": "Rysuj jednore směrne linije bjez špicow.",
+  "feature.dashedLine.title": "Čorkowana linija",
+  "feature.dashedLine.text": "Kresli prosće čorkowane linije za wobruby, wodźidła a mjeze, direktnje při linii.",
   "feature.questionArrow.title": "Šipa z prašakom",
   "feature.questionArrow.text": "Šipy z kołom z prašakom za woznamjenjenje wopačnych městnow.",
   "feature.questionRectangle.title": "Štyrioróžnik z prašakom",

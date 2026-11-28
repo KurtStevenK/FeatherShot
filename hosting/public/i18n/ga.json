@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Tarraing ciorcail agus éilipsí trí bhosca teorann a tharraingt. Imlíne amháin, gan líonadh.",
   "feature.line.title": "Líne",
   "feature.line.text": "Tarraing línte díreacha simplí gan rinn saighde.",
+  "feature.dashedLine.title": "Líne bhriste",
+  "feature.dashedLine.text": "Tarraing línte díreacha briste chun imill, treoirlínte agus teorainneacha a mharcáil, díreach in aice leis an líne.",
   "feature.questionArrow.title": "Saighead cheiste",
   "feature.questionArrow.text": "Saigheada le ciorcal comhartha ceiste chun áiteanna amhrasacha a mharcáil.",
   "feature.questionRectangle.title": "Dronuilleog cheiste",

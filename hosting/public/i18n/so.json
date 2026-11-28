@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Sawir goobo iyo ellipse adigoo jiidaya sanduuq. Xariiq keliya, buuxin la'aan.",
   "feature.line.title": "Xariiq",
   "feature.line.text": "Sawir xariijimo toosan oo fudud oo aan madax fallaad lahayn.",
+  "feature.dashedLine.title": "Xariiq jajab ah",
+  "feature.dashedLine.text": "Xariiqyo toosan oo jajab ah ku sawir xuduudaha, hagayaasha iyo xadka, xiligii xariiqda.",
   "feature.questionArrow.title": "Fallaadhaha su'aasha",
   "feature.questionArrow.text": "Fallaadho leh goobo calaamad su'aal ah si loo calaamadiyo meelaha shakiga leh.",
   "feature.questionRectangle.title": "Afargeesaha su'aasha",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Малюйте кола й еліпси, розтягуючи рамку. Лише контур, без заливки.",
   "feature.line.title": "Лінія",
   "feature.line.text": "Малюйте прості прямі лінії без наконечників.",
+  "feature.dashedLine.title": "Пунктирна лінія",
+  "feature.dashedLine.text": "Малюйте прямі пунктирні лінії для меж, допоміжних ліній і кордонів, поруч із інструментом «Лінія».",
   "feature.questionArrow.title": "Стрілка із запитанням",
   "feature.questionArrow.text": "Стрілки з кружком-запитанням для позначення незрозумілих місць.",
   "feature.questionRectangle.title": "Прямокутник із запитанням",

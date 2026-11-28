@@ -45,6 +45,8 @@
   "feature.ellipse.text": "ارسم دوائر وأشكالًا بيضاوية بسحب إطار محيط. حدود فقط بلا تعبئة.",
   "feature.line.title": "خط",
   "feature.line.text": "ارسم خطوطًا مستقيمة بسيطة بلا رؤوس أسهم.",
+  "feature.dashedLine.title": "الخط المتقطع",
+  "feature.dashedLine.text": "ارسم خطوطًا مستقيمة متقطعة لتحديد الحواف والأدلة والحدود، بجانب أداة الخط.",
   "feature.questionArrow.title": "سهم الاستفهام",
   "feature.questionArrow.text": "أسهم مع دائرة علامة استفهام لتمييز المواضع المشكوك فيها.",
   "feature.questionRectangle.title": "مستطيل الاستفهام",

@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Desenează cercuri și elipse trăgând un cadru de delimitare. Doar contur, fără umplere.",
   "feature.line.title": "Linie",
   "feature.line.text": "Desenează linii drepte simple, fără vârfuri de săgeată.",
+  "feature.dashedLine.title": "Linie punctată",
+  "feature.dashedLine.text": "Desenează linii drepte punctate pentru a marca margini, ghiduri și limite, chiar lângă linie.",
   "feature.questionArrow.title": "Săgeată cu semn de întrebare",
   "feature.questionArrow.text": "Săgeți cu un cerc cu semn de întrebare pentru a marca zonele îndoielnice.",
   "feature.questionRectangle.title": "Dreptunghi cu semn de întrebare",

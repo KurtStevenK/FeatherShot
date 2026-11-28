@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Bi kişandina çarçoveyekê çember û elîpsan xêz bike. Tenê qerax, bê dagirtin.",
   "feature.line.title": "Xet",
   "feature.line.text": "Xetên rast ên sade bê serê tîrê xêz bike.",
+  "feature.dashedLine.title": "Xetê bi xêzikan",
+  "feature.dashedLine.text": "Xetên rast ên bi xêzikan bikişîne ji bo sînor, rêber û sînoran, li kêleka amûra xêtê.",
   "feature.questionArrow.title": "Tîra pirsê",
   "feature.questionArrow.text": "Tîr bi çembera nîşana pirsê ji bo nîşankirina deverên gumanbar.",
   "feature.questionRectangle.title": "Çargoşeya pirsê",

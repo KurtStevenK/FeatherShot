@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Рисувай кръгове и елипси, като влачиш рамка. Само контур, без запълване.",
   "feature.line.title": "Линия",
   "feature.line.text": "Рисувай прости прави линии без стрелки.",
+  "feature.dashedLine.title": "Прекъсната линия",
+  "feature.dashedLine.text": "Рисувайте прави прекъснати линии за граници, водачи и ограничения, точно до обикновената линия.",
   "feature.questionArrow.title": "Стрелка с въпрос",
   "feature.questionArrow.text": "Стрелки с кръгче с въпросителна, за да отбелязваш неясни места.",
   "feature.questionRectangle.title": "Правоъгълник с въпрос",

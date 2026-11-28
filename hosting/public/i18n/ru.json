@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Рисуйте круги и эллипсы, растягивая рамку. Только контур, без заливки.",
   "feature.line.title": "Линия",
   "feature.line.text": "Рисуйте простые прямые линии без наконечников.",
+  "feature.dashedLine.title": "Пунктирная линия",
+  "feature.dashedLine.text": "Рисуйте прямые пунктирные линии для границ, направляющих и рамок, прямо рядом с инструментом «Линия».",
   "feature.questionArrow.title": "Стрелка с вопросом",
   "feature.questionArrow.text": "Стрелки с кружком-вопросом для пометки неясных мест.",
   "feature.questionRectangle.title": "Прямоугольник с вопросом",

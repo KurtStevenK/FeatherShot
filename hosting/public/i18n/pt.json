@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Desenhe círculos e elipses arrastando uma caixa delimitadora. Só contorno, sem preenchimento.",
   "feature.line.title": "Linha",
   "feature.line.text": "Desenhe linhas retas simples sem pontas de seta.",
+  "feature.dashedLine.title": "Linha tracejada",
+  "feature.dashedLine.text": "Desenhe linhas retas tracejadas para marcar bordas, guias e limites, logo ao lado da linha.",
   "feature.questionArrow.title": "Seta de interrogação",
   "feature.questionArrow.text": "Setas com um círculo de ponto de interrogação para assinalar zonas duvidosas.",
   "feature.questionRectangle.title": "Retângulo de interrogação",

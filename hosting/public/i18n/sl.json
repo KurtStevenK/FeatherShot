@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Riši kroge in elipse z vlečenjem okvirja. Samo obroba, brez polnila.",
   "feature.line.title": "Črta",
   "feature.line.text": "Riši preproste ravne črte brez konic.",
+  "feature.dashedLine.title": "Črtkana črta",
+  "feature.dashedLine.text": "Narišite ravne črtkane črte za robove, vodila in meje, tik ob navadni črti.",
   "feature.questionArrow.title": "Puščica z vprašajem",
   "feature.questionArrow.text": "Puščice s krogcem z vprašajem za označevanje spornih mest.",
   "feature.questionRectangle.title": "Pravokotnik z vprašajem",

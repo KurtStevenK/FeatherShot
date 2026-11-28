@@ -45,6 +45,8 @@
   "feature.ellipse.text": "Kresli kruhy a elipsy ťahaním ohraničovacieho rámika. Len obrys, bez výplne.",
   "feature.line.title": "Čiara",
   "feature.line.text": "Kresli jednoduché rovné čiary bez hrotov.",
+  "feature.dashedLine.title": "Čiarkovaná čiara",
+  "feature.dashedLine.text": "Kreslite rovné čiarkované čiary na okraje, pomocné čiary a hranice, hneď vedľa čiary.",
   "feature.questionArrow.title": "Šípka s otáznikom",
   "feature.questionArrow.text": "Šípky s kruhom s otáznikom na označenie sporných miest.",
   "feature.questionRectangle.title": "Obdĺžnik s otáznikom",
