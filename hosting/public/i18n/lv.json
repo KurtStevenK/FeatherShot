@@ -229,5 +229,14 @@
   "link.websiteName": "Vietne",
   "link.supportName": "Atbalsts",
   "link.supportSub": "Jautājumi un atsauksmes",
-  "link.footer": "Izveidojis Kurt Steven Kainzmayer · MIT licence<br><a>Privātums</a> · <a>Preses komplekts</a>"
+  "link.footer": "Izveidojis Kurt Steven Kainzmayer · MIT licence<br><a>Privātums</a> · <a>Preses komplekts</a>",
+  "event.advent1": "1. Adventa svētdiena",
+  "event.advent2": "2. Adventa svētdiena",
+  "event.advent3": "3. Adventa svētdiena",
+  "event.advent4": "4. Adventa svētdiena",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Svētā Nikolaja diena",
+  "event.christmasEve": "Priecīgus Ziemassvētkus",
+  "event.newYearsEve": "Vecgada vakars",
+  "event.newYear": "Laimīgu Jauno gadu"
 }

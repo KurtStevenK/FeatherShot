@@ -229,5 +229,14 @@
   "link.websiteName": "Уебсайт",
   "link.supportName": "Поддръжка",
   "link.supportSub": "Въпроси и обратна връзка",
-  "link.footer": "Създадено от Kurt Steven Kainzmayer · Лиценз MIT<br><a>Поверителност</a> · <a>Прессъобщения</a>"
+  "link.footer": "Създадено от Kurt Steven Kainzmayer · Лиценз MIT<br><a>Поверителност</a> · <a>Прессъобщения</a>",
+  "event.advent1": "Първа неделя на Адвента",
+  "event.advent2": "Втора неделя на Адвента",
+  "event.advent3": "Трета неделя на Адвента",
+  "event.advent4": "Четвърта неделя на Адвента",
+  "event.krampus": "Крампус",
+  "event.nikolaus": "Никулден",
+  "event.christmasEve": "Весела Коледа",
+  "event.newYearsEve": "Новогодишна нощ",
+  "event.newYear": "Честита Нова година"
 }

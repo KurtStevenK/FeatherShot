@@ -229,5 +229,14 @@
   "link.websiteName": "Verkkosivusto",
   "link.supportName": "Tuki",
   "link.supportSub": "Kysymykset ja palaute",
-  "link.footer": "Tekijä: Kurt Steven Kainzmayer · MIT-lisenssi<br><a>Tietosuoja</a> · <a>Lehdistöpaketti</a>"
+  "link.footer": "Tekijä: Kurt Steven Kainzmayer · MIT-lisenssi<br><a>Tietosuoja</a> · <a>Lehdistöpaketti</a>",
+  "event.advent1": "1. adventtisunnuntai",
+  "event.advent2": "2. adventtisunnuntai",
+  "event.advent3": "3. adventtisunnuntai",
+  "event.advent4": "4. adventtisunnuntai",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Pyhän Nikolauksen päivä",
+  "event.christmasEve": "Hyvää joulua",
+  "event.newYearsEve": "Uudenvuodenaatto",
+  "event.newYear": "Hyvää uutta vuotta"
 }

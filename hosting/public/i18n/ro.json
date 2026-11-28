@@ -229,5 +229,14 @@
   "link.websiteName": "Site web",
   "link.supportName": "Asistență",
   "link.supportSub": "Întrebări și feedback",
-  "link.footer": "Creat de Kurt Steven Kainzmayer · Licență MIT<br><a>Confidențialitate</a> · <a>Kit de presă</a>"
+  "link.footer": "Creat de Kurt Steven Kainzmayer · Licență MIT<br><a>Confidențialitate</a> · <a>Kit de presă</a>",
+  "event.advent1": "Prima duminică din Advent",
+  "event.advent2": "A doua duminică din Advent",
+  "event.advent3": "A treia duminică din Advent",
+  "event.advent4": "A patra duminică din Advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sfântul Nicolae",
+  "event.christmasEve": "Crăciun fericit",
+  "event.newYearsEve": "Revelion",
+  "event.newYear": "An Nou fericit"
 }

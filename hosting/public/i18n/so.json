@@ -229,5 +229,14 @@
   "link.websiteName": "Bogga",
   "link.supportName": "Taageero",
   "link.supportSub": "Su'aalo iyo jawaab celin",
-  "link.footer": "Waxaa sameeyay Kurt Steven Kainzmayer · Shatiga MIT<br><a>Qarsoodiga</a> · <a>Xirmada saxaafadda</a>"
+  "link.footer": "Waxaa sameeyay Kurt Steven Kainzmayer · Shatiga MIT<br><a>Qarsoodiga</a> · <a>Xirmada saxaafadda</a>",
+  "event.advent1": "Axadda 1aad ee Advent",
+  "event.advent2": "Axadda 2aad ee Advent",
+  "event.advent3": "Axadda 3aad ee Advent",
+  "event.advent4": "Axadda 4aad ee Advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Maalinta St. Nicholas",
+  "event.christmasEve": "Kirismas wanaagsan",
+  "event.newYearsEve": "Habeenka Sanadka Cusub",
+  "event.newYear": "Sanad Cusub Wanaagsan"
 }

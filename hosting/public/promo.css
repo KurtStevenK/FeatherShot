@@ -66,3 +66,33 @@
     animation: promo-in 0.6s ease;
   }
 }
+
+/* Season events (events.js SEASON). */
+.promo-badge[data-promo='krampus'] {
+  color: #ffd9c7;
+  border: 1px solid rgba(255, 80, 40, 0.6);
+  background: linear-gradient(90deg, #2a0a0a, #5a1010);
+  box-shadow: 0 0 18px rgba(255, 60, 30, 0.35);
+}
+
+.promo-badge[data-promo='nikolaus'],
+.promo-badge[data-promo='christmas'] {
+  color: #ffffff;
+  border: none;
+  background: linear-gradient(90deg, #c8102e, #e0473a);
+  box-shadow: 0 0 18px rgba(224, 71, 58, 0.4);
+}
+
+.promo-badge[data-promo='advent'] {
+  color: #ffffff;
+  border: none;
+  background: linear-gradient(90deg, #5b21b6, #8b5cf6);
+  box-shadow: 0 0 18px rgba(139, 92, 246, 0.4);
+}
+
+.promo-badge[data-promo='new-year'] {
+  color: #1a1400;
+  border: none;
+  background: linear-gradient(90deg, #f5d36b, #ffe9a8, #f5d36b);
+  box-shadow: 0 0 20px rgba(245, 211, 107, 0.45);
+}

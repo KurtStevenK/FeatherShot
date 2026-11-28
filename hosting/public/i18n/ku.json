@@ -229,5 +229,14 @@
   "link.websiteName": "Malper",
   "link.supportName": "Piştgirî",
   "link.supportSub": "Pirs û nirxandin",
-  "link.footer": "Ji aliyê Kurt Steven Kainzmayer ve hatiye çêkirin · Lîsansa MIT<br><a>Nepenî</a> · <a>Pakêta çapemeniyê</a>"
+  "link.footer": "Ji aliyê Kurt Steven Kainzmayer ve hatiye çêkirin · Lîsansa MIT<br><a>Nepenî</a> · <a>Pakêta çapemeniyê</a>",
+  "event.advent1": "Yekşema 1. ya Adventê",
+  "event.advent2": "Yekşema 2. ya Adventê",
+  "event.advent3": "Yekşema 3. ya Adventê",
+  "event.advent4": "Yekşema 4. ya Adventê",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Roja Pîroz Nîkolas",
+  "event.christmasEve": "Noela we pîroz be",
+  "event.newYearsEve": "Şeva Sersalê",
+  "event.newYear": "Sersala we pîroz be"
 }

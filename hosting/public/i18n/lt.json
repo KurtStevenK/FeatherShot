@@ -229,5 +229,14 @@
   "link.websiteName": "Svetainė",
   "link.supportName": "Pagalba",
   "link.supportSub": "Klausimai ir atsiliepimai",
-  "link.footer": "Sukūrė Kurt Steven Kainzmayer · MIT licencija<br><a>Privatumas</a> · <a>Spaudos rinkinys</a>"
+  "link.footer": "Sukūrė Kurt Steven Kainzmayer · MIT licencija<br><a>Privatumas</a> · <a>Spaudos rinkinys</a>",
+  "event.advent1": "1-asis Advento sekmadienis",
+  "event.advent2": "2-asis Advento sekmadienis",
+  "event.advent3": "3-iasis Advento sekmadienis",
+  "event.advent4": "4-asis Advento sekmadienis",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Šv. Mikalojaus diena",
+  "event.christmasEve": "Linksmų Kalėdų",
+  "event.newYearsEve": "Naujųjų metų išvakarės",
+  "event.newYear": "Laimingų Naujųjų metų"
 }

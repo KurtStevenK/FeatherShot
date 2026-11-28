@@ -229,5 +229,14 @@
   "link.websiteName": "Websydło",
   "link.supportName": "Pomoc",
   "link.supportSub": "Prašenja a rezonanca",
-  "link.footer": "Wutworił Kurt Steven Kainzmayer · Licenca MIT<br><a>Škit datow</a> · <a>Presowy material</a>"
+  "link.footer": "Wutworił Kurt Steven Kainzmayer · Licenca MIT<br><a>Škit datow</a> · <a>Presowy material</a>",
+  "event.advent1": "1. adwent",
+  "event.advent2": "2. adwent",
+  "event.advent3": "3. adwent",
+  "event.advent4": "4. adwent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Swjaty Mikławš",
+  "event.christmasEve": "Wjesołe hody",
+  "event.newYearsEve": "Silwester",
+  "event.newYear": "Zbožowne nowe lěto"
 }

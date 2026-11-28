@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store badges in the visitor's language where the stores publish one: the App Store and Mac App Store badges from Apple, and the Snap Store badge. The Chrome Web Store badge stays English.
 - The home page lists every platform: iPhone, iPhone Duo, iPad, Apple Watch, macOS, Windows, Linux, Android and Chrome.
 - Dashed Line in the feature list, next to Line.
-- Black Friday badge from Friday 27 November 2026, switching to Cyber Monday from Monday 30 November 2026, hidden from Tuesday 1 December 2026, 00:01 (Vienna time).
-- Event badges on the home page and the linktree, one at a time: a public holiday of the visitor's country on its day (27 countries, names in the country's language), otherwise Black Friday and Cyber Monday. The linktree ends Cyber Monday on Thursday 3 December 2026, 00:01 (Vienna time); the home page on Tuesday 1 December.
+- Black Friday badge from Friday 27 November 2026, switching to Cyber Monday from Monday 30 November 2026, hidden from Tuesday 1 December 2026 (Vienna time).
+- Event badges on the home page and the linktree, one at a time: a public holiday of the visitor's country on its day (27 countries, names in the country's language), otherwise Black Friday and Cyber Monday. Black Friday runs Friday 27 to Sunday 29 November, Cyber Monday only on Monday 30 November.
+- Season badges every year: Krampus (5 Dec, Austria), Nikolo (6 Dec, Central Europe), the four Advent Sundays, Christmas Eve, New Year's Eve and New Year, labelled in all 44 languages. They come after a promo and before a public holiday.
 
 ### Changed
 
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Pages are served with `Cache-Control: no-cache`, so visitors get a new deploy at once instead of a page that is up to an hour old.
 - The website's release manifest in the repository (`hosting/public/releases/latest.json`) was the 1.3.46 copy. It now matches the 1.3.51 release that the live site serves, so a deploy no longer rolls the download links back.
 - On phones the footer no longer scrolls sideways: the footer glow was wider than the screen.
 

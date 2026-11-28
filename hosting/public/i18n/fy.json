@@ -229,5 +229,14 @@
   "link.websiteName": "Webside",
   "link.supportName": "Stipe",
   "link.supportSub": "Fragen en feedback",
-  "link.footer": "Makke troch Kurt Steven Kainzmayer · MIT-lisinsje<br><a>Privacy</a> · <a>Parsekit</a>"
+  "link.footer": "Makke troch Kurt Steven Kainzmayer · MIT-lisinsje<br><a>Privacy</a> · <a>Parsekit</a>",
+  "event.advent1": "1e advint",
+  "event.advent2": "2e advint",
+  "event.advent3": "3e advint",
+  "event.advent4": "4e advint",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sinteklaas",
+  "event.christmasEve": "Noflike Krystdagen",
+  "event.newYearsEve": "Âldjiersjûn",
+  "event.newYear": "Lokkich Nijjier"
 }

@@ -229,5 +229,14 @@
   "link.websiteName": "Strona",
   "link.supportName": "Pomoc",
   "link.supportSub": "Pytania i opinie",
-  "link.footer": "Stworzył Kurt Steven Kainzmayer · Licencja MIT<br><a>Prywatność</a> · <a>Materiały dla prasy</a>"
+  "link.footer": "Stworzył Kurt Steven Kainzmayer · Licencja MIT<br><a>Prywatność</a> · <a>Materiały dla prasy</a>",
+  "event.advent1": "1. niedziela Adwentu",
+  "event.advent2": "2. niedziela Adwentu",
+  "event.advent3": "3. niedziela Adwentu",
+  "event.advent4": "4. niedziela Adwentu",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Mikołajki",
+  "event.christmasEve": "Wesołych Świąt",
+  "event.newYearsEve": "Sylwester",
+  "event.newYear": "Szczęśliwego Nowego Roku"
 }

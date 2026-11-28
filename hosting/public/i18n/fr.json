@@ -229,5 +229,14 @@
   "link.websiteName": "Site web",
   "link.supportName": "Assistance",
   "link.supportSub": "Questions et retours",
-  "link.footer": "Créé par Kurt Steven Kainzmayer · Licence MIT<br><a>Confidentialité</a> · <a>Dossier de presse</a>"
+  "link.footer": "Créé par Kurt Steven Kainzmayer · Licence MIT<br><a>Confidentialité</a> · <a>Dossier de presse</a>",
+  "event.advent1": "1er dimanche de l'Avent",
+  "event.advent2": "2e dimanche de l'Avent",
+  "event.advent3": "3e dimanche de l'Avent",
+  "event.advent4": "4e dimanche de l'Avent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Saint-Nicolas",
+  "event.christmasEve": "Joyeux Noël",
+  "event.newYearsEve": "Saint-Sylvestre",
+  "event.newYear": "Bonne année"
 }

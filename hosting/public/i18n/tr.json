@@ -229,5 +229,14 @@
   "link.websiteName": "Web sitesi",
   "link.supportName": "Destek",
   "link.supportSub": "Sorular ve geri bildirim",
-  "link.footer": "Yapan: Kurt Steven Kainzmayer · MIT Lisansı<br><a>Gizlilik</a> · <a>Basın kiti</a>"
+  "link.footer": "Yapan: Kurt Steven Kainzmayer · MIT Lisansı<br><a>Gizlilik</a> · <a>Basın kiti</a>",
+  "event.advent1": "Advent'in 1. pazarı",
+  "event.advent2": "Advent'in 2. pazarı",
+  "event.advent3": "Advent'in 3. pazarı",
+  "event.advent4": "Advent'in 4. pazarı",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Aziz Nikolaos Günü",
+  "event.christmasEve": "Mutlu Noeller",
+  "event.newYearsEve": "Yılbaşı gecesi",
+  "event.newYear": "Mutlu yıllar"
 }

@@ -10,6 +10,15 @@
     "trailingSlash": false,
     "headers": [
       {
+        "source": "**/@(*.html|!(*.*))",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
         "source": "/releases/latest.json",
         "headers": [
           {

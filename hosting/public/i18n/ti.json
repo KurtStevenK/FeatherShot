@@ -229,5 +229,14 @@
   "link.websiteName": "መርበብ ሳይት",
   "link.supportName": "ደገፍ",
   "link.supportSub": "ሕቶታትን ርእይቶን",
-  "link.footer": "ብKurt Steven Kainzmayer ዝተሰርሐ · MIT ፍቓድ<br><a>ምስጢራዊነት</a> · <a>ናይ ፕረስ ኪት</a>"
+  "link.footer": "ብKurt Steven Kainzmayer ዝተሰርሐ · MIT ፍቓድ<br><a>ምስጢራዊነት</a> · <a>ናይ ፕረስ ኪት</a>",
+  "event.advent1": "ቀዳማይ ሰንበት ኣድቨንት",
+  "event.advent2": "ካልኣይ ሰንበት ኣድቨንት",
+  "event.advent3": "ሳልሳይ ሰንበት ኣድቨንት",
+  "event.advent4": "ራብዓይ ሰንበት ኣድቨንት",
+  "event.krampus": "ክራምፑስ",
+  "event.nikolaus": "መዓልቲ ቅዱስ ኒኮላስ",
+  "event.christmasEve": "ርሑስ በዓል ልደት",
+  "event.newYearsEve": "ለይቲ ሓድሽ ዓመት",
+  "event.newYear": "ርሑስ ሓድሽ ዓመት"
 }

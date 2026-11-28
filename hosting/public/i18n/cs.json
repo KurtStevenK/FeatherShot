@@ -229,5 +229,14 @@
   "link.websiteName": "Web",
   "link.supportName": "Podpora",
   "link.supportSub": "Dotazy a zpětná vazba",
-  "link.footer": "Vytvořil Kurt Steven Kainzmayer · Licence MIT<br><a>Soukromí</a> · <a>Materiály pro média</a>"
+  "link.footer": "Vytvořil Kurt Steven Kainzmayer · Licence MIT<br><a>Soukromí</a> · <a>Materiály pro média</a>",
+  "event.advent1": "1. adventní neděle",
+  "event.advent2": "2. adventní neděle",
+  "event.advent3": "3. adventní neděle",
+  "event.advent4": "4. adventní neděle",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Mikuláš",
+  "event.christmasEve": "Veselé Vánoce",
+  "event.newYearsEve": "Silvestr",
+  "event.newYear": "Šťastný nový rok"
 }

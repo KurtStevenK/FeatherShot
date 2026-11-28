@@ -229,5 +229,14 @@
   "link.websiteName": "Veb-sajt",
   "link.supportName": "Podrška",
   "link.supportSub": "Pitanja i povratne informacije",
-  "link.footer": "Napravio Kurt Steven Kainzmayer · MIT licenca<br><a>Privatnost</a> · <a>Press kit</a>"
+  "link.footer": "Napravio Kurt Steven Kainzmayer · MIT licenca<br><a>Privatnost</a> · <a>Press kit</a>",
+  "event.advent1": "1. adventska nedelja",
+  "event.advent2": "2. adventska nedelja",
+  "event.advent3": "3. adventska nedelja",
+  "event.advent4": "4. adventska nedelja",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sveti Nikola",
+  "event.christmasEve": "Srećan Božić",
+  "event.newYearsEve": "Doček Nove godine",
+  "event.newYear": "Srećna Nova godina"
 }

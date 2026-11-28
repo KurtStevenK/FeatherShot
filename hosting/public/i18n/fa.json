@@ -229,5 +229,14 @@
   "link.websiteName": "وب‌سایت",
   "link.supportName": "پشتیبانی",
   "link.supportSub": "پرسش‌ها و بازخورد",
-  "link.footer": "ساخته‌شده توسط Kurt Steven Kainzmayer · مجوز MIT<br><a>حریم خصوصی</a> · <a>بسته رسانه‌ای</a>"
+  "link.footer": "ساخته‌شده توسط Kurt Steven Kainzmayer · مجوز MIT<br><a>حریم خصوصی</a> · <a>بسته رسانه‌ای</a>",
+  "event.advent1": "یکشنبهٔ اول ادونت",
+  "event.advent2": "یکشنبهٔ دوم ادونت",
+  "event.advent3": "یکشنبهٔ سوم ادونت",
+  "event.advent4": "یکشنبهٔ چهارم ادونت",
+  "event.krampus": "کرامپوس",
+  "event.nikolaus": "روز سنت نیکلاس",
+  "event.christmasEve": "کریسمس مبارک",
+  "event.newYearsEve": "شب سال نو",
+  "event.newYear": "سال نو مبارک"
 }

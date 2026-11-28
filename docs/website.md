@@ -35,7 +35,7 @@ The website is the static site in `hosting/public`. It is plain HTML, CSS and Ja
 - `events.js` holds the promo moments, in Vienna time (CET, UTC+1 in late November), as fixed instants:
   - Black Friday from Friday 27 November 2026, 00:00;
   - Cyber Monday from Monday 30 November 2026, 00:00;
-  - hidden from Tuesday 1 December 2026, 00:01.
+  - hidden from Tuesday 1 December 2026, 00:00.
 - The page checks once a minute. Every visitor sees the change at the same moment, whatever their time zone.
 - To change a date, edit the `Date.UTC(...)` constants (remember the UTC offset) and check with `window.FeatherShotPromo.kindFor(Date.parse('...'))` in the browser console.
 
@@ -83,10 +83,12 @@ firebase deploy --only hosting --project feathershot
 ## Event badges and public holidays (events.js)
 
 - `events.js` decides the badge on the home page and on the linktree, one badge at a time. The badge styles are in `promo.css`.
-- Priority: a public holiday of the visitor's country on that day (in the country's own time zone) comes first, otherwise the promo event (Black Friday, Cyber Monday) by its instants.
+- Dates are checked in the visitor's country time zone (Vienna without a country); promo events use fixed instants.
 - The country comes from the chosen language and the browser's region for it (`de-CH` gives Switzerland). Without a region, the language's own country is used (`de` gives Austria). Languages without a country (English, Irish, Arabic, ...) show no holidays.
 - Holiday rules: `MM-DD` is a fixed date, `E+n` is Western Easter plus n days, `O+n` is Orthodox Easter plus n days. Bulgaria, Greece, Romania, Russia and Ukraine use the Orthodox Easter.
 - The table is generated: `node scripts/generate-holidays.mjs` writes the COUNTRIES block of `events.js` and the names in `holidays/en.json` and `holidays/<lang>.json` (keys `CC.id`). Change the generator, not the generated block. Then run `node scripts/check-website-i18n.mjs`.
-- The linktree sets the end of Cyber Monday with `data-cyber-until` on its badge (currently Thursday 3 December 2026, 00:01 Vienna time). The home page uses the default end (Tuesday 1 December 2026, 00:01).
+- Black Friday: Friday 27 to Sunday 29 November 2026; Cyber Monday: Monday 30 November 2026 only (Vienna time). A page can still move an end with `data-cyber-until` on its badge; no page does now.
+- Season events (`SEASON` in `events.js`), every year, one day each: Krampus 5 Dec (Austria), Nikolo 6 Dec (Austria, Germany, Switzerland, Poland, Czechia, Slovakia, Hungary, Slovenia, Croatia), the Advent Sundays (rule `A1` to `A4`; not in the Orthodox countries and Turkey), Christmas Eve 24 Dec (not Russia, Turkey), New Year's Eve and New Year. Labels are the i18n keys `event.*`, so they follow the visitor's language.
+- Order: promo, then season event, then public holiday. On 1 January "Happy New Year" wins over the holiday name.
 - Not included: lunar holidays (Eid, Chinese New Year, Ramadan, ...) and weekday-based bank holidays (for example the first Monday of May). Add them to the generator with a new rule type if needed.
 - The holiday names are machine-made in every language except English; they need a native check.

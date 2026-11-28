@@ -229,5 +229,14 @@
   "link.websiteName": "Ιστότοπος",
   "link.supportName": "Υποστήριξη",
   "link.supportSub": "Ερωτήσεις και σχόλια",
-  "link.footer": "Δημιουργήθηκε από τον Kurt Steven Kainzmayer · Άδεια MIT<br><a>Απόρρητο</a> · <a>Πακέτο τύπου</a>"
+  "link.footer": "Δημιουργήθηκε από τον Kurt Steven Kainzmayer · Άδεια MIT<br><a>Απόρρητο</a> · <a>Πακέτο τύπου</a>",
+  "event.advent1": "1η Κυριακή των Χριστουγέννων",
+  "event.advent2": "2η Κυριακή των Χριστουγέννων",
+  "event.advent3": "3η Κυριακή των Χριστουγέννων",
+  "event.advent4": "4η Κυριακή των Χριστουγέννων",
+  "event.krampus": "Κράμπους",
+  "event.nikolaus": "Άγιος Νικόλαος",
+  "event.christmasEve": "Καλά Χριστούγεννα",
+  "event.newYearsEve": "Παραμονή Πρωτοχρονιάς",
+  "event.newYear": "Καλή Χρονιά"
 }

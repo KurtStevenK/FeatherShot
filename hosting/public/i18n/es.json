@@ -229,5 +229,14 @@
   "link.websiteName": "Sitio web",
   "link.supportName": "Soporte",
   "link.supportSub": "Preguntas y comentarios",
-  "link.footer": "Hecho por Kurt Steven Kainzmayer · Licencia MIT<br><a>Privacidad</a> · <a>Kit de prensa</a>"
+  "link.footer": "Hecho por Kurt Steven Kainzmayer · Licencia MIT<br><a>Privacidad</a> · <a>Kit de prensa</a>",
+  "event.advent1": "1.er domingo de Adviento",
+  "event.advent2": "2.º domingo de Adviento",
+  "event.advent3": "3.er domingo de Adviento",
+  "event.advent4": "4.º domingo de Adviento",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "San Nicolás",
+  "event.christmasEve": "Feliz Navidad",
+  "event.newYearsEve": "Nochevieja",
+  "event.newYear": "Feliz Año Nuevo"
 }

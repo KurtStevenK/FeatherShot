@@ -229,5 +229,14 @@
   "link.websiteName": "Gwefan",
   "link.supportName": "Cymorth",
   "link.supportSub": "Cwestiynau ac adborth",
-  "link.footer": "Wedi'i wneud gan Kurt Steven Kainzmayer · Trwydded MIT<br><a>Preifatrwydd</a> · <a>Pecyn y wasg</a>"
+  "link.footer": "Wedi'i wneud gan Kurt Steven Kainzmayer · Trwydded MIT<br><a>Preifatrwydd</a> · <a>Pecyn y wasg</a>",
+  "event.advent1": "Sul cyntaf yr Adfent",
+  "event.advent2": "Ail Sul yr Adfent",
+  "event.advent3": "Trydydd Sul yr Adfent",
+  "event.advent4": "Pedwerydd Sul yr Adfent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Gŵyl Sant Nicolas",
+  "event.christmasEve": "Nadolig Llawen",
+  "event.newYearsEve": "Nos Galan",
+  "event.newYear": "Blwyddyn Newydd Dda"
 }

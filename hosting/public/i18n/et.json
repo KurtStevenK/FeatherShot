@@ -229,5 +229,14 @@
   "link.websiteName": "Veebisait",
   "link.supportName": "Tugi",
   "link.supportSub": "Küsimused ja tagasiside",
-  "link.footer": "Autor: Kurt Steven Kainzmayer · MIT-litsents<br><a>Privaatsus</a> · <a>Pressikomplekt</a>"
+  "link.footer": "Autor: Kurt Steven Kainzmayer · MIT-litsents<br><a>Privaatsus</a> · <a>Pressikomplekt</a>",
+  "event.advent1": "1. advent",
+  "event.advent2": "2. advent",
+  "event.advent3": "3. advent",
+  "event.advent4": "4. advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Püha Nikolause päev",
+  "event.christmasEve": "Häid jõule",
+  "event.newYearsEve": "Vana-aasta õhtu",
+  "event.newYear": "Head uut aastat"
 }

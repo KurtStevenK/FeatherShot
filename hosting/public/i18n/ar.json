@@ -229,5 +229,14 @@
   "link.websiteName": "الموقع",
   "link.supportName": "الدعم",
   "link.supportSub": "أسئلة وملاحظات",
-  "link.footer": "من تطوير Kurt Steven Kainzmayer · رخصة MIT<br><a>الخصوصية</a> · <a>المواد الصحفية</a>"
+  "link.footer": "من تطوير Kurt Steven Kainzmayer · رخصة MIT<br><a>الخصوصية</a> · <a>المواد الصحفية</a>",
+  "event.advent1": "الأحد الأول من زمن المجيء",
+  "event.advent2": "الأحد الثاني من زمن المجيء",
+  "event.advent3": "الأحد الثالث من زمن المجيء",
+  "event.advent4": "الأحد الرابع من زمن المجيء",
+  "event.krampus": "كرامبوس",
+  "event.nikolaus": "عيد القديس نيقولاوس",
+  "event.christmasEve": "عيد ميلاد مجيد",
+  "event.newYearsEve": "ليلة رأس السنة",
+  "event.newYear": "سنة جديدة سعيدة"
 }

@@ -229,5 +229,14 @@
   "link.websiteName": "Faqja e internetit",
   "link.supportName": "Mbështetja",
   "link.supportSub": "Pyetje dhe komente",
-  "link.footer": "Krijuar nga Kurt Steven Kainzmayer · Licenca MIT<br><a>Privatësia</a> · <a>Materialet për shtyp</a>"
+  "link.footer": "Krijuar nga Kurt Steven Kainzmayer · Licenca MIT<br><a>Privatësia</a> · <a>Materialet për shtyp</a>",
+  "event.advent1": "E diela e parë e Adventit",
+  "event.advent2": "E diela e dytë e Adventit",
+  "event.advent3": "E diela e tretë e Adventit",
+  "event.advent4": "E diela e katërt e Adventit",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Shën Nikolla",
+  "event.christmasEve": "Gëzuar Krishtlindjet",
+  "event.newYearsEve": "Nata e Vitit të Ri",
+  "event.newYear": "Gëzuar Vitin e Ri"
 }

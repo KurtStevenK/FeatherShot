@@ -229,5 +229,14 @@
   "link.websiteName": "Web-stranica",
   "link.supportName": "Podrška",
   "link.supportSub": "Pitanja i povratne informacije",
-  "link.footer": "Izradio Kurt Steven Kainzmayer · MIT licencija<br><a>Privatnost</a> · <a>Materijali za medije</a>"
+  "link.footer": "Izradio Kurt Steven Kainzmayer · MIT licencija<br><a>Privatnost</a> · <a>Materijali za medije</a>",
+  "event.advent1": "1. nedjelja došašća",
+  "event.advent2": "2. nedjelja došašća",
+  "event.advent3": "3. nedjelja došašća",
+  "event.advent4": "4. nedjelja došašća",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sveti Nikola",
+  "event.christmasEve": "Sretan Božić",
+  "event.newYearsEve": "Stara godina",
+  "event.newYear": "Sretna Nova godina"
 }

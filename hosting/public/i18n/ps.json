@@ -229,5 +229,14 @@
   "link.websiteName": "وېب‌پاڼه",
   "link.supportName": "ملاتړ",
   "link.supportSub": "پوښتنې او نظرونه",
-  "link.footer": "د Kurt Steven Kainzmayer له خوا جوړ شوی · د MIT جواز<br><a>محرمیت</a> · <a>د رسنیو کټ</a>"
+  "link.footer": "د Kurt Steven Kainzmayer له خوا جوړ شوی · د MIT جواز<br><a>محرمیت</a> · <a>د رسنیو کټ</a>",
+  "event.advent1": "د اډوینټ لومړۍ یکشنبه",
+  "event.advent2": "د اډوینټ دویمه یکشنبه",
+  "event.advent3": "د اډوینټ درېیمه یکشنبه",
+  "event.advent4": "د اډوینټ څلورمه یکشنبه",
+  "event.krampus": "کرامپوس",
+  "event.nikolaus": "د سینټ نیکولاس ورځ",
+  "event.christmasEve": "کرسمس مو مبارک",
+  "event.newYearsEve": "د نوي کال شپه",
+  "event.newYear": "نوی کال مو مبارک"
 }

@@ -229,5 +229,14 @@
   "link.websiteName": "Website",
   "link.supportName": "Support",
   "link.supportSub": "Vragen en feedback",
-  "link.footer": "Gemaakt door Kurt Steven Kainzmayer · MIT-licentie<br><a>Privacy</a> · <a>Perskit</a>"
+  "link.footer": "Gemaakt door Kurt Steven Kainzmayer · MIT-licentie<br><a>Privacy</a> · <a>Perskit</a>",
+  "event.advent1": "1e advent",
+  "event.advent2": "2e advent",
+  "event.advent3": "3e advent",
+  "event.advent4": "4e advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sinterklaas",
+  "event.christmasEve": "Vrolijk kerstfeest",
+  "event.newYearsEve": "Oudejaarsavond",
+  "event.newYear": "Gelukkig nieuwjaar"
 }

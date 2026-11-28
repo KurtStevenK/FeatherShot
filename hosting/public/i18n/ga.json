@@ -229,5 +229,14 @@
   "link.websiteName": "Suíomh gréasáin",
   "link.supportName": "Tacaíocht",
   "link.supportSub": "Ceisteanna agus aiseolas",
-  "link.footer": "Déanta ag Kurt Steven Kainzmayer · Ceadúnas MIT<br><a>Príobháideacht</a> · <a>Cluaisín preasa</a>"
+  "link.footer": "Déanta ag Kurt Steven Kainzmayer · Ceadúnas MIT<br><a>Príobháideacht</a> · <a>Cluaisín preasa</a>",
+  "event.advent1": "An chéad Domhnach den Aidbhint",
+  "event.advent2": "An dara Domhnach den Aidbhint",
+  "event.advent3": "An tríú Domhnach den Aidbhint",
+  "event.advent4": "An ceathrú Domhnach den Aidbhint",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Lá Fhéile Nioclás",
+  "event.christmasEve": "Nollaig Shona",
+  "event.newYearsEve": "Oíche Chinn Bhliana",
+  "event.newYear": "Athbhliain faoi mhaise"
 }

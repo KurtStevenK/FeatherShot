@@ -229,5 +229,14 @@
   "link.websiteName": "Weboldal",
   "link.supportName": "Támogatás",
   "link.supportSub": "Kérdések és visszajelzés",
-  "link.footer": "Készítette: Kurt Steven Kainzmayer · MIT licenc<br><a>Adatvédelem</a> · <a>Sajtócsomag</a>"
+  "link.footer": "Készítette: Kurt Steven Kainzmayer · MIT licenc<br><a>Adatvédelem</a> · <a>Sajtócsomag</a>",
+  "event.advent1": "Advent 1. vasárnapja",
+  "event.advent2": "Advent 2. vasárnapja",
+  "event.advent3": "Advent 3. vasárnapja",
+  "event.advent4": "Advent 4. vasárnapja",
+  "event.krampus": "Krampusz",
+  "event.nikolaus": "Mikulás",
+  "event.christmasEve": "Boldog karácsonyt",
+  "event.newYearsEve": "Szilveszter",
+  "event.newYear": "Boldog új évet"
 }

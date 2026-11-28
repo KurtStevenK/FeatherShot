@@ -229,5 +229,14 @@
   "link.websiteName": "Spletno mesto",
   "link.supportName": "Podpora",
   "link.supportSub": "Vprašanja in povratne informacije",
-  "link.footer": "Naredil Kurt Steven Kainzmayer · Licenca MIT<br><a>Zasebnost</a> · <a>Gradivo za medije</a>"
+  "link.footer": "Naredil Kurt Steven Kainzmayer · Licenca MIT<br><a>Zasebnost</a> · <a>Gradivo za medije</a>",
+  "event.advent1": "1. adventna nedelja",
+  "event.advent2": "2. adventna nedelja",
+  "event.advent3": "3. adventna nedelja",
+  "event.advent4": "4. adventna nedelja",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Miklavž",
+  "event.christmasEve": "Vesel božič",
+  "event.newYearsEve": "Silvestrovo",
+  "event.newYear": "Srečno novo leto"
 }

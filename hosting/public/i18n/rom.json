@@ -229,5 +229,14 @@
   "link.websiteName": "Websajt",
   "link.supportName": "Zhutipe",
   "link.supportSub": "Pučhipa thaj mišljenja",
-  "link.footer": "Kerda le Kurt Steven Kainzmayer · MIT licenca<br><a>Privatnost</a> · <a>Presa-kit</a>"
+  "link.footer": "Kerda le Kurt Steven Kainzmayer · MIT licenca<br><a>Privatnost</a> · <a>Presa-kit</a>",
+  "event.advent1": "1. Advento",
+  "event.advent2": "2. Advento",
+  "event.advent3": "3. Advento",
+  "event.advent4": "4. Advento",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sveto Nikola",
+  "event.christmasEve": "Bahtalo Krečuno",
+  "event.newYearsEve": "Phurane beršeski rat",
+  "event.newYear": "Bahtalo Nevo Berš"
 }

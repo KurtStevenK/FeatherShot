@@ -229,5 +229,14 @@
   "link.websiteName": "Сайт",
   "link.supportName": "Поддержка",
   "link.supportSub": "Вопросы и отзывы",
-  "link.footer": "Создал Kurt Steven Kainzmayer · Лицензия MIT<br><a>Конфиденциальность</a> · <a>Пресс-кит</a>"
+  "link.footer": "Создал Kurt Steven Kainzmayer · Лицензия MIT<br><a>Конфиденциальность</a> · <a>Пресс-кит</a>",
+  "event.advent1": "1-е воскресенье Адвента",
+  "event.advent2": "2-е воскресенье Адвента",
+  "event.advent3": "3-е воскресенье Адвента",
+  "event.advent4": "4-е воскресенье Адвента",
+  "event.krampus": "Крампус",
+  "event.nikolaus": "День святого Николая",
+  "event.christmasEve": "С Рождеством",
+  "event.newYearsEve": "Новогодняя ночь",
+  "event.newYear": "С Новым годом"
 }

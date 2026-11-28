@@ -229,5 +229,14 @@
   "link.websiteName": "Website",
   "link.supportName": "Support",
   "link.supportSub": "Questions and feedback",
-  "link.footer": "Made by Kurt Steven Kainzmayer · MIT License<br><a>Privacy</a> · <a>Press kit</a>"
+  "link.footer": "Made by Kurt Steven Kainzmayer · MIT License<br><a>Privacy</a> · <a>Press kit</a>",
+  "event.advent1": "1st Advent",
+  "event.advent2": "2nd Advent",
+  "event.advent3": "3rd Advent",
+  "event.advent4": "4th Advent",
+  "event.krampus": "Krampus Night",
+  "event.nikolaus": "St. Nicholas Day",
+  "event.christmasEve": "Merry Christmas",
+  "event.newYearsEve": "New Year's Eve",
+  "event.newYear": "Happy New Year"
 }

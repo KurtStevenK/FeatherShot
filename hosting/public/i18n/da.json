@@ -229,5 +229,14 @@
   "link.websiteName": "Website",
   "link.supportName": "Support",
   "link.supportSub": "Spørgsmål og feedback",
-  "link.footer": "Lavet af Kurt Steven Kainzmayer · MIT-licens<br><a>Privatliv</a> · <a>Presskit</a>"
+  "link.footer": "Lavet af Kurt Steven Kainzmayer · MIT-licens<br><a>Privatliv</a> · <a>Presskit</a>",
+  "event.advent1": "1. søndag i advent",
+  "event.advent2": "2. søndag i advent",
+  "event.advent3": "3. søndag i advent",
+  "event.advent4": "4. søndag i advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sankt Nikolaus",
+  "event.christmasEve": "Glædelig jul",
+  "event.newYearsEve": "Nytårsaften",
+  "event.newYear": "Godt nytår"
 }

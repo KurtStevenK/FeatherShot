@@ -229,5 +229,14 @@
   "link.websiteName": "Websajt",
   "link.supportName": "Appoġġ",
   "link.supportSub": "Mistoqsijiet u feedback",
-  "link.footer": "Magħmul minn Kurt Steven Kainzmayer · Liċenzja MIT<br><a>Privatezza</a> · <a>Kit tal-istampa</a>"
+  "link.footer": "Magħmul minn Kurt Steven Kainzmayer · Liċenzja MIT<br><a>Privatezza</a> · <a>Kit tal-istampa</a>",
+  "event.advent1": "L-ewwel Ħadd tal-Avvent",
+  "event.advent2": "It-tieni Ħadd tal-Avvent",
+  "event.advent3": "It-tielet Ħadd tal-Avvent",
+  "event.advent4": "Ir-raba' Ħadd tal-Avvent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "San Nikola",
+  "event.christmasEve": "Il-Milied it-Tajjeb",
+  "event.newYearsEve": "Lejlet l-Ewwel tas-Sena",
+  "event.newYear": "Sena Ġdida Hienja"
 }

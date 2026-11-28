@@ -229,5 +229,14 @@
   "link.websiteName": "Webgunea",
   "link.supportName": "Laguntza",
   "link.supportSub": "Galderak eta iruzkinak",
-  "link.footer": "Egilea: Kurt Steven Kainzmayer · MIT lizentzia<br><a>Pribatutasuna</a> · <a>Prentsa-kita</a>"
+  "link.footer": "Egilea: Kurt Steven Kainzmayer · MIT lizentzia<br><a>Pribatutasuna</a> · <a>Prentsa-kita</a>",
+  "event.advent1": "Abendualdiko 1. igandea",
+  "event.advent2": "Abendualdiko 2. igandea",
+  "event.advent3": "Abendualdiko 3. igandea",
+  "event.advent4": "Abendualdiko 4. igandea",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "San Nikolas",
+  "event.christmasEve": "Eguberri on",
+  "event.newYearsEve": "Urtezahar gaua",
+  "event.newYear": "Urte berri on"
 }

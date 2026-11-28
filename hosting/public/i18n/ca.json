@@ -229,5 +229,14 @@
   "link.websiteName": "Web",
   "link.supportName": "Assistència",
   "link.supportSub": "Preguntes i comentaris",
-  "link.footer": "Creat per Kurt Steven Kainzmayer · Llicència MIT<br><a>Privadesa</a> · <a>Kit de premsa</a>"
+  "link.footer": "Creat per Kurt Steven Kainzmayer · Llicència MIT<br><a>Privadesa</a> · <a>Kit de premsa</a>",
+  "event.advent1": "1r diumenge d'Advent",
+  "event.advent2": "2n diumenge d'Advent",
+  "event.advent3": "3r diumenge d'Advent",
+  "event.advent4": "4t diumenge d'Advent",
+  "event.krampus": "Krampus",
+  "event.nikolaus": "Sant Nicolau",
+  "event.christmasEve": "Bon Nadal",
+  "event.newYearsEve": "Cap d'Any",
+  "event.newYear": "Feliç Any Nou"
 }
