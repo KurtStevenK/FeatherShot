@@ -209,6 +209,24 @@
     })
     .catch(() => {});
 
+  // Feature icons draw once, when their card first scrolls into view. Reduced motion: no animation.
+  const featureGrid = document.querySelector('.features-grid');
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (featureGrid && 'IntersectionObserver' in window && !reduceMotion) {
+    featureGrid.classList.add('anim');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.3 },
+    );
+    featureGrid.querySelectorAll('.feature-card').forEach((card) => observer.observe(card));
+  }
+
   document.querySelectorAll('.copy-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const text = btn.dataset.copy;

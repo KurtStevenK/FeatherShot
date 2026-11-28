@@ -945,3 +945,72 @@ body {
   background: var(--blue);
   color: #fff;
 }
+
+/* ═══════════════════ FEATURE ICONS (drawn once) ═══════════════════ */
+/* The icons are SVG paths. Without JavaScript they show complete. */
+.feature-icon {
+  color: #6cb4ff;
+}
+
+.feature-icon svg {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.feature-icon svg .draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.feature-icon svg .pop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.feature-icon svg text {
+  fill: currentColor;
+  stroke: none;
+  font: 700 7.5px var(--font);
+}
+
+.feature-icon svg .dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* site.js adds .anim to the grid, then .is-in to each card once it is in view. */
+.features-grid.anim .feature-card .draw {
+  stroke-dashoffset: 1;
+}
+
+.features-grid.anim .feature-card .pop {
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+.features-grid.anim .feature-card.is-in .draw {
+  animation: fs-draw 1s ease-out forwards;
+}
+
+.features-grid.anim .feature-card.is-in .pop {
+  animation: fs-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) 0.8s forwards;
+}
+
+@keyframes fs-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fs-pop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
