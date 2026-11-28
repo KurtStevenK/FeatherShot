@@ -1117,3 +1117,75 @@ body {
 .footer-stores .hero-cws img {
   height: 44px;
 }
+
+/* ═══════════════════ NEON STORE BADGES AND PILLS ═══════════════════ */
+/* The colour cycles like the feature icons; the glow follows it (currentColor). */
+.footer-stores {
+  position: relative;
+  isolation: isolate;
+}
+
+/* The WebGL aurora behind the footer badges (stores-glow.js). */
+.stores-glow {
+  position: absolute;
+  left: -48px;
+  top: -34px;
+  width: calc(100% + 96px);
+  height: calc(100% + 68px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.footer-stores .hero-cws,
+.platform-pills .pill {
+  animation: fs-neon 12s linear infinite;
+  box-shadow: 0 0 16px -2px currentColor;
+}
+
+.footer-stores .hero-cws {
+  box-shadow: 0 0 22px 2px currentColor, 0 0 6px currentColor;
+}
+
+.platform-pills .pill {
+  color: #00f0ff;
+}
+
+.platform-pills .pill:nth-child(3n + 2) { animation-delay: -4s; }
+.platform-pills .pill:nth-child(3n + 3) { animation-delay: -8s; }
+
+/* A light sweep across each badge, like light on glass. */
+.footer-stores .hero-cws {
+  position: relative;
+  overflow: hidden;
+  color: #00f0ff;
+}
+
+.footer-stores .hero-cws::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.55) 50%, transparent 60%);
+  transform: translateX(-120%);
+  animation: fs-shine 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.footer-stores .hero-cws:nth-child(2)::after { animation-delay: 1.1s; }
+.footer-stores .hero-cws:nth-child(3)::after { animation-delay: 2.2s; }
+.footer-stores .hero-cws:nth-child(4)::after { animation-delay: 3.3s; }
+
+@keyframes fs-shine {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-stores .hero-cws,
+  .platform-pills .pill {
+    animation: none;
+  }
+
+  .footer-stores .hero-cws::after {
+    display: none;
+  }
+}

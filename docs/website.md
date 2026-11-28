@@ -67,3 +67,9 @@ firebase deploy --only hosting --project feathershot
 - The press kit (`marketing/`) shows a developer note about `hosting/public/marketing/screenshots/`. It should be removed from the public page.
 - The 404 page is Firebase's default text.
 - Language switching happens in the browser, as on niiii.org. Search engines index the English version only.
+
+## Store badges, platform pills and the footer aurora
+
+- The four store badges are in the footer (`.footer-stores` in `index.html`). They wrap onto two lines on phones.
+- The badges and the platform pills share the neon colour cycle of the feature icons (`fs-neon`). Each badge also has a light sweep (`fs-shine` on `::after`).
+- `stores-glow.js` draws a WebGL aurora behind the footer badges. It runs only while the badges are on screen. It does nothing with reduced motion or when WebGL is missing, so the CSS effects still show.

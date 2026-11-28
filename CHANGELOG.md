@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The feature icons on the home page are SVG drawings. Each draws once when its card scrolls into view, and its colour cycles slowly through neon tones. Reduced-motion settings turn the animation off.
 
+- The store badges moved from the hero to the footer, where they sit on one line on wide screens and wrap on phones.
+- The store badges and the platform pills glow in cycling neon colours, and each badge has a light sweep. Behind the footer badges a WebGL neon aurora is drawn. All of it is switched off with reduced-motion settings, and the aurora also when WebGL is not available.
+
 ### Fixed
 
 - The website's release manifest in the repository (`hosting/public/releases/latest.json`) was the 1.3.46 copy. It now matches the 1.3.51 release that the live site serves, so a deploy no longer rolls the download links back.
