@@ -298,7 +298,7 @@
   const BADGE_LANGS = {
     'app-store': ['bg', 'ca', 'cs', 'da', 'de', 'el', 'es', 'et', 'fi', 'fr', 'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'ru', 'sk', 'sl', 'sv', 'tr', 'uk'],
     'mac-app-store': ['ca', 'da', 'de', 'es', 'fi', 'fr', 'hr', 'it', 'nl', 'pt', 'ru', 'sv', 'tr', 'uk'],
-    'snap-store': ['bg', 'de', 'es', 'fr', 'it', 'pl', 'pt', 'ro', 'ru', 'sk', 'uk'],
+    'snap-store': ['ar', 'bg', 'de', 'es', 'fa', 'fr', 'it', 'pl', 'pt', 'ro', 'ru', 'sk', 'uk'],
   };
 
   function applyBadges(code) {
