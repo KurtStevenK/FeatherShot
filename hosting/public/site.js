@@ -1,6 +1,9 @@
 (function () {
   const FALLBACK = 'https://github.com/KurtStevenK/FeatherShot/releases/latest';
 
+  // Translated text from i18n.js; the English in brackets is used until the language file has loaded.
+  const t = (key, fallback, vars) => (window.FeatherShotI18n ? window.FeatherShotI18n.t(key, fallback, vars) : fallback);
+
   const cardMap = {
     macos_dmg: 0,
     windows_exe: 1,
@@ -9,10 +12,12 @@
     // The Chrome card links to the Chrome Web Store listing, not the ZIP.
   };
 
+  let manifest = null;
+
   function applyManifest(data) {
     const badge = document.querySelector('.badge');
     if (badge && data.version) {
-      badge.textContent = `✨ v${data.version} — download from Firebase mirror`;
+      badge.textContent = t('hero.badgeMirror', '✨ v{version} — download from Firebase mirror', { version: data.version });
     }
 
     const cards = document.querySelectorAll('.download-grid .download-card');
@@ -56,10 +61,12 @@
   // The "Checked by VirusTotal" line sits inside a card link, so it opens its own link by script.
   function applyVirusTotal(assets) {
     document.querySelectorAll('.vt-check[data-asset]').forEach((el) => {
-      const sha = assets[el.dataset.asset]?.sha256;
-      if (sha) {
-        el.dataset.href = VT_FILE(sha);
-        el.title = `VirusTotal report for ${assets[el.dataset.asset].filename || 'this file'}`;
+      const asset = assets[el.dataset.asset];
+      if (asset?.sha256) {
+        el.dataset.href = VT_FILE(asset.sha256);
+        el.title = t('download.vtReport', 'VirusTotal report for {file}', {
+          file: asset.filename || t('download.thisFile', 'this file'),
+        });
       }
     });
   }
@@ -77,16 +84,18 @@
 
   // ─── "How to check that your download really comes from us" ───
   const VERIFY_LABELS = {
-    windows_exe: 'Windows installer (.exe)',
-    windows_msi: 'Windows package (.msi)',
-    macos_dmg: 'macOS (.dmg)',
-    linux_deb: 'Linux, Debian/Ubuntu (.deb)',
-    linux_appimage: 'Linux (.AppImage)',
-    linux_pacman: 'Arch Linux (.pacman)',
-    linux_snap: 'Linux snap (.snap)',
-    android_apk: 'Android (.apk)',
-    chrome_zip: 'Chrome extension (.zip)',
+    windows_exe: ['verify.label.windows_exe', 'Windows installer (.exe)'],
+    windows_msi: ['verify.label.windows_msi', 'Windows package (.msi)'],
+    macos_dmg: ['verify.label.macos_dmg', 'macOS (.dmg)'],
+    linux_deb: ['verify.label.linux_deb', 'Linux, Debian/Ubuntu (.deb)'],
+    linux_appimage: ['verify.label.linux_appimage', 'Linux (.AppImage)'],
+    linux_pacman: ['verify.label.linux_pacman', 'Arch Linux (.pacman)'],
+    linux_snap: ['verify.label.linux_snap', 'Linux snap (.snap)'],
+    android_apk: ['verify.label.android_apk', 'Android (.apk)'],
+    chrome_zip: ['verify.label.chrome_zip', 'Chrome extension (.zip)'],
   };
+
+  const labelOf = (k) => t(VERIFY_LABELS[k][0], VERIFY_LABELS[k][1]);
 
   function userOs() {
     const ua = navigator.userAgent;
@@ -108,16 +117,38 @@
     });
   }
 
+  // Shows the fingerprint and commands for the file picked in the list (or the placeholders).
+  function renderVerify() {
+    const select = document.getElementById('verify-file');
+    const assets = manifest?.assets || {};
+    const asset = select && select.value ? assets[select.value] : null;
+    const hashText = document.getElementById('verify-hash');
+    const hashCopy = document.getElementById('verify-hash-copy');
+    if (!hashText) return;
+    if (asset?.sha256) {
+      hashText.textContent = asset.sha256;
+      hashCopy.dataset.copy = asset.sha256;
+      document.getElementById('verify-vt').href = VT_FILE(asset.sha256);
+      fillCommands(asset.filename, asset.sha256);
+    } else {
+      // Without the release list the commands still read sensibly.
+      hashText.textContent = t('verify.hashNoList', 'See the release page on GitHub (sha256: next to each file).');
+      hashCopy.dataset.copy = '';
+      fillCommands('FILE-NAME', 'FINGERPRINT-FROM-STEP-1');
+    }
+  }
+
   function setupVerify(assets) {
     const select = document.getElementById('verify-file');
     if (!select) return;
     const keys = Object.keys(VERIFY_LABELS).filter((k) => assets[k]?.sha256 && assets[k]?.filename);
     if (!keys.length) return;
+    const previous = select.value;
     select.innerHTML = '';
     keys.forEach((k) => {
       const opt = document.createElement('option');
       opt.value = k;
-      opt.textContent = `${VERIFY_LABELS[k]}: ${assets[k].filename}`;
+      opt.textContent = `${labelOf(k)}: ${assets[k].filename}`;
       select.appendChild(opt);
     });
     // Files the current release does not have yet (new formats come with the next release):
@@ -126,40 +157,28 @@
       const opt = document.createElement('option');
       opt.value = k;
       opt.disabled = true;
-      opt.textContent = `${VERIFY_LABELS[k]}: from the next release`;
+      opt.textContent = `${labelOf(k)}: ${t('verify.nextRelease', 'from the next release')}`;
       select.appendChild(opt);
     });
-    const os = userOs();
-    const preferred = { windows: 'windows_exe', macos: 'macos_dmg', linux: 'linux_deb', android: 'android_apk' }[os];
-    if (keys.includes(preferred)) select.value = preferred;
-
-    const update = () => {
-      const asset = assets[select.value];
-      document.getElementById('verify-hash').textContent = asset.sha256;
-      document.getElementById('verify-hash-copy').dataset.copy = asset.sha256;
-      document.getElementById('verify-vt').href = VT_FILE(asset.sha256);
-      fillCommands(asset.filename, asset.sha256);
-    };
-    select.addEventListener('change', update);
-    update();
+    const preferred = { windows: 'windows_exe', macos: 'macos_dmg', linux: 'linux_deb', android: 'android_apk' }[userOs()];
+    if (keys.includes(previous)) select.value = previous;
+    else if (keys.includes(preferred)) select.value = preferred;
+    select.onchange = renderVerify;
+    renderVerify();
   }
 
   function setupVerifyTabs() {
     const tabs = document.querySelectorAll('.verify-tabs [data-os]');
     if (!tabs.length) return;
     const show = (os) => {
-      tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.os === os)));
+      tabs.forEach((tab) => tab.setAttribute('aria-selected', String(tab.dataset.os === os)));
       document.querySelectorAll('.verify-os').forEach((panel) => {
         panel.hidden = panel.dataset.os !== os;
       });
     };
-    tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.os)));
+    tabs.forEach((tab) => tab.addEventListener('click', () => show(tab.dataset.os)));
     const os = userOs();
     show(os === 'android' ? 'windows' : os);
-    // Without the release list the commands still read sensibly.
-    fillCommands('FILE-NAME', 'FINGERPRINT-FROM-STEP-1');
-    const hash = document.getElementById('verify-hash');
-    if (hash) hash.textContent = 'See the release page on GitHub (sha256: next to each file).';
   }
   setupVerifyTabs();
   if (location.hash === '#verify') document.getElementById('verify')?.setAttribute('open', '');
@@ -172,10 +191,21 @@
     btn.innerHTML = COPY_ICONS;
   });
 
+  // Runs at start, when the release list arrives, and after every language change.
+  function renderAll() {
+    if (manifest) applyManifest(manifest);
+    renderVerify();
+  }
+  document.addEventListener('fs:i18n', renderAll);
+  renderAll();
+
   fetch('/releases/latest.json', { cache: 'no-cache' })
     .then((r) => (r.ok ? r.json() : null))
     .then((data) => {
-      if (data?.version) applyManifest(data);
+      if (data?.version) {
+        manifest = data;
+        applyManifest(data);
+      }
     })
     .catch(() => {});
 
@@ -198,7 +228,7 @@
       }
       const label = btn.getAttribute('aria-label') || 'Copy';
       btn.classList.add('copied');
-      btn.setAttribute('aria-label', 'Copied');
+      btn.setAttribute('aria-label', t('common.copied', 'Copied'));
       window.setTimeout(() => {
         btn.classList.remove('copied');
         btn.setAttribute('aria-label', label);

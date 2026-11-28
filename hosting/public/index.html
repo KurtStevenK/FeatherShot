@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FeatherShot — Lightweight Screenshot Annotations</title>
-  <meta name="description"
+  <title data-i18n="meta.title">FeatherShot — Lightweight Screenshot Annotations</title>
+  <meta name="description" data-i18n-content="meta.description"
     content="Capture, annotate, and share screenshots instantly. Arrows, numbered steps, text labels, and callout badges — all in a fast, native app. Available for macOS, Windows, Linux, and Chrome.">
   <meta name="keywords"
     content="screenshot, annotation, screenshot tool, screen capture, annotate screenshots, arrow tool, step arrow, rectangle, macOS, Windows, Linux, Chrome extension, open source, free">
@@ -38,6 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=1.3.51">
+  <link rel="stylesheet" href="lang.css?v=1.3.51-i18n">
 </head>
 
 <body>
@@ -49,12 +50,15 @@
         <img src="icon_1024.png" alt="FeatherShot" width="32" height="32">
         <span>FeatherShot</span>
       </a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#download">Download</a>
-        <a href="/marketing">Press</a>
-        <a href="/privacy">Privacy</a>
-        <a href="https://github.com/KurtStevenK/FeatherShot" target="_blank" rel="noopener">GitHub</a>
+      <div class="nav-end">
+        <div class="nav-links">
+          <a href="#features" data-i18n="nav.features">Features</a>
+          <a href="#download" data-i18n="nav.download">Download</a>
+          <a href="/marketing" data-i18n="nav.press">Press</a>
+          <a href="/privacy" data-i18n="nav.privacy">Privacy</a>
+          <a href="https://github.com/KurtStevenK/FeatherShot" target="_blank" rel="noopener" data-i18n="nav.github">GitHub</a>
+        </div>
+        <div class="lang-host" data-lang-picker></div>
       </div>
     </div>
   </nav>
@@ -63,9 +67,9 @@
   <section class="hero">
     <div class="hero-glow"></div>
     <div class="hero-content">
-      <div class="badge">✨ v1.3.51 — Dashed Line and a new Text tool</div>
-      <h1>Screenshot.<br><span class="gradient-text">Annotate.</span><br>Share.</h1>
-      <p class="subtitle">
+      <div class="badge" data-i18n="hero.badge">✨ v1.3.51 — Dashed Line and a new Text tool</div>
+      <h1><span data-i18n="hero.title1">Screenshot.</span><br><span class="gradient-text" data-i18n="hero.title2">Annotate.</span><br><span data-i18n="hero.title3">Share.</span></h1>
+      <p class="subtitle" data-i18n="hero.subtitle">
         Lightweight screenshot annotations — fast, native, and distraction-free.
         No bloat. No subscription. Open source. On the <strong>App Store</strong> for iPhone and Mac.
       </p>
@@ -74,18 +78,42 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
           </svg>
-          Download Free
+          <span data-i18n="hero.download">Download Free</span>
         </a>
         <a href="https://github.com/KurtStevenK/FeatherShot" class="btn btn-ghost" target="_blank">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
           </svg>
-          View Source
+          <span data-i18n="hero.viewSource">View Source</span>
         </a>
       </div>
 
       <div class="platform-pills">
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83" />
+            <path
+              d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11" />
+          </svg> iPhone</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83" />
+            <path
+              d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11" />
+          </svg> iPhone Duo</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83" />
+            <path
+              d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11" />
+          </svg> iPad</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83" />
+            <path
+              d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11" />
+          </svg> Apple Watch</span>
         <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83" />
@@ -102,22 +130,26 @@
           </svg> Linux</span>
         <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path
+              d="M17.523 15.341c-.551 0-.999-.449-.999-1s.448-.999.999-.999.999.448.999.999-.448 1-.999 1m-11.046 0c-.551 0-.999-.449-.999-1s.448-.999.999-.999.999.448.999.999-.448 1-.999 1m11.405-6.02l1.997-3.459a.416.416 0 00-.152-.567.416.416 0 00-.568.152L17.137 8.95c-1.547-.706-3.284-1.1-5.137-1.1s-3.59.394-5.137 1.1L4.841 5.447a.416.416 0 00-.568-.152.416.416 0 00-.152.567l1.997 3.459C2.689 11.187.343 14.659 0 18.761h24c-.344-4.102-2.689-7.574-6.118-9.44" />
+          </svg> Android</span>
+        <span class="pill"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path
               d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 7.09l.002.001h-.002l-3.953 6.848c.497.048 1.002.075 1.512.08 6.47.048 11.718-5.14 11.718-11.594 0-.215-.006-.43-.018-.644z" />
           </svg> Chrome</span>
       </div>
 
       <div class="hero-stores">
         <a class="hero-cws hero-apple" href="https://apps.apple.com/app/feathershot/id6821684358" target="_blank" rel="noopener">
-          <img src="app-store-badge.svg" width="186" height="62" alt="Download on the App Store">
+          <img src="app-store-badge.svg" width="186" height="62" alt="Download on the App Store" data-i18n-alt="alt.appStore" data-badge="app-store">
         </a>
         <a class="hero-cws hero-apple" href="https://apps.apple.com/app/feathershot/id6821684358?platform=mac" target="_blank" rel="noopener">
-          <img src="mac-app-store-badge.svg" width="242" height="62" alt="Download on the Mac App Store">
+          <img src="mac-app-store-badge.svg" width="242" height="62" alt="Download on the Mac App Store" data-i18n-alt="alt.macAppStore" data-badge="mac-app-store">
         </a>
         <a class="hero-cws" href="https://chromewebstore.google.com/detail/feathershot/agchndmchfimblcabbenpaicoopfdmlc" target="_blank" rel="noopener">
-          <img src="chrome-web-store-badge.png" width="206" height="62" alt="Available in the Chrome Web Store">
+          <img src="chrome-web-store-badge.png" width="206" height="62" alt="Available in the Chrome Web Store" data-i18n-alt="alt.chromeWebStore">
         </a>
         <a class="hero-cws hero-snap" href="https://snapcraft.io/feathershot" target="_blank" rel="noopener">
-          <img src="snap-store-badge.svg" width="199" height="62" alt="Get it from the Snap Store">
+          <img src="snap-store-badge.svg" width="199" height="62" alt="Get it from the Snap Store" data-i18n-alt="alt.snapStore" data-badge="snap-store">
         </a>
       </div>
     </div>
@@ -126,100 +158,100 @@
   <!-- ═══════════════════ FEATURES ═══════════════════ -->
   <section id="features" class="features">
     <div class="container">
-      <h2 class="section-title">Powerful Annotation Tools</h2>
-      <p class="section-sub">Everything you need. Nothing you don't.</p>
+      <h2 class="section-title" data-i18n="features.title">Powerful Annotation Tools</h2>
+      <p class="section-sub" data-i18n="features.sub">Everything you need. Nothing you don't.</p>
 
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">1→</div>
-          <h3>Step Arrow</h3>
-          <p>Arrows with auto-incrementing numbered circles — perfect for step-by-step guides.</p>
+          <h3 data-i18n="feature.stepArrow.title">Step Arrow</h3>
+          <p data-i18n="feature.stepArrow.text">Arrows with auto-incrementing numbered circles — perfect for step-by-step guides.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">1▢</div>
-          <h3>Step Rectangle</h3>
-          <p>Numbered rectangles that auto-increment — highlight regions with ordered callouts.</p>
+          <h3 data-i18n="feature.stepRectangle.title">Step Rectangle</h3>
+          <p data-i18n="feature.stepRectangle.text">Numbered rectangles that auto-increment — highlight regions with ordered callouts.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">↗</div>
-          <h3>Arrow Tool</h3>
-          <p>Draw clean, directional arrows with elegant filled arrowheads to point out details.</p>
+          <h3 data-i18n="feature.arrow.title">Arrow Tool</h3>
+          <p data-i18n="feature.arrow.text">Draw clean, directional arrows with elegant filled arrowheads to point out details.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">▢</div>
-          <h3>Rectangle</h3>
-          <p>Highlight regions with outlined rectangles to draw attention to specific areas.</p>
+          <h3 data-i18n="feature.rectangle.title">Rectangle</h3>
+          <p data-i18n="feature.rectangle.text">Highlight regions with outlined rectangles to draw attention to specific areas.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">◯</div>
-          <h3>Circle / Ellipse</h3>
-          <p>Draw circles and ellipses by dragging a bounding box. Stroke only, no fill.</p>
+          <h3 data-i18n="feature.ellipse.title">Circle / Ellipse</h3>
+          <p data-i18n="feature.ellipse.text">Draw circles and ellipses by dragging a bounding box. Stroke only, no fill.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">╱</div>
-          <h3>Line</h3>
-          <p>Draw simple straight lines without arrowheads.</p>
+          <h3 data-i18n="feature.line.title">Line</h3>
+          <p data-i18n="feature.line.text">Draw simple straight lines without arrowheads.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">?→</div>
-          <h3>Question Arrow</h3>
-          <p>Arrows with a question mark circle to mark questionable areas.</p>
+          <h3 data-i18n="feature.questionArrow.title">Question Arrow</h3>
+          <p data-i18n="feature.questionArrow.text">Arrows with a question mark circle to mark questionable areas.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">?▢</div>
-          <h3>Question Rectangle</h3>
-          <p>Rectangles with a question mark circle to mark questionable areas.</p>
+          <h3 data-i18n="feature.questionRectangle.title">Question Rectangle</h3>
+          <p data-i18n="feature.questionRectangle.text">Rectangles with a question mark circle to mark questionable areas.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">!→</div>
-          <h3>Exclamation Arrow</h3>
-          <p>Arrows with an exclamation badge at the start — highlight warnings and must-see details.</p>
+          <h3 data-i18n="feature.exclamationArrow.title">Exclamation Arrow</h3>
+          <p data-i18n="feature.exclamationArrow.text">Arrows with an exclamation badge at the start — highlight warnings and must-see details.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">!▢</div>
-          <h3>Exclamation Rectangle</h3>
-          <p>Rectangles with an exclamation badge at the top-left — call out critical regions.</p>
+          <h3 data-i18n="feature.exclamationRectangle.title">Exclamation Rectangle</h3>
+          <p data-i18n="feature.exclamationRectangle.text">Rectangles with an exclamation badge at the top-left — call out critical regions.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">T</div>
-          <h3>Text</h3>
-          <p>Place free-floating labels on the canvas — click to add, edit inline, and drag to reposition.</p>
+          <h3 data-i18n="feature.text.title">Text</h3>
+          <p data-i18n="feature.text.text">Place free-floating labels on the canvas — click to add, edit inline, and drag to reposition.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">a→</div>
-          <h3>ABC Arrow</h3>
-          <p>Arrows with auto-incrementing letter labels (a, b, ..., z, aa, ab).</p>
+          <h3 data-i18n="feature.abcArrow.title">ABC Arrow</h3>
+          <p data-i18n="feature.abcArrow.text">Arrows with auto-incrementing letter labels (a, b, ..., z, aa, ab).</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">a▢</div>
-          <h3>ABC Rectangle</h3>
-          <p>Rectangles with auto-incrementing letter labels (a, b, ..., z, aa, ab).</p>
+          <h3 data-i18n="feature.abcRectangle.title">ABC Rectangle</h3>
+          <p data-i18n="feature.abcRectangle.text">Rectangles with auto-incrementing letter labels (a, b, ..., z, aa, ab).</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔍</div>
-          <h3>Magnifier</h3>
-          <p>Create circular zoom lenses on your screenshot with configurable zoom (1.5×–5×). Perfect for highlighting
+          <h3 data-i18n="feature.magnifier.title">Magnifier</h3>
+          <p data-i18n="feature.magnifier.text">Create circular zoom lenses on your screenshot with configurable zoom (1.5×–5×). Perfect for highlighting
             small details.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🎨</div>
-          <h3>Color Picker</h3>
-          <p>Choose any annotation color with a full-spectrum color wheel.</p>
+          <h3 data-i18n="feature.colorPicker.title">Color Picker</h3>
+          <p data-i18n="feature.colorPicker.text">Choose any annotation color with a full-spectrum color wheel.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📏</div>
-          <h3>Line Width</h3>
-          <p>Adjust stroke thickness from 2px to 15px for just the right emphasis.</p>
+          <h3 data-i18n="feature.lineWidth.title">Line Width</h3>
+          <p data-i18n="feature.lineWidth.text">Adjust stroke thickness from 2px to 15px for just the right emphasis.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">✂️</div>
-          <h3>Area Selection</h3>
-          <p>Select exactly the area you want to capture — no more cropping afterwards.</p>
+          <h3 data-i18n="feature.areaSelection.title">Area Selection</h3>
+          <p data-i18n="feature.areaSelection.text">Select exactly the area you want to capture — no more cropping afterwards.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">💾</div>
-          <h3>Save & Copy</h3>
-          <p>One click saves to Downloads and copies to clipboard simultaneously.</p>
+          <h3 data-i18n="feature.saveCopy.title">Save & Copy</h3>
+          <p data-i18n="feature.saveCopy.text">One click saves to Downloads and copies to clipboard simultaneously.</p>
         </div>
       </div>
     </div>
@@ -228,8 +260,8 @@
   <!-- ═══════════════════ DOWNLOAD ═══════════════════ -->
   <section id="download" class="download">
     <div class="container">
-      <h2 class="section-title">Download FeatherShot</h2>
-      <p class="section-sub">Free and open source. Pick your platform.</p>
+      <h2 class="section-title" data-i18n="download.title">Download FeatherShot</h2>
+      <p class="section-sub" data-i18n="download.sub">Free and open source. Pick your platform.</p>
 
       <div class="install-commands">
         <div class="install-command">
@@ -237,7 +269,7 @@
           <div class="install-command-row">
             <code>choco install feathershot</code>
             <button type="button" class="copy-btn" data-copy="choco install feathershot"
-              aria-label="Copy Windows install command">
+              aria-label="Copy Windows install command" data-i18n-label="download.copyWindows">
               <svg class="copy-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" aria-hidden="true">
                 <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -255,7 +287,7 @@
           <div class="install-command-row">
             <code>brew install --cask KurtStevenK/tap/feathershot</code>
             <button type="button" class="copy-btn" data-copy="brew install --cask KurtStevenK/tap/feathershot"
-              aria-label="Copy macOS install command">
+              aria-label="Copy macOS install command" data-i18n-label="download.copyMacos">
               <svg class="copy-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2" aria-hidden="true">
                 <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -271,13 +303,13 @@
         <div class="install-command">
           <span class="install-command-label">Arch Linux</span>
           <div class="install-command-stack">
-            <p class="install-command-note">See <a
+            <p class="install-command-note" data-i18n="download.noteArch">See <a
                 href="https://github.com/KurtStevenK/FeatherShot/blob/main/packaging/arch/README.md">pacman repo setup</a>, then:
             </p>
             <div class="install-command-row">
               <code>pacman -S feathershot</code>
               <button type="button" class="copy-btn" data-copy="pacman -S feathershot"
-                aria-label="Copy Arch Linux install command">
+                aria-label="Copy Arch Linux install command" data-i18n-label="download.copyArch">
                 <svg class="copy-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2" aria-hidden="true">
                   <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -294,13 +326,13 @@
         <div class="install-command">
           <span class="install-command-label">Debian/Ubuntu</span>
           <div class="install-command-stack">
-            <p class="install-command-note">See <a
+            <p class="install-command-note" data-i18n="download.noteDebian">See <a
                 href="https://github.com/KurtStevenK/FeatherShot/blob/main/packaging/apt/README.md">APT setup</a>, then:
             </p>
             <div class="install-command-row">
               <code>apt-get install feathershot</code>
               <button type="button" class="copy-btn" data-copy="apt-get install feathershot"
-                aria-label="Copy Debian/Ubuntu install command">
+                aria-label="Copy Debian/Ubuntu install command" data-i18n-label="download.copyDebian">
                 <svg class="copy-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2" aria-hidden="true">
                   <rect x="9" y="9" width="13" height="13" rx="2" />
@@ -327,14 +359,14 @@
             </svg>
           </div>
           <h3>macOS</h3>
-          <span class="download-format">.dmg — Native Swift App</span>
-          <span class="download-req">macOS 14 (Sonoma) or later</span>
+          <span class="download-format" data-i18n="download.macFormat">.dmg — Native Swift App</span>
+          <span class="download-req" data-i18n="download.macReq">macOS 14 (Sonoma) or later</span>
           <span class="vt-check" role="link" tabindex="0" data-asset="macos_dmg"
             data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
               <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Checked by VirusTotal
+            <span data-i18n="download.vt">Checked by VirusTotal</span>
           </span>
         </a>
 
@@ -346,14 +378,14 @@
             </svg>
           </div>
           <h3>Windows</h3>
-          <span class="download-format">.exe — Installer or Portable, or .msi</span>
-          <span class="download-req">Windows 10 or later</span>
+          <span class="download-format" data-i18n="download.winFormat">.exe — Installer or Portable, or .msi</span>
+          <span class="download-req" data-i18n="download.winReq">Windows 10 or later</span>
           <span class="vt-check" role="link" tabindex="0" data-asset="windows_exe"
             data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
               <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Checked by VirusTotal
+            <span data-i18n="download.vt">Checked by VirusTotal</span>
           </span>
         </a>
 
@@ -365,14 +397,14 @@
             </svg>
           </div>
           <h3>Linux</h3>
-          <span class="download-format">.deb / .AppImage / pacman (Arch)</span>
-          <span class="download-req">Debian, Ubuntu, Arch, Fedora</span>
+          <span class="download-format" data-i18n="download.linuxFormat">.deb / .AppImage / pacman (Arch)</span>
+          <span class="download-req" data-i18n="download.linuxReq">Debian, Ubuntu, Arch, Fedora</span>
           <span class="vt-check" role="link" tabindex="0" data-asset="linux_deb"
             data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
               <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Checked by VirusTotal
+            <span data-i18n="download.vt">Checked by VirusTotal</span>
           </span>
         </a>
 
@@ -383,15 +415,15 @@
                 d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0112 6.545h10.691A12 12 0 0012 0zM1.931 5.47A11.943 11.943 0 000 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 01-6.865-2.29zm13.342 2.166a5.446 5.446 0 011.45 7.09l.002.001h-.002l-3.953 6.848c.497.048 1.002.075 1.512.08 6.47.048 11.718-5.14 11.718-11.594 0-.215-.006-.43-.018-.644z" />
             </svg>
           </div>
-          <h3>Chrome Extension</h3>
-          <span class="download-format">Browser Extension</span>
-          <span class="download-req">Chrome, Edge, Brave, Arc</span>
+          <h3 data-i18n="download.chromeName">Chrome Extension</h3>
+          <span class="download-format" data-i18n="download.chromeFormat">Browser Extension</span>
+          <span class="download-req" data-i18n="download.chromeReq">Chrome, Edge, Brave, Arc</span>
           <span class="vt-check" role="link" tabindex="0" data-asset="chrome_zip"
             data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
               <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Checked by VirusTotal
+            <span data-i18n="download.vt">Checked by VirusTotal</span>
           </span>
         </a>
 
@@ -403,14 +435,14 @@
             </svg>
           </div>
           <h3>Android</h3>
-          <span class="download-format">.apk — also for Huawei phones</span>
-          <span class="download-req">Android 10 or later, no Google services needed</span>
+          <span class="download-format" data-i18n="download.androidFormat">.apk — also for Huawei phones</span>
+          <span class="download-req" data-i18n="download.androidReq">Android 10 or later, no Google services needed</span>
           <span class="vt-check" role="link" tabindex="0" data-asset="android_apk"
             data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
               <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            Checked by VirusTotal
+            <span data-i18n="download.vt">Checked by VirusTotal</span>
           </span>
         </a>
       </div>
@@ -423,17 +455,17 @@
             </svg>
           </span>
           <span class="extra-text">
-            <strong>Windows for companies</strong>
-            <span>.msi package for all users. Works with Group Policy and Intune.</span>
+            <strong data-i18n="download.msiTitle">Windows for companies</strong>
+            <span data-i18n="download.msiText">.msi package for all users. Works with Group Policy and Intune.</span>
             <span class="vt-check" role="link" tabindex="0" data-asset="windows_msi"
               data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                 aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
                 <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-              Checked by VirusTotal
+              <span data-i18n="download.vt">Checked by VirusTotal</span>
             </span>
           </span>
-          <span class="extra-action">Download .msi</span>
+          <span class="extra-action" data-i18n="download.msiAction">Download .msi</span>
         </a>
 
         <a class="extra-card" href="https://snapcraft.io/feathershot" target="_blank" rel="noopener">
@@ -444,27 +476,27 @@
             </svg>
           </span>
           <span class="extra-text">
-            <strong>Ubuntu and other Linux</strong>
-            <span>Install from the Snap Store and get updates automatically.</span>
+            <strong data-i18n="download.snapTitle">Ubuntu and other Linux</strong>
+            <span data-i18n="download.snapText">Install from the Snap Store and get updates automatically.</span>
             <span class="vt-check" role="link" tabindex="0" data-asset="linux_snap"
               data-href="https://github.com/KurtStevenK/FeatherShot/releases/latest">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                 aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3z" />
                 <path d="M8.5 12l2.5 2.5 4.5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
-              Snap file checked by VirusTotal
+              <span data-i18n="download.vtSnap">Snap file checked by VirusTotal</span>
             </span>
           </span>
-          <img class="extra-badge" src="snap-store-badge.svg" width="143" height="44" alt="Get it from the Snap Store">
+          <img class="extra-badge" src="snap-store-badge.svg" width="143" height="44" alt="Get it from the Snap Store" data-i18n-alt="alt.snapStore" data-badge="snap-store">
         </a>
       </div>
 
       <details class="verify" id="verify">
         <summary>
           <span class="verify-shield" aria-hidden="true">🛡️</span>
-          How to check that your download really comes from us
+          <span data-i18n="verify.summary">How to check that your download really comes from us</span>
         </summary>
         <div class="verify-body">
-          <p>
+          <p data-i18n="verify.intro">
             Every FeatherShot release is built by GitHub Actions from the public source code. The files on GitHub
             and on our download mirror are exactly the same, so they have the same <strong>SHA-256 fingerprint</strong>.
             After each release, GitHub Actions also uploads every file to <strong>VirusTotal</strong>, where more than
@@ -473,146 +505,144 @@
           </p>
 
           <label class="verify-pick">
-            Which file did you download?
+            <span data-i18n="verify.pick">Which file did you download?</span>
             <select id="verify-file"></select>
           </label>
 
-          <h4>Step 1: the official fingerprint</h4>
-          <p class="verify-cmd-label">The SHA-256 fingerprint of <code class="v-file">the file</code> from our release:</p>
+          <h4 data-i18n="verify.step1">Step 1: the official fingerprint</h4>
+          <p class="verify-cmd-label" data-i18n="verify.step1Text">The SHA-256 fingerprint of <code class="v-file">the file</code> from our release:</p>
           <div class="install-command-row">
-            <code id="verify-hash">Loading…</code>
-            <button type="button" class="copy-btn" id="verify-hash-copy" data-copy="" aria-label="Copy fingerprint"></button>
+            <code id="verify-hash" data-i18n="verify.hashLoading">Loading…</code>
+            <button type="button" class="copy-btn" id="verify-hash-copy" data-copy="" aria-label="Copy fingerprint" data-i18n-label="common.copyFingerprint"></button>
           </div>
-          <p class="verify-links">
-            <a id="verify-vt" href="https://github.com/KurtStevenK/FeatherShot/releases/latest" target="_blank" rel="noopener">VirusTotal report for this file</a>
+          <p class="verify-links" data-i18n="verify.links"><a id="verify-vt" href="https://github.com/KurtStevenK/FeatherShot/releases/latest" target="_blank" rel="noopener">VirusTotal report for this file</a>
             ·
             <a href="https://github.com/KurtStevenK/FeatherShot/releases/latest" target="_blank" rel="noopener">the same fingerprint on GitHub</a>
-            (shown as <code>sha256:</code> next to each file)
-          </p>
+            (shown as <code>sha256:</code> next to each file)</p>
 
-          <h4>Step 2: the fingerprint of your file</h4>
-          <p>Run these commands one after the other. Each line has its own copy button.</p>
-          <div class="verify-tabs" role="tablist" aria-label="Operating system">
+          <h4 data-i18n="verify.step2">Step 2: the fingerprint of your file</h4>
+          <p data-i18n="verify.step2Intro">Run these commands one after the other. Each line has its own copy button.</p>
+          <div class="verify-tabs" role="tablist" aria-label="Operating system" data-i18n-label="verify.osLabel">
             <button type="button" role="tab" data-os="windows">Windows</button>
             <button type="button" role="tab" data-os="macos">macOS</button>
             <button type="button" role="tab" data-os="linux">Linux</button>
           </div>
           <div class="verify-os" data-os="windows">
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Open PowerShell (Start menu, type <em>PowerShell</em>) and go to your Downloads folder:</p>
+              <p class="verify-cmd-label" data-i18n="verify.psCd">Open PowerShell (Start menu, type <em>PowerShell</em>) and go to your Downloads folder:</p>
               <div class="install-command-row">
                 <code data-tpl="cd $HOME\Downloads">cd $HOME\Downloads</code>
-                <button type="button" class="copy-btn" data-copy="cd $HOME\Downloads" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="cd $HOME\Downloads" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <p class="verify-cmd-label" data-i18n="verify.psHash">Show the fingerprint of the file:</p>
               <div class="install-command-row">
                 <code data-tpl="(Get-FileHash .\{file} -Algorithm SHA256).Hash">(Get-FileHash .\{file} -Algorithm SHA256).Hash</code>
-                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Or let PowerShell compare it for you. It prints <strong>True</strong> when the file is ours:</p>
+              <p class="verify-cmd-label" data-i18n="verify.psCompare">Or let PowerShell compare it for you. It prints <strong>True</strong> when the file is ours:</p>
               <div class="install-command-row">
                 <code data-tpl="(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;">(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;</code>
-                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="(Get-FileHash .\{file} -Algorithm SHA256).Hash -eq &quot;{hash}&quot;" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
           </div>
           <div class="verify-os" data-os="macos">
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Open Terminal (Spotlight, type <em>Terminal</em>) and go to your Downloads folder:</p>
+              <p class="verify-cmd-label" data-i18n="verify.macCd">Open Terminal (Spotlight, type <em>Terminal</em>) and go to your Downloads folder:</p>
               <div class="install-command-row">
                 <code data-tpl="cd ~/Downloads">cd ~/Downloads</code>
-                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <p class="verify-cmd-label" data-i18n="verify.macHash">Show the fingerprint of the file:</p>
               <div class="install-command-row">
                 <code data-tpl="shasum -a 256 {file}">shasum -a 256 {file}</code>
-                <button type="button" class="copy-btn" data-copy="shasum -a 256 {file}" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="shasum -a 256 {file}" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Or let Terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
+              <p class="verify-cmd-label" data-i18n="verify.macCompare">Or let Terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
               <div class="install-command-row">
                 <code data-tpl="echo &quot;{hash}  {file}&quot; | shasum -a 256 -c">echo &quot;{hash}  {file}&quot; | shasum -a 256 -c</code>
-                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | shasum -a 256 -c" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | shasum -a 256 -c" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
           </div>
           <div class="verify-os" data-os="linux">
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Open a terminal and go to your Downloads folder:</p>
+              <p class="verify-cmd-label" data-i18n="verify.linuxCd">Open a terminal and go to your Downloads folder:</p>
               <div class="install-command-row">
                 <code data-tpl="cd ~/Downloads">cd ~/Downloads</code>
-                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="cd ~/Downloads" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Show the fingerprint of the file:</p>
+              <p class="verify-cmd-label" data-i18n="verify.linuxHash">Show the fingerprint of the file:</p>
               <div class="install-command-row">
                 <code data-tpl="sha256sum {file}">sha256sum {file}</code>
-                <button type="button" class="copy-btn" data-copy="sha256sum {file}" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="sha256sum {file}" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Or let the terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
+              <p class="verify-cmd-label" data-i18n="verify.linuxCompare">Or let the terminal compare it for you. It prints <strong><span class="v-file">the file</span>: OK</strong> when the file is ours:</p>
               <div class="install-command-row">
                 <code data-tpl="echo &quot;{hash}  {file}&quot; | sha256sum -c">echo &quot;{hash}  {file}&quot; | sha256sum -c</code>
-                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | sha256sum -c" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="echo &quot;{hash}  {file}&quot; | sha256sum -c" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
           </div>
-          <p>If the two fingerprints are different, do not open the file. Delete it and download it again from this page.</p>
+          <p data-i18n="verify.mismatch">If the two fingerprints are different, do not open the file. Delete it and download it again from this page.</p>
 
-          <h4>Step 3 (optional): proof that GitHub built it from our code</h4>
-          <p>
+          <h4 data-i18n="verify.step3">Step 3 (optional): proof that GitHub built it from our code</h4>
+          <p data-i18n="verify.step3Text">
             From version 1.3.49 on, GitHub signs every release file with a build attestation. It proves that the file
             was built by the FeatherShot workflow in
             <a href="https://github.com/KurtStevenK/FeatherShot">github.com/KurtStevenK/FeatherShot</a> and was not
             changed afterwards, whether you downloaded it from GitHub or from our mirror.
           </p>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Windows: install the GitHub CLI:</p>
+              <p class="verify-cmd-label" data-i18n="verify.winCli">Windows: install the GitHub CLI:</p>
               <div class="install-command-row">
                 <code data-tpl="winget install --id GitHub.cli">winget install --id GitHub.cli</code>
-                <button type="button" class="copy-btn" data-copy="winget install --id GitHub.cli" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="winget install --id GitHub.cli" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">macOS: install the GitHub CLI:</p>
+              <p class="verify-cmd-label" data-i18n="verify.macCli">macOS: install the GitHub CLI:</p>
               <div class="install-command-row">
                 <code data-tpl="brew install gh">brew install gh</code>
-                <button type="button" class="copy-btn" data-copy="brew install gh" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="brew install gh" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Debian or Ubuntu: install the GitHub CLI:</p>
+              <p class="verify-cmd-label" data-i18n="verify.debCli">Debian or Ubuntu: install the GitHub CLI:</p>
               <div class="install-command-row">
                 <code data-tpl="sudo apt install gh">sudo apt install gh</code>
-                <button type="button" class="copy-btn" data-copy="sudo apt install gh" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="sudo apt install gh" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">Sign in to GitHub once (a free account is enough):</p>
+              <p class="verify-cmd-label" data-i18n="verify.ghLogin">Sign in to GitHub once (a free account is enough):</p>
               <div class="install-command-row">
                 <code data-tpl="gh auth login">gh auth login</code>
-                <button type="button" class="copy-btn" data-copy="gh auth login" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="gh auth login" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
             <div class="verify-cmd">
-              <p class="verify-cmd-label">In your Downloads folder, check the file. It prints <strong>Verification succeeded!</strong> when GitHub built it from our code:</p>
+              <p class="verify-cmd-label" data-i18n="verify.ghCheck">In your Downloads folder, check the file. It prints <strong>Verification succeeded!</strong> when GitHub built it from our code:</p>
               <div class="install-command-row">
                 <code data-tpl="gh attestation verify {file} --repo KurtStevenK/FeatherShot">gh attestation verify {file} --repo KurtStevenK/FeatherShot</code>
-                <button type="button" class="copy-btn" data-copy="gh attestation verify {file} --repo KurtStevenK/FeatherShot" aria-label="Copy command"></button>
+                <button type="button" class="copy-btn" data-copy="gh attestation verify {file} --repo KurtStevenK/FeatherShot" aria-label="Copy command" data-i18n-label="common.copy"></button>
               </div>
             </div>
 
-          <h4>Step 4 (optional): look it up on VirusTotal yourself</h4>
-          <p>
+          <h4 data-i18n="verify.step4">Step 4 (optional): look it up on VirusTotal yourself</h4>
+          <p data-i18n="verify.step4Text">
             Open <a href="https://www.virustotal.com/" target="_blank" rel="noopener">virustotal.com</a>, choose
             <em>Search</em> and paste the fingerprint from step 1. You see the scan results for our file without
             uploading anything.
@@ -630,13 +660,14 @@
           <img src="icon_1024.png" alt="FeatherShot" width="28" height="28">
           <span>FeatherShot</span>
         </div>
-        <p><a href="/privacy">Privacy</a> · <a href="/marketing">Press kit</a> · MIT License</p>
-        <p>Copyright © 2026 <a href="https://github.com/KurtStevenK">Kurt Steven Kainzmayer</a></p>
+        <p data-i18n="footer.linksMit"><a href="/privacy">Privacy</a> · <a href="/marketing">Press kit</a> · MIT License</p>
+        <p data-i18n="footer.copyright">Copyright © 2026 <a href="https://github.com/KurtStevenK">Kurt Steven Kainzmayer</a></p>
       </div>
     </div>
   </footer>
 
-  <script src="site.js?v=1.3.51" defer></script>
+  <script src="i18n.js?v=1.3.51-i18n" defer></script>
+  <script src="site.js?v=1.3.51-i18n" defer></script>
 </body>
 
 </html>

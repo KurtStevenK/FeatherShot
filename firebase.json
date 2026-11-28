@@ -28,6 +28,24 @@
         ]
       },
       {
+        "source": "/badges/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
+      },
+      {
+        "source": "/i18n/*.json",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          }
+        ]
+      },
+      {
         "source": "**/*.@(png|jpg|jpeg|gif|webp|ico)",
         "headers": [
           {
