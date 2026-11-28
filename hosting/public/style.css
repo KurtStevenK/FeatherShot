@@ -1103,3 +1103,17 @@ body {
     animation: fadeInUp 0.6s ease;
   }
 }
+
+/* Store badges in the footer: one line when the screen is wide enough, wrapping on narrow screens. */
+.footer-stores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.footer-stores .hero-cws img {
+  height: 44px;
+}
