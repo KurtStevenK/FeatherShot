@@ -14,14 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The home page lists every platform: iPhone, iPhone Duo, iPad, Apple Watch, macOS, Windows, Linux, Android and Chrome.
 - Dashed Line in the feature list, next to Line.
 - Black Friday badge from Friday 27 November 2026, switching to Cyber Monday from Monday 30 November 2026, hidden from Tuesday 1 December 2026, 00:01 (Vienna time).
+- Event badges on the home page and the linktree, one at a time: a public holiday of the visitor's country on its day (27 countries, names in the country's language), otherwise Black Friday and Cyber Monday. The linktree ends Cyber Monday on Thursday 3 December 2026, 00:01 (Vienna time); the home page on Tuesday 1 December.
 
 ### Changed
 
 - The feature icons on the home page are SVG drawings. Each draws once when its card scrolls into view, and its colour cycles slowly through neon tones. Reduced-motion settings turn the animation off.
 
 - The store badges moved from the hero to the footer, where they sit on one line on wide screens and wrap on phones.
-- The store badges and the platform pills glow in cycling neon colours, and each badge has a light sweep. Behind the footer badges a WebGL neon aurora is drawn. All of it is switched off with reduced-motion settings, and the aurora also when WebGL is not available.
-- Each feature icon has a WebGL neon halo with a slow rim light, drawn on one canvas for the whole grid. It is off with reduced-motion settings and without WebGL.
+- The store badges glow in cycling neon colours, and each badge has a light sweep. Behind the footer badges a WebGL neon aurora is drawn. All of it is switched off with reduced-motion settings, and the aurora also when WebGL is not available.
+- Each feature icon has a WebGL neon halo with a slow rim light, drawn on one canvas for the whole grid. It shows only while the mouse is over its card, and it is off with reduced-motion settings and without WebGL.
 
 ### Fixed
 

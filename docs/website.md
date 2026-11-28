@@ -32,7 +32,7 @@ The website is the static site in `hosting/public`. It is plain HTML, CSS and Ja
 
 ## Promo badge (Black Friday / Cyber Monday)
 
-- `promo.js` holds the three moments, in Vienna time (CET, UTC+1 in late November), as fixed instants:
+- `events.js` holds the promo moments, in Vienna time (CET, UTC+1 in late November), as fixed instants:
   - Black Friday from Friday 27 November 2026, 00:00;
   - Cyber Monday from Monday 30 November 2026, 00:00;
   - hidden from Tuesday 1 December 2026, 00:01.
@@ -71,11 +71,22 @@ firebase deploy --only hosting --project feathershot
 ## Store badges, platform pills and the footer aurora
 
 - The four store badges are in the footer (`.footer-stores` in `index.html`). They wrap onto two lines on phones.
-- The badges and the platform pills share the neon colour cycle of the feature icons (`fs-neon`). Each badge also has a light sweep (`fs-shine` on `::after`).
+- The badges share the neon colour cycle of the feature icons (`fs-neon`). The platform pills stay grey. Each badge also has a light sweep (`fs-shine` on `::after`).
 - `stores-glow.js` draws a WebGL aurora behind the footer badges. It runs only while the badges are on screen. It does nothing with reduced motion or when WebGL is missing, so the CSS effects still show.
 
 ## Neon halos on the feature icons (icons-glow.js)
 
-- One WebGL canvas covers the features grid. Each frame it draws a small quad around every icon that is on screen, using the icon's current neon colour (read from the `fs-neon` animation), so the shader only works around the icons.
+- One WebGL canvas covers the features grid. Each frame it draws a small quad around every icon whose card the mouse is over (the halo eases in and out), using the icon's current neon colour (read from the `fs-neon` animation), so the shader only works around the icons.
 - The canvas sits above the card backgrounds and below the icon tiles and the card text (`style.css`). The card hover lift uses `top`, not `transform`, so the halo stays visible when a card is hovered.
 - It runs at about 30 frames a second, caps the pixel ratio at 1.5, and runs only while the grid is on screen. It is off with reduced motion and without WebGL.
+
+## Event badges and public holidays (events.js)
+
+- `events.js` decides the badge on the home page and on the linktree, one badge at a time. The badge styles are in `promo.css`.
+- Priority: a public holiday of the visitor's country on that day (in the country's own time zone) comes first, otherwise the promo event (Black Friday, Cyber Monday) by its instants.
+- The country comes from the chosen language and the browser's region for it (`de-CH` gives Switzerland). Without a region, the language's own country is used (`de` gives Austria). Languages without a country (English, Irish, Arabic, ...) show no holidays.
+- Holiday rules: `MM-DD` is a fixed date, `E+n` is Western Easter plus n days, `O+n` is Orthodox Easter plus n days. Bulgaria, Greece, Romania, Russia and Ukraine use the Orthodox Easter.
+- The table is generated: `node scripts/generate-holidays.mjs` writes the COUNTRIES block of `events.js` and the names in `holidays/en.json` and `holidays/<lang>.json` (keys `CC.id`). Change the generator, not the generated block. Then run `node scripts/check-website-i18n.mjs`.
+- The linktree sets the end of Cyber Monday with `data-cyber-until` on its badge (currently Thursday 3 December 2026, 00:01 Vienna time). The home page uses the default end (Tuesday 1 December 2026, 00:01).
+- Not included: lunar holidays (Eid, Chinese New Year, Ramadan, ...) and weekday-based bank holidays (for example the first Monday of May). Add them to the generator with a new rule type if needed.
+- The holiday names are machine-made in every language except English; they need a native check.

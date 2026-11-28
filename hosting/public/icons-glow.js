@@ -206,6 +206,7 @@
   const data = new Float32Array(MAX_ICONS * 6 * FLOATS);
   const colors = icons.map(() => [0, 0.94, 1]);
   const fadeFrom = icons.map(() => -1);
+  const hover = icons.map(() => 0); // 0 to 1: eases towards 1 while the mouse is over the card
   const seeds = icons.map((_, i) => ((i * 0.618034) % 1) + 0.13);
 
   // Canvas size in CSS px, its drawing buffer size, and the top of its window inside the grid.
@@ -308,14 +309,18 @@
       const ext = half + REACH;
       if (r.bottom + REACH < 0 || r.top - REACH > vh) continue; // off screen
 
+      // The halo shows only while the mouse is over its card: it eases in and out.
+      const card = icon.parentElement;
+      hover[i] += ((card.matches(':hover') ? 1 : 0) - hover[i]) * 0.3;
+
       // The halo fades in once the card has drawn its icon (site.js adds .is-in).
-      if (fadeFrom[i] < 0 && (!animated || icon.parentElement.classList.contains('is-in'))) {
+      if (fadeFrom[i] < 0 && (!animated || card.classList.contains('is-in'))) {
         fadeFrom[i] = animated ? now + 300 : now - 2000;
       }
       if (fadeFrom[i] < 0) continue;
       const k = Math.min(1, Math.max(0, (now - fadeFrom[i]) / 1400));
-      const fade = k * k * (3 - 2 * k);
-      if (fade <= 0) continue;
+      const fade = k * k * (3 - 2 * k) * hover[i];
+      if (fade <= 0.002) continue;
 
       readColor(icon, colors[i]);
       const cx = r.left + half - originX;

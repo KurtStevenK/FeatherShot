@@ -90,6 +90,37 @@ for (const key of enKeys) {
   }
 }
 
+// Holidays (events.js): names per language, and the country table
+const holidayDir = path.join(root, "holidays");
+const holidayEn = JSON.parse(fs.readFileSync(path.join(holidayDir, "en.json"), "utf8"));
+const holidayLangs = fs.readdirSync(holidayDir).filter((f) => f.endsWith(".json") && f !== "en.json").map((f) => f.slice(0, -5));
+for (const key of Object.keys(holidayEn)) {
+  if (!/^[A-Z]{2}\.[a-z0-9_]+$/.test(key)) errors.push(`holidays/en.json: bad key "${key}"`);
+}
+const holidayDict = {};
+for (const lang of holidayLangs) {
+  const dict = JSON.parse(fs.readFileSync(path.join(holidayDir, `${lang}.json`), "utf8"));
+  holidayDict[lang] = dict;
+  for (const [key, value] of Object.entries(dict)) {
+    if (!(key in holidayEn)) errors.push(`holidays/${lang}.json: ${key} is not in holidays/en.json`);
+    if (typeof value !== "string" || !value.trim()) errors.push(`holidays/${lang}.json: ${key} is empty`);
+  }
+}
+const eventsSrc = fs.readFileSync(path.join(root, "events.js"), "utf8");
+let countries = 0;
+for (const m of eventsSrc.matchAll(/^  ([A-Z]{2}): \{ lang: '([a-z]{2})', tz: '([^']+)', days: \[(.*)\] \},$/gm)) {
+  countries++;
+  const [, cc, lang, , daysText] = m;
+  if (!holidayLangs.includes(lang)) errors.push(`events.js: ${cc} uses language "${lang}" with no holidays/${lang}.json`);
+  for (const d of daysText.matchAll(/\['([^']+)', '([^']+)'\]/g)) {
+    const [, id, rule] = d;
+    if (!/^(\d\d-\d\d|[EO](?:[+-]\d+)?)$/.test(rule)) errors.push(`events.js: ${cc}.${id} has a bad rule "${rule}"`);
+    if (!(`${cc}.${id}` in holidayEn)) errors.push(`holidays/en.json is missing ${cc}.${id}`);
+    if (holidayLangs.includes(lang) && !(`${cc}.${id}` in holidayDict[lang])) errors.push(`holidays/${lang}.json is missing ${cc}.${id}`);
+  }
+}
+if (countries !== 27) errors.push(`events.js: ${countries} countries found, expected 27`);
+
 for (const w of warnings) console.log(`warning: ${w}`);
 for (const e of errors) console.log(`error: ${e}`);
 console.log(`${enKeys.length} keys, ${expected.length} translations, ${errors.length} errors, ${warnings.length} warnings`);

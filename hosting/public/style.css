@@ -1027,12 +1027,13 @@ body {
   84% { color: #0096ff; }
 }
 
-.feature-icon {
+/* The glow only while the mouse is over the card (the halo in icons-glow.js follows the same rule). */
+.feature-card:hover .feature-icon {
   animation: fs-neon 12s linear infinite;
   box-shadow: 0 0 18px -4px currentColor;
 }
 
-.feature-icon svg {
+.feature-card:hover .feature-icon svg {
   filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 7px currentColor);
 }
 
@@ -1054,70 +1055,6 @@ body {
   }
 }
 
-/* ═══════════════════ PROMO BADGE (Black Friday / Cyber Monday) ═══════════════════ */
-/* promo.js shows it only inside its time window. */
-.promo-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding: 6px 16px;
-  border-radius: 100px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  animation: fadeInUp 0.6s ease;
-}
-
-.promo-badge[hidden] {
-  display: none;
-}
-
-/* Black Friday: black with gold. */
-.promo-badge[data-promo='black-friday'] {
-  background: #0b0b0f;
-  color: #f5d36b;
-  border: 1px solid rgba(245, 211, 107, 0.55);
-  box-shadow: 0 0 18px rgba(245, 211, 107, 0.2);
-}
-
-/* Cyber Monday: neon gradient that drifts slowly. */
-.promo-badge[data-promo='cyber-monday'] {
-  color: #0a0a1a;
-  border: none;
-  background: linear-gradient(90deg, #00f0ff, #b26bff, #ff2bd6, #00f0ff);
-  background-size: 300% 100%;
-  box-shadow: 0 0 22px rgba(178, 107, 255, 0.5);
-  animation: promo-drift 8s linear infinite, fadeInUp 0.6s ease;
-}
-
-@keyframes promo-drift {
-  to {
-    background-position: 300% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .promo-badge[data-promo='cyber-monday'] {
-    animation: fadeInUp 0.6s ease;
-  }
-}
-
-/* Store badges in the footer: one line when the screen is wide enough, wrapping on narrow screens. */
-.footer-stores {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.footer-stores .hero-cws img {
-  height: 44px;
-}
-
 /* ═══════════════════ NEON STORE BADGES AND PILLS ═══════════════════ */
 /* The colour cycles like the feature icons; the glow follows it (currentColor). */
 .footer-stores {
@@ -1136,8 +1073,7 @@ body {
   pointer-events: none;
 }
 
-.footer-stores .hero-cws,
-.platform-pills .pill {
+.footer-stores .hero-cws {
   animation: fs-neon 12s linear infinite;
   box-shadow: 0 0 16px -2px currentColor;
 }
@@ -1146,12 +1082,6 @@ body {
   box-shadow: 0 0 22px 2px currentColor, 0 0 6px currentColor;
 }
 
-.platform-pills .pill {
-  color: #00f0ff;
-}
-
-.platform-pills .pill:nth-child(3n + 2) { animation-delay: -4s; }
-.platform-pills .pill:nth-child(3n + 3) { animation-delay: -8s; }
 
 /* A light sweep across each badge, like light on glass. */
 .footer-stores .hero-cws {
@@ -1180,8 +1110,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .footer-stores .hero-cws,
-  .platform-pills .pill {
+  .footer-stores .hero-cws {
     animation: none;
   }
 
