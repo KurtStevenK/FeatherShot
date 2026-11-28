@@ -73,3 +73,9 @@ firebase deploy --only hosting --project feathershot
 - The four store badges are in the footer (`.footer-stores` in `index.html`). They wrap onto two lines on phones.
 - The badges and the platform pills share the neon colour cycle of the feature icons (`fs-neon`). Each badge also has a light sweep (`fs-shine` on `::after`).
 - `stores-glow.js` draws a WebGL aurora behind the footer badges. It runs only while the badges are on screen. It does nothing with reduced motion or when WebGL is missing, so the CSS effects still show.
+
+## Neon halos on the feature icons (icons-glow.js)
+
+- One WebGL canvas covers the features grid. Each frame it draws a small quad around every icon that is on screen, using the icon's current neon colour (read from the `fs-neon` animation), so the shader only works around the icons.
+- The canvas sits above the card backgrounds and below the icon tiles and the card text (`style.css`). The card hover lift uses `top`, not `transform`, so the halo stays visible when a card is hovered.
+- It runs at about 30 frames a second, caps the pixel ratio at 1.5, and runs only while the grid is on screen. It is off with reduced motion and without WebGL.

@@ -1189,3 +1189,46 @@ body {
     display: none;
   }
 }
+
+/* ═══════════════════ FEATURE ICONS: WEBGL NEON HALO (icons-glow.js) ═══════════════════ */
+/* One WebGL canvas over the features grid draws a soft neon halo, a rim light and a slow light
+   sweep around every icon tile. It sits above the card backgrounds but below the icon tiles and
+   the card text, so the text stays crisp. Without WebGL or with reduced motion there is no canvas
+   and these rules change nothing visible. */
+.features {
+  position: relative;
+  isolation: isolate;
+}
+
+.icons-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.feature-card {
+  position: relative;
+  top: 0;
+}
+
+/* Lift on hover with top instead of transform: a transform would make the card its own layer and
+   hide the halo under the card background. Same 4 px lift, same transition. */
+.feature-card:hover {
+  transform: none;
+  top: -4px;
+}
+
+.feature-icon,
+.feature-card h3,
+.feature-card p {
+  position: relative;
+  z-index: 2;
+}
+
+/* The footer aurora canvas (stores-glow.js) reaches 48 px past the badges; on a phone that is past
+   the screen edge and made the page 24 px wider than the screen. Clip it at the footer edges. */
+.footer {
+  overflow-x: clip;
+}
